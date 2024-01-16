@@ -4,8 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import com.cc221013.bookify.Book
-import com.cc221013.bookify.ui.BccStudent
+import com.cc221013.bookify.ui.Book
 
 
 class DatabaseHandler(context: Context) : SQLiteOpenHelper(context, dbName, null, 1) {
@@ -130,7 +129,8 @@ class DatabaseHandler(context: Context) : SQLiteOpenHelper(context, dbName, null
                 days >= 0 &&
                 mediaType >= 0
                 )
-                allBooks.add(Book(
+                allBooks.add(
+                    Book(
                     cursor.getString(titleID),
                     cursor.getString(author),
                     cursor.getString(genre),
@@ -144,7 +144,8 @@ class DatabaseHandler(context: Context) : SQLiteOpenHelper(context, dbName, null
                     cursor.getInt(pages),
                     cursor.getInt(days),
                     cursor.getString(mediaType),
-                    cursor.getInt(idID)))
+                    cursor.getInt(idID))
+                )
         }
 
         return allBooks.toList()

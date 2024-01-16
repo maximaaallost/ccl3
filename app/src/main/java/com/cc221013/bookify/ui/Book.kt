@@ -1,4 +1,4 @@
-package com.cc221013.bookify
+package com.cc221013.bookify.ui
 
 data class Book (
     val title: String,

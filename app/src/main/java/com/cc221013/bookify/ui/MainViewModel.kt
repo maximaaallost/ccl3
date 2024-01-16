@@ -1,7 +1,6 @@
 package com.cc221013.bookify.ui
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.cc221013.bookify.data.DatabaseHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,31 +11,31 @@ class MainViewModel(private val db: DatabaseHandler): ViewModel() {
     private val _mainViewState = MutableStateFlow(MainViewState())
     val mainViewState: StateFlow<MainViewState> = _mainViewState.asStateFlow()
 
-    fun save(student: BccStudent){
-        db.insertStudent(student)
+    fun save(book: Book){
+        db.insertBook(book)
     }
 
-    fun getStudents() {
-        _mainViewState.update { it.copy(students = db.getStudents()) }
+    fun getBooks() {
+        _mainViewState.update { it.copy(books = db.getBooks()) }
     }
 
     fun selectScreen(screen: Screen){
         _mainViewState.update { it.copy(selectedScreen = screen) }
     }
 
-    fun clickDelete(student: BccStudent){
-        db.deleteStudent(student)
-        getStudents()
+    fun clickDelete(book: Book){
+        db.deleteBook(book)
+        getBooks()
     }
 
-    fun editStudent(student: BccStudent){
-        _mainViewState.update { it.copy(openDialog = true, editStudent = student) }
+    fun editBook(book: Book){
+        _mainViewState.update { it.copy(openDialog = true, editBook = book) }
     }
 
-    fun saveStudent(student: BccStudent){
+    fun saveBook(book: Book){
         _mainViewState.update { it.copy(openDialog = false) }
-        db.updateStudent(student)
-        getStudents()
+        db.updateBook(book)
+        getBooks()
     }
 
     fun dismissDialog(){
