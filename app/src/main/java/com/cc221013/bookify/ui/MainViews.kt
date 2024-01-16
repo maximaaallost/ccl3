@@ -52,8 +52,9 @@ import androidx.navigation.compose.rememberNavController
 import com.cc221013.bookify.R
 
 sealed class Screen(val route: String){
-    object First: Screen("first")
-    object Second: Screen("second")
+    object Read: Screen("first")
+    object TBR: Screen("second")
+    object Wishlist: Screen("third")
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,16 +69,19 @@ fun MainView(mainViewModel: MainViewModel){
         NavHost(
             navController = navController,
             modifier = Modifier.padding(it),
-            startDestination = Screen.First.route
+            startDestination = Screen.Read.route
         ){
-            composable(Screen.First.route){
-                mainViewModel.selectScreen(Screen.First)
-                mainScreen(mainViewModel)
+            composable(Screen.Read.route){
+                mainViewModel.selectScreen(Screen.Read)
+                ReadScreen(mainViewModel)
             }
-            composable(Screen.Second.route){
-                mainViewModel.selectScreen(Screen.Second)
-                mainViewModel.getStudents()
-                displayStudents(mainViewModel)
+            composable(Screen.TBR.route){
+                mainViewModel.selectScreen(Screen.TBR)
+                TBRScreen(mainViewModel)
+            }
+            composable(Screen.Wishlist.route){
+                mainViewModel.selectScreen(Screen.Wishlist)
+                WishlistScreen(mainViewModel)
             }
         }
     }
@@ -89,158 +93,35 @@ fun BottomNavigationBar(navController: NavHostController, selectedScreen: Screen
         backgroundColor = MaterialTheme.colorScheme.primary
     ) {
         NavigationBarItem(
-            selected = (selectedScreen == Screen.First),
-            onClick = { navController.navigate(Screen.First.route) },
+            selected = (selectedScreen == Screen.Read),
+            onClick = { navController.navigate(Screen.Read.route) },
             icon = { Icon(imageVector = Icons.Default.Home, contentDescription = "") })
 
         NavigationBarItem(
-            selected = (selectedScreen == Screen.Second),
-            onClick = { navController.navigate(Screen.Second.route) },
+            selected = (selectedScreen == Screen.TBR),
+            onClick = { navController.navigate(Screen.TBR.route) },
+            icon = { Icon(imageVector = Icons.Default.AccountBox, contentDescription = "") })
+
+        NavigationBarItem(
+            selected = (selectedScreen == Screen.Wishlist),
+            onClick = { navController.navigate(Screen.Wishlist.route) },
             icon = { Icon(imageVector = Icons.Default.AccountBox, contentDescription = "") })
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun mainScreen(mainViewModel: MainViewModel){
-    var name by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
-    var uid by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
-
-    Column (
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = stringResource(R.string.mainscreen_title),
-            fontSize = 50.sp,
-            style = TextStyle(fontFamily = FontFamily.Cursive)
-        )
-
-        Image(
-            painter = painterResource(id = R.drawable.ic_launcher_foreground),
-            contentDescription = stringResource(R.string.decorative_android_icon)
-        )
-
-        Spacer(
-            modifier = Modifier.height(50.dp)
-        )
-
-        TextField(
-            value = name,
-            onValueChange = {
-                    newText -> name = newText
-            },
-            label = { Text(text = stringResource(R.string.mainscreen_field_name) ) }
-        )
-
-        TextField(
-            modifier = Modifier.padding(top = 20.dp),
-            value = uid,
-            onValueChange = {
-                    newText -> uid = newText
-            },
-            label = {
-                Text(text = stringResource(R.string.mainscreen_field_uid))
-            }
-        )
-
-        Button(
-            onClick = { mainViewModel.save(BccStudent(name.text,uid.text)) },
-            modifier = Modifier.padding(top = 20.dp)
-        ) {
-            Text(text = stringResource(R.string.mainscreen_button_save), fontSize = 20.sp)
-        }
-    }
+fun ReadScreen(mainViewModel: MainViewModel){
+  Text(text ="Read Screen")
 }
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun displayStudents(mainViewModel: MainViewModel){
-    val state = mainViewModel.mainViewState.collectAsState()
-
-    // https://developer.android.com/jetpack/compose/lists
-    LazyColumn (
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        item{
-            Text(
-                text = stringResource(R.string.displaystudents_title),
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        items(state.value.students){
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp)
-                .clickable { mainViewModel.editStudent(it) }
-            ){
-                Column (modifier = Modifier.weight(1f)) {
-                    Text(text = "Name: ${it.name}")
-                    Text(text = "UID: ${it.uid}")
-                }
-                IconButton(onClick = { mainViewModel.clickDelete(it)}) {
-                    Icon(Icons.Default.Delete,"Delete")
-                }
-            }
-        }
-    }
-    Column {
-        editStudentModal(mainViewModel)
-    }
+fun TBRScreen(mainViewModel: MainViewModel){
+    Text(text ="TBR Screen")
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun editStudentModal(mainViewModel: MainViewModel){
-    val state = mainViewModel.mainViewState.collectAsState()
-
-    if(state.value.openDialog){
-        var name by rememberSaveable { mutableStateOf(state.value.editStudent.name) }
-        var uid by rememberSaveable { mutableStateOf(state.value.editStudent.uid) }
-
-        // https://developer.android.com/jetpack/compose/components/dialog
-        AlertDialog(
-            onDismissRequest = {
-                mainViewModel.dismissDialog()
-            },
-            text = {
-                Column {
-                    // https://www.jetpackcompose.net/textfield-in-jetpack-compose
-                    TextField(
-                        modifier = Modifier.padding(top = 20.dp),
-                        value = name,
-                        onValueChange = { newText -> name = newText },
-                        label = { Text(text = stringResource(R.string.editmodal_field_name) ) }
-                    )
-
-                    TextField(
-                        modifier = Modifier.padding(top = 20.dp),
-                        value = uid,
-                        onValueChange = { newText -> uid = newText },
-                        label = { Text(text = stringResource(R.string.editmodal_field_uid)) }
-                    )
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        mainViewModel.saveStudent(
-                            BccStudent(
-                                name,
-                                uid,
-                                state.value.editStudent.id
-                            )
-                        )
-                    }
-                ) {
-                    Text(stringResource(R.string.editmodal_button_save))
-                }
-            }
-        )
-    }
+fun WishlistScreen(mainViewModel: MainViewModel){
+    Text(text ="Wishlist Screen")
 }

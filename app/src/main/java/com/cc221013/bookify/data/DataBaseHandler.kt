@@ -129,8 +129,7 @@ class DatabaseHandler(context: Context) : SQLiteOpenHelper(context, dbName, null
                 days >= 0 &&
                 mediaType >= 0
                 )
-                allBooks.add(
-                    Book(
+                allBooks.add(Book(
                     cursor.getString(titleID),
                     cursor.getString(author),
                     cursor.getString(genre),
@@ -144,8 +143,7 @@ class DatabaseHandler(context: Context) : SQLiteOpenHelper(context, dbName, null
                     cursor.getInt(pages),
                     cursor.getInt(days),
                     cursor.getString(mediaType),
-                    cursor.getInt(idID))
-                )
+                    cursor.getInt(idID)))
         }
 
         return allBooks.toList()
