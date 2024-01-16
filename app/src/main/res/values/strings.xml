@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Bookify</string>
+    <string name="mainscreen_title">SQLite Demo</string>
+    <string name="mainscreen_field_name">Name</string>
+    <string name="mainscreen_field_uid">UID</string>
+    <string name="mainscreen_button_save">Save</string>
+    <string name="editmodal_field_name">Name</string>
+    <string name="editmodal_field_uid">UID</string>
+    <string name="editmodal_button_save">Confirm</string>
+    <string name="decorative_android_icon">Decorative Android Icon</string>
+    <string name="displaystudents_title">BCC Students:</string>
+</resources>
