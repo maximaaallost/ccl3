@@ -22,7 +22,7 @@
         app:fontStyle="normal"
         app:fontWeight="1000" />
     <font
-        app:font="@font/modak"
+        app:font="@font/calistoga"
         app:fontStyle="normal"
         app:fontWeight="600" />
 </font-family>

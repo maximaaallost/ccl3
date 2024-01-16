@@ -17,8 +17,8 @@ val Poppins = FontFamily(
     Font(R.font.poppins_bold, FontWeight.Black)
 )
 
-val Modak = FontFamily(
-    Font(R.font.modak, FontWeight.Medium)
+val Calistoga = FontFamily(
+    Font(R.font.calistoga, FontWeight.Normal)
     )
 
 
@@ -33,7 +33,7 @@ val Typography = Typography(
         color = Violet
     ),
     titleLarge = TextStyle(
-        fontFamily = Modak,
+        fontFamily = Calistoga,
         fontSize = 40.sp,
         lineHeight = 28.sp,
         letterSpacing = 0.sp,
