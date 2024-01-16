@@ -1,5 +1,7 @@
 package com.cc221013.bookify.ui
 
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.cc221013.bookify.data.DatabaseHandler
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,6 +15,13 @@ class MainViewModel(private val db: DatabaseHandler): ViewModel() {
 
     fun save(book: Book){
         db.insertBook(book)
+    }
+
+    private val _selectedCafe = mutableStateOf<Book?>(null)
+    val selectedCafe: State<Book?> = _selectedCafe
+
+    fun setSelectedBook(book: Book) {
+        _selectedCafe.value = book
     }
 
     fun getBooks() {
