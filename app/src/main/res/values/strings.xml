@@ -1,12 +1,16 @@
 <resources>
-    <string name="app_name">Bookify</string>
-    <string name="mainscreen_title">SQLite Demo</string>
-    <string name="mainscreen_field_name">Name</string>
-    <string name="mainscreen_field_uid">UID</string>
-    <string name="mainscreen_button_save">Save</string>
-    <string name="editmodal_field_name">Name</string>
-    <string name="editmodal_field_uid">UID</string>
+    <string name="app_name">Memory Maker</string>
+    <string name="addscreen_description">Describe your Memory</string>
+    <string name="addscreen_location">Add a Location</string>
+    <string name="addscreen_field_description">e.g. Family Dinner</string>
+    <string name="addscreen_field_location">e.g. Vienna</string>
+    <string name="addscreen_button_save">Save</string>
+    <string name="button_delete_confirm">Delete</string>
+    <string name="button_delete_cancel">Cancel</string>
+    <string name="editmodal_field_description">Description</string>
+    <string name="editmodal_field_location">Location</string>
     <string name="editmodal_button_save">Confirm</string>
-    <string name="decorative_android_icon">Decorative Android Icon</string>
-    <string name="displaystudents_title">BCC Students:</string>
+    <string name="decorative_fridge_image">Decorative fridge image</string>
+    <string name="photobook_title">My Digital Photobook</string>
+    <string name="addscreen_title">New Memory</string>
 </resources>
