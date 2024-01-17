@@ -5,9 +5,11 @@ import android.util.Log
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,6 +17,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -45,6 +48,8 @@ import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItem
@@ -62,6 +67,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
@@ -280,23 +286,126 @@ fun TopDecoration(navController: NavHostController, titlePage: String, subHeadin
     }
 }
 
+
+@Composable
+fun SmallText(text: String, color: Color) {
+    Text(
+        text = text,
+        style = TextStyle(
+            fontSize = 13.sp,
+            color = color,
+            fontFamily = Poppins,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+    ))
+}
+@Composable
+fun ReadStats() {
+    Card(
+        modifier = Modifier
+            .width(370.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .verticalScroll(rememberScrollState()),
+        colors = CardDefaults.cardColors(containerColor = Violet)
+    ) {
+
+        Column(
+            modifier = Modifier
+                .padding(10.dp)
+        ) {
+
+            Box(modifier = Modifier.padding (10.dp, 0.dp, 0.dp, 0.dp)){
+                SmallText("Your reading Statistics", NonWhite)
+            }
+
+            Row(
+                modifier = Modifier.padding(10.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .width(90.dp)
+                        .height(80.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .border(
+                            BorderStroke(2.dp, SolidColor(NonWhite)),
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                        .padding(10.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(text = "dd", color = NonWhite)
+                    SmallText("books", NonWhite)
+                }
+                Spacer (modifier = Modifier.width(10.dp))
+                Column(
+                    modifier = Modifier
+                        .width(130.dp)
+                        .height(80.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .border(
+                            BorderStroke(2.dp, SolidColor(NonWhite)),
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                        .padding(10.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(text = "105.588", color = NonWhite)
+                    SmallText("pages", NonWhite)
+                }
+                Spacer (modifier = Modifier.width(10.dp))
+
+                Column(
+                    modifier = Modifier
+                        .width(100.dp)
+                        .height(80.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .border(
+                            BorderStroke(2.dp, SolidColor(Yellow)),
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                        .padding(10.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.add),
+                        contentDescription = "hey",
+                        modifier = Modifier.size(20.dp),
+                        tint = Yellow
+                    )
+                    SmallText(text = "see more", color = Yellow)
+                }
+            }
+        }
+
+    }
+}
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
     val state = mainViewModel.mainViewState.collectAsState()
 
-    Column(
-        modifier = Modifier
-            .background(NonWhite)
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .background(NonWhite),
+            horizontalAlignment = Alignment.CenterHorizontally,
 //            .fillMaxSize()
 //            .fillMaxWidth()
-    ) {
-        TopDecoration(navController, "Read Books", null)
+        ) {
 
-        LazyVerticalGrid(
-            modifier = Modifier.fillMaxSize(),
-            columns = GridCells.Fixed(2),
-        ){
+            TopDecoration(navController, "Read Books", null)
+
+            ReadStats()
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            LazyVerticalGrid(
+                modifier = Modifier.fillMaxSize(),
+                columns = GridCells.Fixed(2),
+            ) {
                 if (state.value.books.isEmpty()) { // Show a message if there are no books saved in this shelve
                     // Show a message if there are no entries
                     item {
@@ -372,9 +481,9 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                 }
             }
 
-
+        }
     }
-}
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -394,7 +503,7 @@ fun TBRScreen(mainViewModel: MainViewModel, navController: NavHostController) {
         LazyVerticalGrid(
             modifier = Modifier.fillMaxSize(),
             columns = GridCells.Fixed(3),
-        ){
+        ) {
             if (state.value.books.isEmpty()) { // Show a message if there are no books saved in this shelve
                 // Show a message if there are no entries
                 item {
@@ -489,7 +598,7 @@ fun WishlistScreen(mainViewModel: MainViewModel, navController: NavHostControlle
         LazyVerticalGrid(
             modifier = Modifier.fillMaxSize(),
             columns = GridCells.Fixed(3),
-        ){
+        ) {
             if (state.value.books.isEmpty()) { // Show a message if there are no books saved in this shelve
                 // Show a message if there are no entries
                 item {
