@@ -323,10 +323,7 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController){
                             painter = rememberImagePainter(data = book.cover),
                             contentDescription = "Entry Image",
                             modifier = Modifier
-
                                 .height(200.dp)
-
-
                         )
 
                         // Middle: Description and Date
