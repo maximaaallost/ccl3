@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Memory Maker</string>
+    <string name="app_name">Bookify</string>
     <string name="addscreen_description">Describe your Memory</string>
     <string name="addscreen_location">Add a Location</string>
     <string name="addscreen_field_description">e.g. Family Dinner</string>

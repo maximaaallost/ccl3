@@ -1,5 +1,6 @@
 package com.cc221013.bookify.ui
 
+import android.net.Uri
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -13,15 +14,31 @@ class MainViewModel(private val db: DatabaseHandler): ViewModel() {
     private val _mainViewState = MutableStateFlow(MainViewState())
     val mainViewState: StateFlow<MainViewState> = _mainViewState.asStateFlow()
 
+    private val _cameraState = MutableStateFlow(CameraState())
+    val cameraState: StateFlow<CameraState> = _cameraState.asStateFlow()
+
+    fun setCameraPermission(value: Boolean){
+        _cameraState.update { it.copy(cameraPermissionGranted = value) }
+    }
+
+    fun enableCameraPreview(value: Boolean){
+        _cameraState.update { it.copy(enableCameraPreview = value) }
+    }
+
+    fun setNewUri(value: Uri){
+        _cameraState.update { it.copy(photosListState = it.photosListState + value) }
+        enableCameraPreview(false)
+    }
+
     fun save(book: Book){
         db.insertBook(book)
     }
 
-    private val _selectedCafe = mutableStateOf<Book?>(null)
-    val selectedCafe: State<Book?> = _selectedCafe
+    private val _selectedBook = mutableStateOf<Book?>(null)
+    val selectedBook: State<Book?> = _selectedBook
 
     fun setSelectedBook(book: Book) {
-        _selectedCafe.value = book
+        _selectedBook.value = book
     }
 
     fun getBooks() {
