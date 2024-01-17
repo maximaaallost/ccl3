@@ -5,12 +5,14 @@ import android.util.Log
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,12 +22,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.BottomNavigation
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -64,6 +71,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -87,43 +95,44 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.util.concurrent.ExecutorService
+import com.google.accompanist.flowlayout.FlowRow
 
-sealed class Screen(val route: String){
-    object Read: Screen("first")
-    object TBR: Screen("second")
-    object Wishlist: Screen("third")
-    object AddBook: Screen("fourth")
+sealed class Screen(val route: String) {
+    object Read : Screen("first")
+    object TBR : Screen("second")
+    object Wishlist : Screen("third")
+    object AddBook : Screen("fourth")
 }
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainView(mainViewModel: MainViewModel){
+fun MainView(mainViewModel: MainViewModel) {
     val state = mainViewModel.mainViewState.collectAsState()
     val navController = rememberNavController()
 
     Scaffold(
-        bottomBar = {BottomNavigationBar(navController, state.value.selectedScreen)}
+        bottomBar = { BottomNavigationBar(navController, state.value.selectedScreen) }
     ) {
         NavHost(
             navController = navController,
             modifier = Modifier.padding(it),
             startDestination = Screen.Read.route
-        ){
-            composable(Screen.Read.route){
+        ) {
+            composable(Screen.Read.route) {
                 mainViewModel.selectScreen(Screen.Read)
                 mainViewModel.getBooks()
                 ReadScreen(mainViewModel, navController)
             }
-            composable(Screen.TBR.route){
+            composable(Screen.TBR.route) {
                 mainViewModel.selectScreen(Screen.TBR)
                 TBRScreen(mainViewModel, navController)
             }
-            composable(Screen.Wishlist.route){
+            composable(Screen.Wishlist.route) {
                 mainViewModel.selectScreen(Screen.Wishlist)
                 WishlistScreen(mainViewModel, navController)
             }
-            composable(Screen.AddBook.route){
+            composable(Screen.AddBook.route) {
                 mainViewModel.selectScreen(Screen.AddBook)
                 AddBookScreen(mainViewModel, navController)
             }
@@ -160,14 +169,15 @@ fun NavigationBarItem(
 }
 
 @Composable
-fun BottomNavigationBar(navController: NavHostController, selectedScreen: Screen){
-    BottomNavigation (
+fun BottomNavigationBar(navController: NavHostController, selectedScreen: Screen) {
+    BottomNavigation(
         backgroundColor = Violet,
         modifier = Modifier
             .height(70.dp)
             .clip(RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp))
     ) {
-        Row(modifier = Modifier.fillMaxSize(),
+        Row(
+            modifier = Modifier.fillMaxSize(),
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -176,13 +186,13 @@ fun BottomNavigationBar(navController: NavHostController, selectedScreen: Screen
                 onClick = { navController.navigate(Screen.Read.route) },
                 icon = painterResource(id = R.drawable.read),
                 contentDescription = "Read Books section"
-                )
+            )
             NavigationBarItem(
                 selected = (selectedScreen == Screen.TBR),
                 onClick = { navController.navigate(Screen.TBR.route) },
                 icon = painterResource(id = R.drawable.tbr),
                 contentDescription = "To be Read Section"
-                )
+            )
 
             NavigationBarItem(
                 selected = (selectedScreen == Screen.Wishlist),
@@ -209,7 +219,7 @@ fun TopDecoration(navController: NavHostController, titlePage: String, subHeadin
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(15.dp),
-        ){
+        ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -270,86 +280,89 @@ fun TopDecoration(navController: NavHostController, titlePage: String, subHeadin
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController){
+fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
     val state = mainViewModel.mainViewState.collectAsState()
 
     Column(
         modifier = Modifier
             .background(NonWhite)
-            .fillMaxSize()
-            .fillMaxWidth()
-    ){
+//            .fillMaxSize()
+//            .fillMaxWidth()
+    ) {
         TopDecoration(navController, "Read Books", null)
 
-        LazyColumn (
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxSize()
+        LazyVerticalGrid(
+            modifier = Modifier.fillMaxSize(),
+            columns = GridCells.Fixed(2),
+        ){
+                if (state.value.books.isEmpty()) { // Show a message if there are no books saved in this shelve
+                    // Show a message if there are no entries
+                    item {
+                        Text(
+                            text = "No Books saved yet",
+                            style = TextStyle(
+                                fontSize = 15.sp,
+                                color = Color.Gray,
+                                fontFamily = Poppins,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 40.dp, end = 40.dp, top = 10.dp)
+                        )
+                    }
+                    // If there are entries, show them
+                } else {
+                    items(state.value.books.reversed()) { book -> // Reverse the list to show the newest entry on top
 
-        ) {
-            if (state.value.books.isEmpty()) { // Show a message if there are no books saved in this shelve
-                // Show a message if there are no entries
-                item {
-//            Image(
-//                painter = painterResource(id = R.drawable.emptystateimage),
-//                contentDescription = "Entry Image",
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .height(300.dp)
-//
-//            )
-                    Text(
-                        text = "No Books saved yet",
-                        style = TextStyle(fontSize = 15.sp, color = Color.Gray, fontFamily = Poppins, textAlign = androidx.compose.ui.text.style.TextAlign.Center),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 40.dp, end = 40.dp, top = 10.dp)
-                    )
-                }
-            } else { // If there are entries, show them
-
-                items(state.value.books.reversed()) { book -> // Reverse the list to show the newest entry on top
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { mainViewModel.editBook(book) }
-
-                    ) {
-
-                        Column {
-                            Box(){
+                        //One Book
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            //One Book
+                            Box() {
                                 Icon(
                                     painter = painterResource(id = R.drawable.bookcover),
                                     contentDescription = "Book cover background",
                                     modifier = Modifier.size(225.dp)
-
                                 )
                                 // Top: Image
                                 Image(
                                     painter = rememberImagePainter(data = book.cover),
                                     contentDescription = "Entry Image",
                                     modifier = Modifier
-                                        .height(170.dp)
-                                        .padding(55.dp, 10.dp, 0.dp, 0.dp)
-                                        .clip(RoundedCornerShape(2.dp))
+                                        .height(175.dp)
+                                        .padding(40.dp, 5.dp, 0.dp, 0.dp)
+                                        .clip(RoundedCornerShape(10.dp, 0.dp, 0.dp, 0.dp))
                                 )
                             }
-
-
                             // Middle: Description and Date
                             Column(
                                 modifier = Modifier
-                                    .width(225.dp)
+                                    .width(150.dp),
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
                                     text = "${book.title}",
-                                    style = TextStyle(fontSize = 15.sp, color = Violet, fontFamily = Poppins),
+                                    style = TextStyle(
+                                        fontSize = 16.sp,
+                                        color = Violet,
+                                        fontFamily = Calistoga,
+                                        textAlign = TextAlign.Center
+                                    ),
                                 )
                                 Text(
                                     text = "${book.author}",
-                                    style = TextStyle(fontSize = 15.sp, color = LightViolet, fontFamily = Poppins),
+                                    style = TextStyle(
+                                        fontSize = 14.sp,
+                                        color = LightViolet,
+                                        fontFamily = Poppins,
+                                        textAlign = TextAlign.Center
+                                    ),
                                 )
 
                             }
@@ -358,35 +371,199 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController){
                     }
                 }
             }
-        }
-    }
 
+
+    }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TBRScreen(mainViewModel: MainViewModel, navController: NavHostController){
+fun TBRScreen(mainViewModel: MainViewModel, navController: NavHostController) {
+
+    val state = mainViewModel.mainViewState.collectAsState()
+
     Column(
         modifier = Modifier
             .background(NonWhite)
             .fillMaxSize()
             .fillMaxWidth()
-    ){
+    ) {
         TopDecoration(navController, "TBR", "Books in your shelf")
 
+        LazyVerticalGrid(
+            modifier = Modifier.fillMaxSize(),
+            columns = GridCells.Fixed(3),
+        ){
+            if (state.value.books.isEmpty()) { // Show a message if there are no books saved in this shelve
+                // Show a message if there are no entries
+                item {
+                    Text(
+                        text = "No Books saved yet",
+                        style = TextStyle(
+                            fontSize = 15.sp,
+                            color = Color.Gray,
+                            fontFamily = Poppins,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 40.dp, end = 40.dp, top = 10.dp)
+                    )
+                }
+                // If there are entries, show them
+            } else {
+                items(state.value.books.reversed()) { book -> // Reverse the list to show the newest entry on top
+
+                    //One Book
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        //One Book
+                        Box() {
+                            Icon(
+                                painter = painterResource(id = R.drawable.bookcover),
+                                contentDescription = "Book cover background",
+                                modifier = Modifier.size(150.dp)
+                            )
+                            // Top: Image
+                            Image(
+                                painter = rememberImagePainter(data = book.cover),
+                                contentDescription = "Entry Image",
+                                modifier = Modifier
+                                    .height(120.dp)
+                                    .padding(24.dp, 2.5.dp, 0.dp, 0.dp)
+                                    .clip(RoundedCornerShape(10.dp, 0.dp, 0.dp, 0.dp))
+                            )
+                        }
+                        // Middle: Description and Date
+                        Column(
+                            modifier = Modifier
+                                .width(100.dp),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "${book.title}",
+                                style = TextStyle(
+                                    fontSize = 14.sp,
+                                    color = Violet,
+                                    fontFamily = Calistoga,
+                                    textAlign = TextAlign.Center
+                                ),
+                            )
+                            Text(
+                                text = "${book.author}",
+                                style = TextStyle(
+                                    fontSize = 12.sp,
+                                    color = LightViolet,
+                                    fontFamily = Poppins,
+                                    textAlign = TextAlign.Center
+                                ),
+                            )
+
+                        }
+                    }
+
+                }
+            }
+        }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WishlistScreen(mainViewModel: MainViewModel, navController: NavHostController){
+fun WishlistScreen(mainViewModel: MainViewModel, navController: NavHostController) {
+
+    val state = mainViewModel.mainViewState.collectAsState()
+
     Column(
         modifier = Modifier
             .background(NonWhite)
             .fillMaxSize()
             .fillMaxWidth()
-    ){
+    ) {
         TopDecoration(navController, "Wishlist", "Books you want to buy")
+
+        LazyVerticalGrid(
+            modifier = Modifier.fillMaxSize(),
+            columns = GridCells.Fixed(3),
+        ){
+            if (state.value.books.isEmpty()) { // Show a message if there are no books saved in this shelve
+                // Show a message if there are no entries
+                item {
+                    Text(
+                        text = "No Books saved yet",
+                        style = TextStyle(
+                            fontSize = 15.sp,
+                            color = Color.Gray,
+                            fontFamily = Poppins,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 40.dp, end = 40.dp, top = 10.dp)
+                    )
+                }
+                // If there are entries, show them
+            } else {
+                items(state.value.books.reversed()) { book -> // Reverse the list to show the newest entry on top
+
+                    //One Book
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        //One Book
+                        Box() {
+                            Icon(
+                                painter = painterResource(id = R.drawable.bookcover),
+                                contentDescription = "Book cover background",
+                                modifier = Modifier.size(150.dp)
+                            )
+                            // Top: Image
+                            Image(
+                                painter = rememberImagePainter(data = book.cover),
+                                contentDescription = "Entry Image",
+                                modifier = Modifier
+                                    .height(120.dp)
+                                    .padding(25.dp, 5.dp, 0.dp, 0.dp)
+                                    .clip(RoundedCornerShape(10.dp, 0.dp, 0.dp, 0.dp))
+                            )
+                        }
+                        // Middle: Description and Date
+                        Column(
+                            modifier = Modifier
+                                .width(100.dp),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "${book.title}",
+                                style = TextStyle(
+                                    fontSize = 14.sp,
+                                    color = Violet,
+                                    fontFamily = Calistoga,
+                                    textAlign = TextAlign.Center
+                                ),
+                            )
+                            Text(
+                                text = "${book.author}",
+                                style = TextStyle(
+                                    fontSize = 12.sp,
+                                    color = LightViolet,
+                                    fontFamily = Poppins,
+                                    textAlign = TextAlign.Center
+                                ),
+                            )
+
+                        }
+                    }
+
+                }
+            }
+        }
     }
 }
 
@@ -479,106 +656,106 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
     }
 
 
-    Column (
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
-    ){
+    ) {
         Button(onClick = { navController.navigate(Screen.Read.route) }) {
             Text(text = "Back", style = TextStyle(fontSize = 20.sp, color = NonWhite))
         }
         Button(
-            onClick = { mainViewModel.enableCameraPreview(true)},
+            onClick = { mainViewModel.enableCameraPreview(true) },
             modifier = Modifier
                 .padding(20.dp)
         ) { Text(text = "Upload Picture", style = TextStyle(fontSize = 20.sp, color = NonWhite)) }
 
-    TextField(
-        modifier = Modifier.padding(top = 10.dp),
-        value = color,
-        onValueChange = { newText -> color = newText },
-        label = { Text(text = "Color") },
-    )
+        TextField(
+            modifier = Modifier.padding(top = 10.dp),
+            value = color,
+            onValueChange = { newText -> color = newText },
+            label = { Text(text = "Color") },
+        )
 
-    TextField(
-        modifier = Modifier.padding(top = 10.dp),
-        value = title,
-        onValueChange = { newText -> title = newText },
-        label = { Text(text = "Title") },
-    )
+        TextField(
+            modifier = Modifier.padding(top = 10.dp),
+            value = title,
+            onValueChange = { newText -> title = newText },
+            label = { Text(text = "Title") },
+        )
 
-    TextField(
-        modifier = Modifier.padding(top = 10.dp),
-        value = author,
-        onValueChange = { newText -> author = newText },
-        label = { Text(text = "Author") },
-    )
+        TextField(
+            modifier = Modifier.padding(top = 10.dp),
+            value = author,
+            onValueChange = { newText -> author = newText },
+            label = { Text(text = "Author") },
+        )
 
-    TextField(
-        modifier = Modifier.padding(top = 10.dp),
-        value = genre,
-        onValueChange = { newText -> genre = newText },
-        label = { Text(text = "Genre") },
-    )
+        TextField(
+            modifier = Modifier.padding(top = 10.dp),
+            value = genre,
+            onValueChange = { newText -> genre = newText },
+            label = { Text(text = "Genre") },
+        )
 
-    TextField(
-        modifier = Modifier.padding(top = 10.dp),
-        value = shelf,
-        onValueChange = { newText -> shelf = newText },
-        label = { Text(text = "Shelf") },
-    )
+        TextField(
+            modifier = Modifier.padding(top = 10.dp),
+            value = shelf,
+            onValueChange = { newText -> shelf = newText },
+            label = { Text(text = "Shelf") },
+        )
 
-    TextField(
-        modifier = Modifier.padding(top = 10.dp),
-        value = rating,
-        onValueChange = { newText -> rating = newText },
-        label = { Text(text = "Rating") },
-    )
+        TextField(
+            modifier = Modifier.padding(top = 10.dp),
+            value = rating,
+            onValueChange = { newText -> rating = newText },
+            label = { Text(text = "Rating") },
+        )
 
-    TextField(
-        modifier = Modifier.padding(top = 10.dp),
-        value = review,
-        onValueChange = { newText -> review = newText },
-        label = { Text(text = "Review") },
-    )
+        TextField(
+            modifier = Modifier.padding(top = 10.dp),
+            value = review,
+            onValueChange = { newText -> review = newText },
+            label = { Text(text = "Review") },
+        )
 
-    TextField(
-        modifier = Modifier.padding(top = 10.dp),
-        value = quote,
-        onValueChange = { newText -> quote = newText },
-        label = { Text(text = "Quote") },
-    )
+        TextField(
+            modifier = Modifier.padding(top = 10.dp),
+            value = quote,
+            onValueChange = { newText -> quote = newText },
+            label = { Text(text = "Quote") },
+        )
 
-    TextField(
-        modifier = Modifier.padding(top = 10.dp),
-        value = language,
-        onValueChange = { newText -> language = newText },
-        label = { Text(text = "Language") },
-    )
+        TextField(
+            modifier = Modifier.padding(top = 10.dp),
+            value = language,
+            onValueChange = { newText -> language = newText },
+            label = { Text(text = "Language") },
+        )
 
-    TextField(
-        modifier = Modifier.padding(top = 10.dp),
-        value = pages,
-        onValueChange = { newText -> pages = newText },
-        label = { Text(text = "Pages") },
-    )
+        TextField(
+            modifier = Modifier.padding(top = 10.dp),
+            value = pages,
+            onValueChange = { newText -> pages = newText },
+            label = { Text(text = "Pages") },
+        )
 
-    TextField(
-        modifier = Modifier.padding(top = 10.dp),
-        value = days,
-        onValueChange = { newText -> days = newText },
-        label = { Text(text = "Days") },
-    )
+        TextField(
+            modifier = Modifier.padding(top = 10.dp),
+            value = days,
+            onValueChange = { newText -> days = newText },
+            label = { Text(text = "Days") },
+        )
 
-    TextField(
-        modifier = Modifier.padding(top = 10.dp),
-        value = mediaType,
-        onValueChange = { newText -> mediaType = newText },
-        label = { Text(text = "Media Type") },
-    )
+        TextField(
+            modifier = Modifier.padding(top = 10.dp),
+            value = mediaType,
+            onValueChange = { newText -> mediaType = newText },
+            label = { Text(text = "Media Type") },
+        )
 
         Button(
             onClick = {
@@ -606,23 +783,37 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
             },
             modifier = Modifier.padding(20.dp),
         ) {
-            Text(text = stringResource(R.string.addscreen_button_save), fontSize = 20.sp, color = Color.White, fontFamily = Poppins)
+            Text(
+                text = stringResource(R.string.addscreen_button_save),
+                fontSize = 20.sp,
+                color = Color.White,
+                fontFamily = Poppins
+            )
         }
-}
+    }
 
 }
 
 @Composable
-fun CameraView(mainViewModel: MainViewModel, previewView: PreviewView, imageCapture: ImageCapture, cameraExecutor: ExecutorService, directory: File){
-    Box(contentAlignment = Alignment.BottomCenter, modifier = Modifier.fillMaxSize()){
-        AndroidView({previewView}, modifier = Modifier.fillMaxSize())
+fun CameraView(
+    mainViewModel: MainViewModel,
+    previewView: PreviewView,
+    imageCapture: ImageCapture,
+    cameraExecutor: ExecutorService,
+    directory: File
+) {
+    Box(contentAlignment = Alignment.BottomCenter, modifier = Modifier.fillMaxSize()) {
+        AndroidView({ previewView }, modifier = Modifier.fillMaxSize())
 
         Button(
             modifier = Modifier.padding(25.dp),
             onClick = {
                 val photoFile = File(
                     directory,
-                    SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.US).format(System.currentTimeMillis()) + ".jpg" // Save the photo with the current date
+                    SimpleDateFormat(
+                        "yyyy-MM-dd-HH-mm-ss-SSS",
+                        Locale.US
+                    ).format(System.currentTimeMillis()) + ".jpg" // Save the photo with the current date
                 )
 
                 imageCapture.takePicture(
