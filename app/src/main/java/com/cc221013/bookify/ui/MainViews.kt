@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.BottomNavigation
@@ -49,6 +50,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -99,7 +101,7 @@ fun MainView(mainViewModel: MainViewModel){
         NavHost(
             navController = navController,
             modifier = Modifier.padding(it),
-            startDestination = Screen.Read.route
+            startDestination = Screen.AddBook.route
         ){
             composable(Screen.Read.route){
                 mainViewModel.selectScreen(Screen.Read)
@@ -251,87 +253,55 @@ fun WishlistScreen(mainViewModel: MainViewModel){
 fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController) {
     val camState = mainViewModel.cameraState.collectAsState()
     val photosList = camState.value.photosListState // Get the list of photos taken
+    val lastItem = if (photosList.isNotEmpty()) {
+        photosList.last()
+    } else {
+        Uri.parse("android.resource://com.cc221013.bookify/drawable/placeholdercover")
+    }
 
-    var title by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(
-            TextFieldValue(
-                ""
-            )
+    var title by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
+    var author by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
+    var genre by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
+    var color by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
+    var shelf by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
+    var rating by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
+    var review by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
+    var quote by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
+    var language by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
+    var pages by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
+    var days by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
+    var mediaType by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
+
+
+
+
+    Box(modifier = Modifier.fillMaxSize()) {
+
+
+        Button(onClick = { navController.navigate(Screen.Read.route) }) {
+            Text(text = "Back", style = TextStyle(fontSize = 20.sp, color = NonWhite))
+        }
+
+
+        Image(
+            painter = painterResource(id = R.drawable.violetswirl),
+            contentDescription = "Decorative Picture" )
+
+        Image(
+            painter = rememberImagePainter(lastItem), // show the last taken photo form the photosList
+            contentDescription = "Entry Image",
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .clip(RoundedCornerShape(8.dp))
         )
-    }
-    var author by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(
-            TextFieldValue("")
-        )
-    }
-    var genre by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(
-            TextFieldValue(
-                ""
-            )
-        )
-    }
-    var color by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(
-            TextFieldValue(
-                ""
-            )
-        )
-    }
-    var cover by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(
-            TextFieldValue(
-                ""
-            )
-        )
-    }
-    var shelf by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(
-            TextFieldValue(
-                ""
-            )
-        )
-    }
-    var rating by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(
-            TextFieldValue("")
-        )
-    }
-    var review by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(
-            TextFieldValue("")
-        )
-    }
-    var quote by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(
-            TextFieldValue(
-                ""
-            )
-        )
-    }
-    var language by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(
-            TextFieldValue("")
-        )
-    }
-    var pages by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(
-            TextFieldValue(
-                ""
-            )
-        )
-    }
-    var days by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(
-            TextFieldValue(
-                ""
-            )
-        )
-    }
-    var mediaType by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(
-            TextFieldValue("")
-        )
+
+        Button(
+            onClick = { mainViewModel.enableCameraPreview(true)},
+            modifier = Modifier
+                .padding(20.dp)
+        ) { Text(text = "Upload Picture", style = TextStyle(fontSize = 20.sp, color = NonWhite)) }
+
     }
 
 
@@ -343,14 +313,9 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ){
-        Button(onClick = { navController.navigate(Screen.Read.route) }) {
-            Text(text = "Back", style = TextStyle(fontSize = 20.sp, color = NonWhite))
-        }
-        Button(
-            onClick = { mainViewModel.enableCameraPreview(true)},
-            modifier = Modifier
-                .padding(20.dp)
-        ) { Text(text = "Upload Picture", style = TextStyle(fontSize = 20.sp, color = NonWhite)) }
+
+
+
 
         TextField(
             modifier = Modifier.padding(top = 10.dp),
