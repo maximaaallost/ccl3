@@ -20,6 +20,9 @@ class MainViewModel(private val db: DatabaseHandler): ViewModel() {
     fun setCameraPermission(value: Boolean){
         _cameraState.update { it.copy(cameraPermissionGranted = value) }
     }
+    fun setFilePermission(value: Boolean){
+        _cameraState.update { it.copy(filePermissionGranted = value) }
+    }
 
     fun enableCameraPreview(value: Boolean){
         _cameraState.update { it.copy(enableCameraPreview = value) }

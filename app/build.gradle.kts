@@ -69,6 +69,8 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+    implementation ("androidx.activity:activity-ktx:1.3.0")
+    implementation ("androidx.fragment:fragment-ktx:1.3.6")
 
 
     // CameraX core library using the camera2 implementation
