@@ -28,6 +28,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 
+
 class MainActivity : ComponentActivity() {
     private val db = DatabaseHandler(this)
     private val mainViewModel = MainViewModel(db)
