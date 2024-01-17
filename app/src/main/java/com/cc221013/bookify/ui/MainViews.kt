@@ -149,7 +149,7 @@ fun BottomNavigationBar(navController: NavHostController, selectedScreen: Screen
 fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController){
     val state = mainViewModel.mainViewState.collectAsState()
 
-  Text(text ="Read Screen")
+    Text(text ="Read Screen")
     Box(contentAlignment = Alignment.TopEnd, modifier = Modifier.fillMaxSize()){
         Button(
             onClick = {navController.navigate(Screen.AddBook.route) },
@@ -171,9 +171,9 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController){
             .padding(top = 80.dp)
 
     ) {
-    if (state.value.books.isEmpty()) { // Show a message if there are no books saved in this shelve
-        // Show a message if there are no entries
-        item {
+        if (state.value.books.isEmpty()) { // Show a message if there are no books saved in this shelve
+            // Show a message if there are no entries
+            item {
 //            Image(
 //                painter = painterResource(id = R.drawable.emptystateimage),
 //                contentDescription = "Entry Image",
@@ -183,55 +183,55 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController){
 //
 //            )
 
-            Text(
-                text = "No Books saved yet",
-                style = TextStyle(fontSize = 15.sp, color = Color.Gray, fontFamily = Poppins, textAlign = androidx.compose.ui.text.style.TextAlign.Center),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 40.dp, end = 40.dp, top = 10.dp)
-            )
-        }
-    } else { // If there are entries, show them
-
-        items(state.value.books.reversed()) { book -> // Reverse the list to show the newest entry on top
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { mainViewModel.editBook(book) }
-
-            ) {
-
-                // Top: Image
-                Image(
-                    painter = rememberImagePainter(data = book.cover),
-                    contentDescription = "Entry Image",
+                Text(
+                    text = "No Books saved yet",
+                    style = TextStyle(fontSize = 15.sp, color = Color.Gray, fontFamily = Poppins, textAlign = androidx.compose.ui.text.style.TextAlign.Center),
                     modifier = Modifier
-
-                        .height(200.dp)
-
-
-                )
-
-                // Middle: Description and Date
-                Column(
-                    modifier = Modifier
-                        .padding(top = 210.dp, bottom = 20.dp, start = 20.dp, end = 20.dp)
                         .fillMaxWidth()
+                        .padding(start = 40.dp, end = 40.dp, top = 10.dp)
+                )
+            }
+        } else { // If there are entries, show them
+
+            items(state.value.books.reversed()) { book -> // Reverse the list to show the newest entry on top
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { mainViewModel.editBook(book) }
+
                 ) {
-                    Text(
-                        text = "${book.title}",
-                        style = TextStyle(fontSize = 15.sp, color = Violet, fontFamily = Poppins),
-                    )
-                    Text(
-                        text = "${book.author}",
-                        style = TextStyle(fontSize = 15.sp, color = LightViolet, fontFamily = Poppins),
+
+                    // Top: Image
+                    Image(
+                        painter = rememberImagePainter(data = book.cover),
+                        contentDescription = "Entry Image",
+                        modifier = Modifier
+
+                            .height(200.dp)
+
+
                     )
 
+                    // Middle: Description and Date
+                    Column(
+                        modifier = Modifier
+                            .padding(top = 210.dp, bottom = 20.dp, start = 20.dp, end = 20.dp)
+                            .fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "${book.title}",
+                            style = TextStyle(fontSize = 15.sp, color = Violet, fontFamily = Poppins),
+                        )
+                        Text(
+                            text = "${book.author}",
+                            style = TextStyle(fontSize = 15.sp, color = LightViolet, fontFamily = Poppins),
+                        )
+
+                    }
                 }
             }
         }
     }
-}
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -352,89 +352,89 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
                 .padding(20.dp)
         ) { Text(text = "Upload Picture", style = TextStyle(fontSize = 20.sp, color = NonWhite)) }
 
-    TextField(
-        modifier = Modifier.padding(top = 10.dp),
-        value = color,
-        onValueChange = { newText -> color = newText },
-        label = { Text(text = "Color") },
-    )
+        TextField(
+            modifier = Modifier.padding(top = 10.dp),
+            value = color,
+            onValueChange = { newText -> color = newText },
+            label = { Text(text = "Color") },
+        )
 
-    TextField(
-        modifier = Modifier.padding(top = 10.dp),
-        value = title,
-        onValueChange = { newText -> title = newText },
-        label = { Text(text = "Title") },
-    )
+        TextField(
+            modifier = Modifier.padding(top = 10.dp),
+            value = title,
+            onValueChange = { newText -> title = newText },
+            label = { Text(text = "Title") },
+        )
 
-    TextField(
-        modifier = Modifier.padding(top = 10.dp),
-        value = author,
-        onValueChange = { newText -> author = newText },
-        label = { Text(text = "Author") },
-    )
+        TextField(
+            modifier = Modifier.padding(top = 10.dp),
+            value = author,
+            onValueChange = { newText -> author = newText },
+            label = { Text(text = "Author") },
+        )
 
-    TextField(
-        modifier = Modifier.padding(top = 10.dp),
-        value = genre,
-        onValueChange = { newText -> genre = newText },
-        label = { Text(text = "Genre") },
-    )
+        TextField(
+            modifier = Modifier.padding(top = 10.dp),
+            value = genre,
+            onValueChange = { newText -> genre = newText },
+            label = { Text(text = "Genre") },
+        )
 
-    TextField(
-        modifier = Modifier.padding(top = 10.dp),
-        value = shelf,
-        onValueChange = { newText -> shelf = newText },
-        label = { Text(text = "Shelf") },
-    )
+        TextField(
+            modifier = Modifier.padding(top = 10.dp),
+            value = shelf,
+            onValueChange = { newText -> shelf = newText },
+            label = { Text(text = "Shelf") },
+        )
 
-    TextField(
-        modifier = Modifier.padding(top = 10.dp),
-        value = rating,
-        onValueChange = { newText -> rating = newText },
-        label = { Text(text = "Rating") },
-    )
+        TextField(
+            modifier = Modifier.padding(top = 10.dp),
+            value = rating,
+            onValueChange = { newText -> rating = newText },
+            label = { Text(text = "Rating") },
+        )
 
-    TextField(
-        modifier = Modifier.padding(top = 10.dp),
-        value = review,
-        onValueChange = { newText -> review = newText },
-        label = { Text(text = "Review") },
-    )
+        TextField(
+            modifier = Modifier.padding(top = 10.dp),
+            value = review,
+            onValueChange = { newText -> review = newText },
+            label = { Text(text = "Review") },
+        )
 
-    TextField(
-        modifier = Modifier.padding(top = 10.dp),
-        value = quote,
-        onValueChange = { newText -> quote = newText },
-        label = { Text(text = "Quote") },
-    )
+        TextField(
+            modifier = Modifier.padding(top = 10.dp),
+            value = quote,
+            onValueChange = { newText -> quote = newText },
+            label = { Text(text = "Quote") },
+        )
 
-    TextField(
-        modifier = Modifier.padding(top = 10.dp),
-        value = language,
-        onValueChange = { newText -> language = newText },
-        label = { Text(text = "Language") },
-    )
+        TextField(
+            modifier = Modifier.padding(top = 10.dp),
+            value = language,
+            onValueChange = { newText -> language = newText },
+            label = { Text(text = "Language") },
+        )
 
-    TextField(
-        modifier = Modifier.padding(top = 10.dp),
-        value = pages,
-        onValueChange = { newText -> pages = newText },
-        label = { Text(text = "Pages") },
-    )
+        TextField(
+            modifier = Modifier.padding(top = 10.dp),
+            value = pages,
+            onValueChange = { newText -> pages = newText },
+            label = { Text(text = "Pages") },
+        )
 
-    TextField(
-        modifier = Modifier.padding(top = 10.dp),
-        value = days,
-        onValueChange = { newText -> days = newText },
-        label = { Text(text = "Days") },
-    )
+        TextField(
+            modifier = Modifier.padding(top = 10.dp),
+            value = days,
+            onValueChange = { newText -> days = newText },
+            label = { Text(text = "Days") },
+        )
 
-    TextField(
-        modifier = Modifier.padding(top = 10.dp),
-        value = mediaType,
-        onValueChange = { newText -> mediaType = newText },
-        label = { Text(text = "Media Type") },
-    )
+        TextField(
+            modifier = Modifier.padding(top = 10.dp),
+            value = mediaType,
+            onValueChange = { newText -> mediaType = newText },
+            label = { Text(text = "Media Type") },
+        )
 
         Button(
             onClick = {
@@ -464,7 +464,7 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
         ) {
             Text(text = stringResource(R.string.addscreen_button_save), fontSize = 20.sp, color = Color.White, fontFamily = Poppins)
         }
-}
+    }
 
 }
 
