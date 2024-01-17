@@ -1,5 +1,10 @@
 package com.cc221013.bookify.ui
 
+import android.net.Uri
+import android.util.Log
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
+import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,18 +16,22 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.BottomNavigation
+import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Button
@@ -49,19 +58,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberImagePainter
 import com.cc221013.bookify.R
 import com.cc221013.bookify.ui.theme.DarkBeige
 import com.cc221013.bookify.ui.theme.LightBeige
+import com.cc221013.bookify.ui.theme.LightViolet
 import com.cc221013.bookify.ui.theme.NonWhite
 import com.cc221013.bookify.ui.theme.Poppins
 import com.cc221013.bookify.ui.theme.Violet
 import com.cc221013.bookify.ui.theme.Yellow
+import java.io.File
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Locale
+import java.util.concurrent.ExecutorService
 
 sealed class Screen(val route: String){
     object Read: Screen("first")
@@ -69,6 +85,7 @@ sealed class Screen(val route: String){
     object Wishlist: Screen("third")
     object AddBook: Screen("fourth")
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -86,6 +103,7 @@ fun MainView(mainViewModel: MainViewModel){
         ){
             composable(Screen.Read.route){
                 mainViewModel.selectScreen(Screen.Read)
+                mainViewModel.getBooks()
                 ReadScreen(mainViewModel, navController)
             }
             composable(Screen.TBR.route){
@@ -126,11 +144,13 @@ fun BottomNavigationBar(navController: NavHostController, selectedScreen: Screen
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController){
+    val state = mainViewModel.mainViewState.collectAsState()
+
   Text(text ="Read Screen")
-    Box(contentAlignment = Alignment.BottomStart, modifier = Modifier.fillMaxSize()){
+    Box(contentAlignment = Alignment.TopEnd, modifier = Modifier.fillMaxSize()){
         Button(
             onClick = {navController.navigate(Screen.AddBook.route) },
             modifier = Modifier
@@ -138,12 +158,82 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController){
         ) {
             androidx.compose.material3.Icon(
                 Icons.Default.Add,
-                "Open Camera Preview",
+                "Open Add Books",
                 tint = Color.White
             )
         }
     }
+    LazyColumn (
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 80.dp)
+
+    ) {
+    if (state.value.books.isEmpty()) { // Show a message if there are no books saved in this shelve
+        // Show a message if there are no entries
+        item {
+//            Image(
+//                painter = painterResource(id = R.drawable.emptystateimage),
+//                contentDescription = "Entry Image",
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .height(300.dp)
+//
+//            )
+
+            Text(
+                text = "No Books saved yet",
+                style = TextStyle(fontSize = 15.sp, color = Color.Gray, fontFamily = Poppins, textAlign = androidx.compose.ui.text.style.TextAlign.Center),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 40.dp, end = 40.dp, top = 10.dp)
+            )
+        }
+    } else { // If there are entries, show them
+
+        items(state.value.books.reversed()) { book -> // Reverse the list to show the newest entry on top
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { mainViewModel.editBook(book) }
+
+            ) {
+
+                // Top: Image
+                Image(
+                    painter = rememberImagePainter(data = book.cover),
+                    contentDescription = "Entry Image",
+                    modifier = Modifier
+
+                        .height(200.dp)
+
+
+                )
+
+                // Middle: Description and Date
+                Column(
+                    modifier = Modifier
+                        .padding(top = 210.dp, bottom = 20.dp, start = 20.dp, end = 20.dp)
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        text = "${book.title}",
+                        style = TextStyle(fontSize = 15.sp, color = Violet, fontFamily = Poppins),
+                    )
+                    Text(
+                        text = "${book.author}",
+                        style = TextStyle(fontSize = 15.sp, color = LightViolet, fontFamily = Poppins),
+                    )
+
+                }
+            }
+        }
+    }
 }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TBRScreen(mainViewModel: MainViewModel){
@@ -159,6 +249,9 @@ fun WishlistScreen(mainViewModel: MainViewModel){
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController) {
+    val camState = mainViewModel.cameraState.collectAsState()
+    val photosList = camState.value.photosListState // Get the list of photos taken
+
     var title by rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(
             TextFieldValue(
@@ -253,12 +346,11 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
         Button(onClick = { navController.navigate(Screen.Read.route) }) {
             Text(text = "Back", style = TextStyle(fontSize = 20.sp, color = NonWhite))
         }
-    TextField(
-        modifier = Modifier.padding(top = 10.dp),
-        value = cover,
-        onValueChange = { newText -> cover = newText },
-        label = { Text(text = "Cover") },
-    )
+        Button(
+            onClick = { mainViewModel.enableCameraPreview(true)},
+            modifier = Modifier
+                .padding(20.dp)
+        ) { Text(text = "Upload Picture", style = TextStyle(fontSize = 20.sp, color = NonWhite)) }
 
     TextField(
         modifier = Modifier.padding(top = 10.dp),
@@ -355,7 +447,7 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
                         author.text,
                         genre.text,
                         color.text,
-                        cover.text,
+                        photosList.last().toString(),
                         shelf.text,
                         rating.text.toIntOrNull(),
                         review.text,
@@ -374,4 +466,42 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
         }
 }
 
+}
+
+@Composable
+fun CameraView(mainViewModel: MainViewModel, previewView: PreviewView, imageCapture: ImageCapture, cameraExecutor: ExecutorService, directory: File){
+    Box(contentAlignment = Alignment.BottomCenter, modifier = Modifier.fillMaxSize()){
+        AndroidView({previewView}, modifier = Modifier.fillMaxSize())
+
+        Button(
+            modifier = Modifier.padding(25.dp),
+            onClick = {
+                val photoFile = File(
+                    directory,
+                    SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.US).format(System.currentTimeMillis()) + ".jpg" // Save the photo with the current date
+                )
+
+                imageCapture.takePicture(
+                    ImageCapture.OutputFileOptions.Builder(photoFile).build(),
+                    cameraExecutor,
+                    object : ImageCapture.OnImageSavedCallback {
+                        override fun onError(exception: ImageCaptureException) {
+                            Log.e("camApp", "Error when capturing image")
+                        }
+
+                        override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                            mainViewModel.setNewUri(Uri.fromFile(photoFile))
+                        }
+                    }
+                )
+            }
+        )
+        {
+            androidx.compose.material3.Icon(
+                Icons.Default.AddCircle,
+                "Take Photo",
+                tint = Color.White
+            )
+        }
+    }
 }
