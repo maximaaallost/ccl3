@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -52,6 +53,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -71,6 +73,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberImagePainter
 import com.cc221013.bookify.R
+import com.cc221013.bookify.ui.theme.Calistoga
 import com.cc221013.bookify.ui.theme.DarkBeige
 import com.cc221013.bookify.ui.theme.LightBeige
 import com.cc221013.bookify.ui.theme.LightViolet
@@ -114,11 +117,11 @@ fun MainView(mainViewModel: MainViewModel){
             }
             composable(Screen.TBR.route){
                 mainViewModel.selectScreen(Screen.TBR)
-                TBRScreen(mainViewModel)
+                TBRScreen(mainViewModel, navController)
             }
             composable(Screen.Wishlist.route){
                 mainViewModel.selectScreen(Screen.Wishlist)
-                WishlistScreen(mainViewModel)
+                WishlistScreen(mainViewModel, navController)
             }
             composable(Screen.AddBook.route){
                 mainViewModel.selectScreen(Screen.AddBook)
@@ -160,7 +163,9 @@ fun NavigationBarItem(
 fun BottomNavigationBar(navController: NavHostController, selectedScreen: Screen){
     BottomNavigation (
         backgroundColor = Violet,
-        modifier = Modifier.height(70.dp) .clip(RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp))
+        modifier = Modifier
+            .height(70.dp)
+            .clip(RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp))
     ) {
         Row(modifier = Modifier.fillMaxSize(),
             horizontalArrangement = Arrangement.SpaceAround,
@@ -189,36 +194,104 @@ fun BottomNavigationBar(navController: NavHostController, selectedScreen: Screen
     }
 }
 
+@Composable
+fun TopDecoration(navController: NavHostController, titlePage: String, subHeading: String?) {
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center,
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.topswirl),
+            contentDescription = "Beige Swirl in the Background of the Text"
+        )
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(15.dp),
+        ){
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(15.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(
+                        text = titlePage,
+                        style = TextStyle(
+                            fontFamily = Calistoga,
+                            fontSize = 36.sp,
+                            color = Violet
+                        )
+                    )
+                    if (subHeading != null) {
+                        Text(
+                            text = subHeading,
+                            style = TextStyle(
+                                fontFamily = Poppins,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 16.sp,
+                                color = Violet
+                            )
+                        )
+                    }
+                }
+
+                Row(
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.trophy),
+                        contentDescription = "Go to Reading Challenge",
+                        tint = Violet,
+                        modifier = Modifier
+                            .size(54.dp)
+                            .clickable { }
+                    )
+                    Spacer(modifier = Modifier.width(15.dp))
+
+                    Icon(
+                        painter = painterResource(id = R.drawable.add),
+                        contentDescription = "Add a new Book",
+                        tint = Violet,
+                        modifier = Modifier
+                            .size(54.dp)
+                            .clickable { navController.navigate(Screen.AddBook.route) }
+                    )
+
+                }
+
+
+            }
+        }
+
+    }
+}
 
 @Composable
 fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController){
     val state = mainViewModel.mainViewState.collectAsState()
 
-  Text(text ="Read Screen")
-    Box(contentAlignment = Alignment.TopEnd, modifier = Modifier.fillMaxSize()){
-        Button(
-            onClick = {navController.navigate(Screen.AddBook.route) },
-            modifier = Modifier
-                .padding(20.dp)
-        ) {
-            androidx.compose.material3.Icon(
-                Icons.Default.Add,
-                "Open Add Books",
-                tint = Color.White
-            )
-        }
-    }
-    LazyColumn (
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally,
+    Column(
         modifier = Modifier
+            .background(NonWhite)
             .fillMaxSize()
-            .padding(top = 80.dp)
+            .fillMaxWidth()
+    ){
+        TopDecoration(navController, "Read Books", null)
 
-    ) {
-    if (state.value.books.isEmpty()) { // Show a message if there are no books saved in this shelve
-        // Show a message if there are no entries
-        item {
+        LazyColumn (
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+
+        ) {
+            if (state.value.books.isEmpty()) { // Show a message if there are no books saved in this shelve
+                // Show a message if there are no entries
+                item {
 //            Image(
 //                painter = painterResource(id = R.drawable.emptystateimage),
 //                contentDescription = "Entry Image",
@@ -227,68 +300,84 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController){
 //                    .height(300.dp)
 //
 //            )
-
-            Text(
-                text = "No Books saved yet",
-                style = TextStyle(fontSize = 15.sp, color = Color.Gray, fontFamily = Poppins, textAlign = androidx.compose.ui.text.style.TextAlign.Center),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 40.dp, end = 40.dp, top = 10.dp)
-            )
-        }
-    } else { // If there are entries, show them
-
-        items(state.value.books.reversed()) { book -> // Reverse the list to show the newest entry on top
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { mainViewModel.editBook(book) }
-
-            ) {
-
-                // Top: Image
-                Image(
-                    painter = rememberImagePainter(data = book.cover),
-                    contentDescription = "Entry Image",
-                    modifier = Modifier
-
-                        .height(200.dp)
-
-
-                )
-
-                // Middle: Description and Date
-                Column(
-                    modifier = Modifier
-                        .padding(top = 210.dp, bottom = 20.dp, start = 20.dp, end = 20.dp)
-                        .fillMaxWidth()
-                ) {
                     Text(
-                        text = "${book.title}",
-                        style = TextStyle(fontSize = 15.sp, color = Violet, fontFamily = Poppins),
+                        text = "No Books saved yet",
+                        style = TextStyle(fontSize = 15.sp, color = Color.Gray, fontFamily = Poppins, textAlign = androidx.compose.ui.text.style.TextAlign.Center),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 40.dp, end = 40.dp, top = 10.dp)
                     )
-                    Text(
-                        text = "${book.author}",
-                        style = TextStyle(fontSize = 15.sp, color = LightViolet, fontFamily = Poppins),
-                    )
+                }
+            } else { // If there are entries, show them
 
+                items(state.value.books.reversed()) { book -> // Reverse the list to show the newest entry on top
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { mainViewModel.editBook(book) }
+
+                    ) {
+
+                        // Top: Image
+                        Image(
+                            painter = rememberImagePainter(data = book.cover),
+                            contentDescription = "Entry Image",
+                            modifier = Modifier
+
+                                .height(200.dp)
+
+
+                        )
+
+                        // Middle: Description and Date
+                        Column(
+                            modifier = Modifier
+                                .padding(top = 210.dp, bottom = 20.dp, start = 20.dp, end = 20.dp)
+                                .fillMaxWidth()
+                        ) {
+                            Text(
+                                text = "${book.title}",
+                                style = TextStyle(fontSize = 15.sp, color = Violet, fontFamily = Poppins),
+                            )
+                            Text(
+                                text = "${book.author}",
+                                style = TextStyle(fontSize = 15.sp, color = LightViolet, fontFamily = Poppins),
+                            )
+
+                        }
+                    }
                 }
             }
         }
     }
-}
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TBRScreen(mainViewModel: MainViewModel){
-    Text(text ="TBR Screen")
+fun TBRScreen(mainViewModel: MainViewModel, navController: NavHostController){
+    Column(
+        modifier = Modifier
+            .background(NonWhite)
+            .fillMaxSize()
+            .fillMaxWidth()
+    ){
+        TopDecoration(navController, "TBR", "Books in your shelf")
+
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WishlistScreen(mainViewModel: MainViewModel){
-    Text(text ="Wishlist Screen")
+fun WishlistScreen(mainViewModel: MainViewModel, navController: NavHostController){
+    Column(
+        modifier = Modifier
+            .background(NonWhite)
+            .fillMaxSize()
+            .fillMaxWidth()
+    ){
+        TopDecoration(navController, "Wishlist", "Books you want to buy")
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
