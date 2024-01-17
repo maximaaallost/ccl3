@@ -249,8 +249,6 @@ fun WishlistScreen(mainViewModel: MainViewModel){
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController) {
-    val camState = mainViewModel.cameraState.collectAsState()
-    val photosList = camState.value.photosListState // Get the list of photos taken
 
     var title by rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(
@@ -347,7 +345,7 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
             Text(text = "Back", style = TextStyle(fontSize = 20.sp, color = NonWhite))
         }
         Button(
-            onClick = { mainViewModel.enableCameraPreview(true)},
+            onClick = {},
             modifier = Modifier
                 .padding(20.dp)
         ) { Text(text = "Upload Picture", style = TextStyle(fontSize = 20.sp, color = NonWhite)) }
@@ -447,7 +445,7 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
                         author.text,
                         genre.text,
                         color.text,
-                        photosList.last().toString(),
+                        cover.text,
                         shelf.text,
                         rating.text.toIntOrNull(),
                         review.text,
@@ -468,40 +466,4 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
 
 }
 
-@Composable
-fun CameraView(mainViewModel: MainViewModel, previewView: PreviewView, imageCapture: ImageCapture, cameraExecutor: ExecutorService, directory: File){
-    Box(contentAlignment = Alignment.BottomCenter, modifier = Modifier.fillMaxSize()){
-        AndroidView({previewView}, modifier = Modifier.fillMaxSize())
 
-        Button(
-            modifier = Modifier.padding(25.dp),
-            onClick = {
-                val photoFile = File(
-                    directory,
-                    SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.US).format(System.currentTimeMillis()) + ".jpg" // Save the photo with the current date
-                )
-
-                imageCapture.takePicture(
-                    ImageCapture.OutputFileOptions.Builder(photoFile).build(),
-                    cameraExecutor,
-                    object : ImageCapture.OnImageSavedCallback {
-                        override fun onError(exception: ImageCaptureException) {
-                            Log.e("camApp", "Error when capturing image")
-                        }
-
-                        override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                            mainViewModel.setNewUri(Uri.fromFile(photoFile))
-                        }
-                    }
-                )
-            }
-        )
-        {
-            androidx.compose.material3.Icon(
-                Icons.Default.AddCircle,
-                "Take Photo",
-                tint = Color.White
-            )
-        }
-    }
-}
