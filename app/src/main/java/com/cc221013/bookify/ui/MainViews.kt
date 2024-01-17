@@ -107,7 +107,8 @@ fun MainView(mainViewModel: MainViewModel){
 @Composable
 fun BottomNavigationBar(navController: NavHostController, selectedScreen: Screen){
     BottomNavigation (
-        backgroundColor = MaterialTheme.colorScheme.primary
+        backgroundColor = Violet,
+        modifier = Modifier.height(70.dp)
     ) {
         NavigationBarItem(
             selected = (selectedScreen == Screen.Read),
