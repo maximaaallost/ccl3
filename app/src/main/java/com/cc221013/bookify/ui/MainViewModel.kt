@@ -13,25 +13,13 @@ import kotlinx.coroutines.flow.update
 class MainViewModel(private val db: DatabaseHandler): ViewModel() {
     private val _mainViewState = MutableStateFlow(MainViewState())
     val mainViewState: StateFlow<MainViewState> = _mainViewState.asStateFlow()
-
     private val _cameraState = MutableStateFlow(CameraState())
     val cameraState: StateFlow<CameraState> = _cameraState.asStateFlow()
 
-    fun setCameraPermission(value: Boolean){
-        _cameraState.update { it.copy(cameraPermissionGranted = value) }
-    }
     fun setFilePermission(value: Boolean){
         _cameraState.update { it.copy(filePermissionGranted = value) }
     }
 
-    fun enableCameraPreview(value: Boolean){
-        _cameraState.update { it.copy(enableCameraPreview = value) }
-    }
-
-    fun setNewUri(value: Uri){
-        _cameraState.update { it.copy(photosListState = it.photosListState + value) }
-        enableCameraPreview(false)
-    }
 
     fun save(book: Book){
         db.insertBook(book)
