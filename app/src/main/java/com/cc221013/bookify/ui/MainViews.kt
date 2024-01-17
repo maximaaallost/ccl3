@@ -10,6 +10,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,9 +30,11 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.BottomNavigation
@@ -60,12 +63,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.painter.Painter
@@ -76,6 +81,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -88,11 +94,20 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberImagePainter
 import com.cc221013.bookify.R
 import com.cc221013.bookify.ui.theme.Calistoga
+import com.cc221013.bookify.ui.theme.Blue
 import com.cc221013.bookify.ui.theme.DarkBeige
+import com.cc221013.bookify.ui.theme.DarkBlue
+import com.cc221013.bookify.ui.theme.DarkRed
 import com.cc221013.bookify.ui.theme.LightBeige
+import com.cc221013.bookify.ui.theme.LightRed
 import com.cc221013.bookify.ui.theme.LightViolet
+import com.cc221013.bookify.ui.theme.Lime
+import com.cc221013.bookify.ui.theme.Mint
 import com.cc221013.bookify.ui.theme.NonWhite
+import com.cc221013.bookify.ui.theme.Orange
+import com.cc221013.bookify.ui.theme.Pink
 import com.cc221013.bookify.ui.theme.Poppins
+import com.cc221013.bookify.ui.theme.Turquoise
 import com.cc221013.bookify.ui.theme.Violet
 import com.cc221013.bookify.ui.theme.Yellow
 import java.io.File
@@ -101,19 +116,18 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.util.concurrent.ExecutorService
-import com.google.accompanist.flowlayout.FlowRow
 
-sealed class Screen(val route: String) {
-    object Read : Screen("first")
-    object TBR : Screen("second")
-    object Wishlist : Screen("third")
-    object AddBook : Screen("fourth")
+sealed class Screen(val route: String){
+    object Read: Screen("first")
+    object TBR: Screen("second")
+    object Wishlist: Screen("third")
+    object AddBook: Screen("fourth")
 }
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainView(mainViewModel: MainViewModel) {
+fun MainView(mainViewModel: MainViewModel){
     val state = mainViewModel.mainViewState.collectAsState()
     val navController = rememberNavController()
 
@@ -678,193 +692,139 @@ fun WishlistScreen(mainViewModel: MainViewModel, navController: NavHostControlle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+fun WishlistScreen(mainViewModel: MainViewModel){
+    Text(text ="Wishlist Screen")
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController) {
     val camState = mainViewModel.cameraState.collectAsState()
     val photosList = camState.value.photosListState // Get the list of photos taken
-
-    var title by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(
-            TextFieldValue(
-                ""
-            )
-        )
-    }
-    var author by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(
-            TextFieldValue("")
-        )
-    }
-    var genre by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(
-            TextFieldValue(
-                ""
-            )
-        )
-    }
-    var color by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(
-            TextFieldValue(
-                ""
-            )
-        )
-    }
-    var cover by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(
-            TextFieldValue(
-                ""
-            )
-        )
-    }
-    var shelf by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(
-            TextFieldValue(
-                ""
-            )
-        )
-    }
-    var rating by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(
-            TextFieldValue("")
-        )
-    }
-    var review by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(
-            TextFieldValue("")
-        )
-    }
-    var quote by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(
-            TextFieldValue(
-                ""
-            )
-        )
-    }
-    var language by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(
-            TextFieldValue("")
-        )
-    }
-    var pages by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(
-            TextFieldValue(
-                ""
-            )
-        )
-    }
-    var days by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(
-            TextFieldValue(
-                ""
-            )
-        )
-    }
-    var mediaType by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(
-            TextFieldValue("")
-        )
+    val lastItem = if (photosList.isNotEmpty()) {
+        photosList.last()
+    } else {
+        Uri.parse("android.resource://com.cc221013.bookify/drawable/placeholdercover")
     }
 
+    var title by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
+    var author by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
+    var genre by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
+    var color by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
+    var shelf by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
+    var rating by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
+    var review by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
+    var quote by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
+    var language by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
+    var pages by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
+    var days by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
+    var mediaType by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(20.dp),
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
-    ) {
-        Button(onClick = { navController.navigate(Screen.Read.route) }) {
-            Text(text = "Back", style = TextStyle(fontSize = 20.sp, color = NonWhite))
+    ){
+        //with back button, violetswirl and cover image
+        Box(modifier = Modifier.fillMaxSize()) {
+            Image(
+                painter = painterResource(id = R.drawable.violetswirl),
+                contentDescription = "Decorative Picture" )
+
+            Icon (
+                painter = painterResource(id = R.drawable.goback),
+                contentDescription = "Back",
+                tint = NonWhite,
+                modifier = Modifier
+                    .padding(20.dp)
+                    .clickable { navController.navigate(Screen.Read.route) }
+                    .size(40.dp)
+
+
+            )
+            Box( modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 90.dp, bottom = 20.dp, start = 20.dp, end = 20.dp)){
+                Icon(
+                    painter = painterResource(id = R.drawable.bookcover),
+                    contentDescription = "Book cover background",
+                    tint = DarkBeige,
+                    modifier = Modifier
+                        .size(275.dp)
+                )
+
+                Image(
+                    painter = rememberImagePainter(lastItem),
+                    contentDescription = "Entry Image",
+                    modifier = Modifier
+                        .height(225.dp)
+                        .padding(65.dp, 5.dp, 0.dp, 0.dp)
+                        .clip(RoundedCornerShape(10.dp, 0.dp, 0.dp, 0.dp))
+                )
+            }
+
         }
-        Button(
-            onClick = { mainViewModel.enableCameraPreview(true) },
+
+        //with camera button
+        Button(onClick = { mainViewModel.enableCameraPreview(true) },
             modifier = Modifier
-                .padding(20.dp)
-        ) { Text(text = "Upload Picture", style = TextStyle(fontSize = 20.sp, color = NonWhite)) }
+                .clip(RoundedCornerShape(8.dp))
+                .background(Yellow),
+            colors = androidx.compose.material3.ButtonDefaults.buttonColors(Color.Transparent),
+        ) {
+            Icon(painter = painterResource(id = R.drawable.upload), contentDescription = "upload image icon", tint = Violet)
+            Text(text = "upload cover image", style = TextStyle(fontSize = 15.sp, color = Violet, fontFamily = Poppins), modifier = Modifier.padding(start = 10.dp))
+        }
 
-        TextField(
-            modifier = Modifier.padding(top = 10.dp),
-            value = color,
-            onValueChange = { newText -> color = newText },
-            label = { Text(text = "Color") },
+        Text(text = "Book Color",
+            style = TextStyle(fontSize = 16.sp, color = Violet, fontFamily = Poppins, fontWeight = FontWeight.ExtraBold),
+            modifier = Modifier
+                .padding(top = 20.dp, start = 45.dp)
+                .align(Alignment.Start),
         )
 
-        TextField(
-            modifier = Modifier.padding(top = 10.dp),
-            value = title,
-            onValueChange = { newText -> title = newText },
-            label = { Text(text = "Title") },
-        )
+        ColorList()
 
-        TextField(
-            modifier = Modifier.padding(top = 10.dp),
-            value = author,
-            onValueChange = { newText -> author = newText },
-            label = { Text(text = "Author") },
-        )
+        Button(onClick = { },
+            modifier = Modifier
+                .clip(RoundedCornerShape(8.dp))
+                .align(Alignment.Start)
+                .padding(start = 40.dp),
+            //colors = ButtonDefaults.buttonColors(backgroundColor = Yellow),
+        ) {
+            Icon(painter = painterResource(id = R.drawable.paintbrush), contentDescription = "custom color icon", tint = NonWhite)
+            Text(text = "custom color", style = TextStyle(fontSize = 15.sp, color = NonWhite, fontFamily = Poppins), modifier = Modifier.padding(start = 10.dp))
+        }
 
-        TextField(
-            modifier = Modifier.padding(top = 10.dp),
-            value = genre,
-            onValueChange = { newText -> genre = newText },
-            label = { Text(text = "Genre") },
-        )
-
-        TextField(
-            modifier = Modifier.padding(top = 10.dp),
-            value = shelf,
-            onValueChange = { newText -> shelf = newText },
-            label = { Text(text = "Shelf") },
-        )
-
-        TextField(
-            modifier = Modifier.padding(top = 10.dp),
-            value = rating,
-            onValueChange = { newText -> rating = newText },
-            label = { Text(text = "Rating") },
-        )
-
-        TextField(
-            modifier = Modifier.padding(top = 10.dp),
-            value = review,
-            onValueChange = { newText -> review = newText },
-            label = { Text(text = "Review") },
-        )
-
-        TextField(
-            modifier = Modifier.padding(top = 10.dp),
-            value = quote,
-            onValueChange = { newText -> quote = newText },
-            label = { Text(text = "Quote") },
-        )
-
-        TextField(
-            modifier = Modifier.padding(top = 10.dp),
-            value = language,
-            onValueChange = { newText -> language = newText },
-            label = { Text(text = "Language") },
-        )
-
-        TextField(
-            modifier = Modifier.padding(top = 10.dp),
-            value = pages,
-            onValueChange = { newText -> pages = newText },
-            label = { Text(text = "Pages") },
-        )
-
-        TextField(
-            modifier = Modifier.padding(top = 10.dp),
-            value = days,
-            onValueChange = { newText -> days = newText },
-            label = { Text(text = "Days") },
-        )
-
-        TextField(
-            modifier = Modifier.padding(top = 10.dp),
-            value = mediaType,
-            onValueChange = { newText -> mediaType = newText },
-            label = { Text(text = "Media Type") },
-        )
+ Column {
+        StyledTextField(title,"Book Title")
+        StyledTextField(author,"Author")
+        StyledTextField(genre,"Genre")
+        StyledText("Shelf")
+        StyledTextField(shelf,"Shelf")
+        StyledText("Rate the book")
+        StyledTextField(rating,"Rating")
+        StyledText("Write a review")
+        StyledTextField(review,"Review")
+        StyledText("Quotes")
+        StyledTextField(quote,"'I will not die today' - Harry Potter")
+        Button(onClick = { mainViewModel.enableCameraPreview(true) },
+         modifier = Modifier
+             .clip(RoundedCornerShape(8.dp))
+             .padding(start = 20.dp)
+         //colors = ButtonDefaults.buttonColors(backgroundColor = Yellow),
+        ) {
+         Icon(imageVector = Icons.Default.Add, contentDescription = "add quote", tint = NonWhite)
+         Text(text = "add quote", style = TextStyle(fontSize = 15.sp, color = NonWhite, fontFamily = Poppins), modifier = Modifier.padding(start = 5.dp))
+        }
+        StyledTextField(language,"Language")
+        StyledText("Amount of Pages")
+        StyledTextField(pages,"Pages")
+        StyledTextField(days,"Days")
+        StyledTextField(mediaType,"Media Type")
+ }
 
         Button(
             onClick = {
@@ -892,37 +852,78 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
             },
             modifier = Modifier.padding(20.dp),
         ) {
-            Text(
-                text = stringResource(R.string.addscreen_button_save),
-                fontSize = 20.sp,
-                color = Color.White,
-                fontFamily = Poppins
-            )
+            Text(text = stringResource(R.string.addscreen_button_save), fontSize = 20.sp, color = Color.White, fontFamily = Poppins)
         }
-    }
+}
 
 }
 
 @Composable
-fun CameraView(
-    mainViewModel: MainViewModel,
-    previewView: PreviewView,
-    imageCapture: ImageCapture,
-    cameraExecutor: ExecutorService,
-    directory: File
-) {
-    Box(contentAlignment = Alignment.BottomCenter, modifier = Modifier.fillMaxSize()) {
-        AndroidView({ previewView }, modifier = Modifier.fillMaxSize())
+fun ColorList() {
+    val colorList = listOf(
+        DarkRed, LightRed, Pink, Orange, Lime, Mint, Turquoise, Blue, DarkBlue
+    )
+   Row {
+        Spacer(modifier = Modifier.padding(20.dp))
+        LazyRow {
+            items(colorList) { color ->
+                Icon(
+                    painter = painterResource(id = R.drawable.circle),
+                    contentDescription = null,
+                    tint = color,
+                    modifier = Modifier
+                        .size(60.dp)
+                        .padding(5.dp)
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun StyledTextField( value: TextFieldValue, label: String) {
+    var inputValue = value;
+    TextField(
+        value = inputValue,
+//        colors = TextFieldDefaults.textFieldColors(
+//            backgroundColor = DarkBeige,
+//            focusedIndicatorColor = Color.Transparent,
+//            unfocusedIndicatorColor = Color.Transparent,
+//            disabledIndicatorColor = Color.Transparent
+//        ),
+        modifier = Modifier
+            .padding(top = 10.dp)
+            .padding(horizontal = 16.dp)
+            .background(DarkBeige, RoundedCornerShape(8.dp)),
+        onValueChange = { newText -> inputValue = newText },
+        label = { Text(text = "$label", color = Violet, fontSize = 13.sp) },
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType = KeyboardType.Text
+        )
+    )
+}
+
+@Composable
+fun StyledText(text: String) {
+    Text(text = "$text",
+        style = TextStyle(fontSize = 16.sp, color = Violet, fontFamily = Poppins, fontWeight = FontWeight.ExtraBold),
+        modifier = Modifier
+            .padding(start = 16.dp, top = 10.dp )
+    )
+}
+
+        @Composable
+fun CameraView(mainViewModel: MainViewModel, previewView: PreviewView, imageCapture: ImageCapture, cameraExecutor: ExecutorService, directory: File){
+    Box(contentAlignment = Alignment.BottomCenter, modifier = Modifier.fillMaxSize()){
+        AndroidView({previewView}, modifier = Modifier.fillMaxSize())
 
         Button(
             modifier = Modifier.padding(25.dp),
             onClick = {
                 val photoFile = File(
                     directory,
-                    SimpleDateFormat(
-                        "yyyy-MM-dd-HH-mm-ss-SSS",
-                        Locale.US
-                    ).format(System.currentTimeMillis()) + ".jpg" // Save the photo with the current date
+                    SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.US).format(System.currentTimeMillis()) + ".jpg" // Save the photo with the current date
                 )
 
                 imageCapture.takePicture(

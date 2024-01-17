@@ -28,10 +28,12 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 
+
 class MainActivity : ComponentActivity() {
     private val db = DatabaseHandler(this)
     private val mainViewModel = MainViewModel(db)
     private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()){ mainViewModel.setCameraPermission(it) }
+    private val requestFilePermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()){ mainViewModel.setFilePermission(it) }
     private lateinit var cameraProviderFuture : ListenableFuture<ProcessCameraProvider>
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var previewView: PreviewView
@@ -77,6 +79,17 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun requestFilePermission(){
+        ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE).let{ result ->
+            if(result != PackageManager.PERMISSION_GRANTED){
+                requestFilePermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                requestFilePermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+            } else {
+                mainViewModel.setFilePermission(true)
+            }
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         cameraExecutor.shutdown()
@@ -86,6 +99,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestPermission()
+        requestFilePermission()
         setContent {
             BookifyTheme {
                 // A surface container using the 'background' color from the theme
