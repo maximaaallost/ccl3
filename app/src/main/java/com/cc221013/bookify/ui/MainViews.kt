@@ -318,30 +318,43 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController){
 
                     ) {
 
-                        // Top: Image
-                        Image(
-                            painter = rememberImagePainter(data = book.cover),
-                            contentDescription = "Entry Image",
-                            modifier = Modifier
-                                .height(200.dp)
-                        )
+                        Column {
+                            Box(){
+                                Icon(
+                                    painter = painterResource(id = R.drawable.bookcover),
+                                    contentDescription = "Book cover background",
+                                    modifier = Modifier.size(225.dp)
 
-                        // Middle: Description and Date
-                        Column(
-                            modifier = Modifier
-                                .padding(top = 210.dp, bottom = 20.dp, start = 20.dp, end = 20.dp)
-                                .fillMaxWidth()
-                        ) {
-                            Text(
-                                text = "${book.title}",
-                                style = TextStyle(fontSize = 15.sp, color = Violet, fontFamily = Poppins),
-                            )
-                            Text(
-                                text = "${book.author}",
-                                style = TextStyle(fontSize = 15.sp, color = LightViolet, fontFamily = Poppins),
-                            )
+                                )
+                                // Top: Image
+                                Image(
+                                    painter = rememberImagePainter(data = book.cover),
+                                    contentDescription = "Entry Image",
+                                    modifier = Modifier
+                                        .height(170.dp)
+                                        .padding(55.dp, 10.dp, 0.dp, 0.dp)
+                                        .clip(RoundedCornerShape(2.dp))
+                                )
+                            }
 
+
+                            // Middle: Description and Date
+                            Column(
+                                modifier = Modifier
+                                    .width(225.dp)
+                            ) {
+                                Text(
+                                    text = "${book.title}",
+                                    style = TextStyle(fontSize = 15.sp, color = Violet, fontFamily = Poppins),
+                                )
+                                Text(
+                                    text = "${book.author}",
+                                    style = TextStyle(fontSize = 15.sp, color = LightViolet, fontFamily = Poppins),
+                                )
+
+                            }
                         }
+
                     }
                 }
             }
