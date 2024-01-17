@@ -16,6 +16,7 @@ import com.cc221013.bookify.ui.MainViewModel
 
 
 
+
 class MainActivity : ComponentActivity() {
     private val db = DatabaseHandler(this)
     private val mainViewModel = MainViewModel(db)
