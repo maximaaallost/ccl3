@@ -140,6 +140,7 @@ sealed class Screen(val route: String) {
     object Wishlist : Screen("third")
     object AddBook : Screen("fourth")
     object BookDetails : Screen("fifth")
+    object Stats : Screen("sixth")
 }
 
 
@@ -177,6 +178,10 @@ fun MainView(mainViewModel: MainViewModel) {
             composable(Screen.BookDetails.route) {
                 mainViewModel.selectScreen(Screen.BookDetails)
                 BookDetails(mainViewModel, navController)
+            }
+            composable(Screen.Stats.route) {
+                mainViewModel.selectScreen(Screen.Stats)
+                StatsScreen(mainViewModel, navController)
             }
         }
     }
@@ -336,6 +341,7 @@ fun SmallText(text: String?, color: Color) {
     )
 }
 
+//Styled Text
 @Composable
 fun BigText(text: Int?, color: Color) {
     Text(
@@ -350,6 +356,7 @@ fun BigText(text: Int?, color: Color) {
     )
 }
 
+//Reading Statistics on Read Page
 @Composable
 fun ReadStats() {
     Card(
@@ -434,6 +441,7 @@ fun ReadStats() {
     }
 }
 
+//Vertical Scroll to filter Genres
 @Composable
 fun GenreScroll() {
     val genreColors = listOf(
@@ -883,7 +891,6 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TBRScreen(mainViewModel: MainViewModel, navController: NavHostController) {
@@ -1076,6 +1083,11 @@ fun WishlistScreen(mainViewModel: MainViewModel, navController: NavHostControlle
             }
         }
     }
+}
+
+@Composable
+fun StatsScreen(mainViewModel: MainViewModel, navHostController: NavHostController){
+
 }
 
 
