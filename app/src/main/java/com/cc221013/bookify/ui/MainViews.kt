@@ -82,6 +82,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -313,29 +314,32 @@ fun TopDecoration(navController: NavHostController, titlePage: String, subHeadin
                     }
                 }
 
-                Row(
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.trophy),
-                        contentDescription = "Go to Reading Challenge",
-                        tint = Violet,
-                        modifier = Modifier
-                            .size(54.dp)
-                            .clickable { }
-                    )
-                    Spacer(modifier = Modifier.width(15.dp))
+                if(titlePage !== "Stats"){
+                    Row(
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.trophy),
+                            contentDescription = "Go to Reading Challenge",
+                            tint = Violet,
+                            modifier = Modifier
+                                .size(54.dp)
+                                .clickable { navController.navigate(Screen.Stats.route) }
+                        )
+                        Spacer(modifier = Modifier.width(15.dp))
 
-                    Icon(
-                        painter = painterResource(id = R.drawable.add),
-                        contentDescription = "Add a new Book",
-                        tint = Violet,
-                        modifier = Modifier
-                            .size(54.dp)
-                            .clickable { navController.navigate(Screen.AddBook.route) }
-                    )
+                        Icon(
+                            painter = painterResource(id = R.drawable.add),
+                            contentDescription = "Add a new Book",
+                            tint = Violet,
+                            modifier = Modifier
+                                .size(54.dp)
+                                .clickable { navController.navigate(Screen.AddBook.route) }
+                        )
 
+                    }
                 }
+
 
 
             }
@@ -667,7 +671,8 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
             //book review & quote and buttons (delete/edit)
             item{
                 Column(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(30.dp, 0.dp, 0.dp, 0.dp)
                 ) {
                     Spacer(modifier = Modifier.height(15.dp))
@@ -740,8 +745,9 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
 
                     //Buttons: Delete, Edit
                     Row(
-                        modifier = Modifier.fillMaxWidth()
-                        .padding(end = 20.dp, bottom = 40.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(end = 20.dp, bottom = 40.dp),
                         horizontalArrangement = Arrangement.SpaceAround,
                         verticalAlignment = Alignment.CenterVertically,
                     ){
@@ -1103,8 +1109,189 @@ fun WishlistScreen(mainViewModel: MainViewModel, navController: NavHostControlle
 }
 
 @Composable
-fun StatsScreen(mainViewModel: MainViewModel, navHostController: NavHostController){
+fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController){
 
+    LazyColumn(
+        verticalArrangement = Arrangement.Center,
+    ){
+        item {
+            TopDecoration(navController, "Stats", "Your reading in numbers")
+        }
+        item{
+
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center){
+
+                //amount of books and pages
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+
+                    //Amount of books
+                    Box(
+                        modifier = Modifier
+                            .background(color = Violet, RoundedCornerShape(10.dp))
+                            .width(150.dp)
+                            .height(80.dp),
+                    ){
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ){
+                            BigText(text = 8, color = NonWhite)
+                            SmallText(text = "books", color = NonWhite)
+                        }
+
+                    }
+                    Spacer(modifier = Modifier.width(20.dp))
+
+                    //Amount of Pages
+                    Box(
+                        modifier = Modifier
+                            .background(color = Violet, RoundedCornerShape(10.dp))
+                            .height(80.dp)
+                            .width(180.dp)
+                    ){
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ){
+                            BigText(text = 178895, color = NonWhite)
+                            SmallText(text = "pages", color = NonWhite)
+                        }
+
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                //Media Type Distribution
+                Box(
+                    modifier = Modifier
+                        .background(color = Violet, RoundedCornerShape(10.dp))
+                        .height(80.dp)
+                        .width(350.dp)
+                ){
+                    Column( modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally){
+                        //heading
+                        SmallText(text = "Media Type", color = NonWhite)
+
+
+                        //Row for Media Tyoe
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 20.dp, end = 20.dp),
+                            horizontalArrangement = Arrangement.SpaceAround
+                        ){
+                            //Ebook
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ){
+                                Icon(painter = painterResource(id = R.drawable.ebook),
+                                    contentDescription = "E-Books",
+                                    tint = NonWhite,
+                                    modifier = Modifier.size(25.dp))
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Text(
+                                    text = "10%",
+                                    style = TextStyle(
+                                        fontFamily = Poppins,
+                                        fontWeight = FontWeight.SemiBold,
+                                        fontSize = 14.sp
+                                    )
+                                )
+                            }
+                            //Paperback
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ){
+                                Icon(painter = painterResource(id = R.drawable.paperback),
+                                    contentDescription = "E-Books",
+                                    tint = NonWhite,
+                                    modifier = Modifier.size(25.dp))
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Text(
+                                    text = "20%",
+                                    style = TextStyle(
+                                        fontFamily = Poppins,
+                                        fontWeight = FontWeight.SemiBold,
+                                        fontSize = 14.sp
+                                    )
+                                )
+                            }
+                            //Audio book
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ){
+                                Icon(painter = painterResource(id = R.drawable.audiobook),
+                                    contentDescription = "E-Books",
+                                    tint = NonWhite,
+                                    modifier = Modifier.size(25.dp))
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Text(
+                                    text = "80%",
+                                    style = TextStyle(
+                                        fontFamily = Poppins,
+                                        fontWeight = FontWeight.SemiBold,
+                                        fontSize = 14.sp
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                //Data Vis for Genre
+                Box(modifier = Modifier
+                    .background(color = Violet, RoundedCornerShape(10.dp))
+                    .width(350.dp),
+                    contentAlignment = Center
+                ){
+                    Box(
+                        modifier = Modifier
+                            .size(300.dp)
+                            .padding(30.dp)
+                            .background(Yellow, CircleShape),
+                        contentAlignment = Center
+                    ){
+                        Text(text = "Genre", )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+
+                Button(onClick = {  },
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Yellow),
+                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(Color.Transparent),
+                ) {
+                    Icon(painter = painterResource(id = R.drawable.add), contentDescription = "add icon", tint = Violet, modifier = Modifier.size(25.dp))
+                    Text(text = "add reading challenge", style = TextStyle(fontSize = 15.sp, color = Violet, fontFamily = Poppins), modifier = Modifier.padding(start = 10.dp))
+                }
+
+            }
+
+
+
+
+
+        }
+
+    }
 }
 
 
