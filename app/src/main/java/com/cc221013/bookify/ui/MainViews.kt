@@ -810,7 +810,12 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
         }
 
  Column {
-        StyledTextField(title,"Book Title")
+     TextField(
+         modifier = Modifier.padding(top = 10.dp),
+         value = title,
+         onValueChange = { newText -> title = newText },
+         label = { Text(text = "Book title") }
+     )
         StyledTextField(author,"Author")
         StyledTextField(color, "Color")
         StyledTextField(genre,"Genre")
