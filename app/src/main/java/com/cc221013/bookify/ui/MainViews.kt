@@ -1,7 +1,13 @@
 package com.cc221013.bookify.ui
 
+import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.view.PreviewView
@@ -75,6 +81,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -690,15 +697,12 @@ fun WishlistScreen(mainViewModel: MainViewModel, navController: NavHostControlle
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun WishlistScreen(mainViewModel: MainViewModel){
-    Text(text ="Wishlist Screen")
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController) {
+
+
     val camState = mainViewModel.cameraState.collectAsState()
     val photosList = camState.value.photosListState // Get the list of photos taken
     val lastItem = if (photosList.isNotEmpty()) {
@@ -707,6 +711,7 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
         Uri.parse("android.resource://com.cc221013.bookify/drawable/placeholdercover")
     }
 
+    var cover by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
     var title by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
     var author by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
     var genre by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
@@ -719,6 +724,10 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
     var pages by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
     var days by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
     var mediaType by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
+
+    val photoPicker = setupPhotoPicker { uri ->
+        cover = TextFieldValue(uri.toString())
+    }
 
     Column(
         modifier = Modifier
@@ -767,16 +776,18 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
 
         }
 
-        //with camera button
-        Button(onClick = { mainViewModel.enableCameraPreview(true) },
-            modifier = Modifier
-                .clip(RoundedCornerShape(8.dp))
-                .background(Yellow),
-            colors = androidx.compose.material3.ButtonDefaults.buttonColors(Color.Transparent),
-        ) {
-            Icon(painter = painterResource(id = R.drawable.upload), contentDescription = "upload image icon", tint = Violet)
-            Text(text = "upload cover image", style = TextStyle(fontSize = 15.sp, color = Violet, fontFamily = Poppins), modifier = Modifier.padding(start = 10.dp))
-        }
+
+        //Picture upload Button
+        Button(onClick = { photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
+        modifier = Modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(Yellow),
+        colors = androidx.compose.material3.ButtonDefaults.buttonColors(Color.Transparent),
+    ) {
+        Icon(painter = painterResource(id = R.drawable.upload), contentDescription = "upload image icon", tint = Violet)
+        Text(text = "upload cover image", style = TextStyle(fontSize = 15.sp, color = Violet, fontFamily = Poppins), modifier = Modifier.padding(start = 10.dp))
+    }
+
 
         Text(text = "Book Color",
             style = TextStyle(fontSize = 16.sp, color = Violet, fontFamily = Poppins, fontWeight = FontWeight.ExtraBold),
@@ -799,8 +810,14 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
         }
 
  Column {
-        StyledTextField(title,"Book Title")
+     TextField(
+         modifier = Modifier.padding(top = 10.dp),
+         value = title,
+         onValueChange = { newText -> title = newText },
+         label = { Text(text = "Book title") }
+     )
         StyledTextField(author,"Author")
+        StyledTextField(color, "Color")
         StyledTextField(genre,"Genre")
         StyledText("Shelf")
         StyledTextField(shelf,"Shelf")
@@ -810,7 +827,7 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
         StyledTextField(review,"Review")
         StyledText("Quotes")
         StyledTextField(quote,"'I will not die today' - Harry Potter")
-        Button(onClick = { mainViewModel.enableCameraPreview(true) },
+        Button(onClick = {},
          modifier = Modifier
              .clip(RoundedCornerShape(8.dp))
              .padding(start = 20.dp)
@@ -837,7 +854,7 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
                         author.text,
                         genre.text,
                         color.text,
-                        photosList.last().toString(),
+                        cover.text.toString(),
                         shelf.text,
                         rating.text.toIntOrNull(),
                         review.text,
@@ -856,6 +873,21 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
         }
 }
 
+}
+
+
+@Composable
+private fun setupPhotoPicker(onImagePicked: (Uri) -> Unit): ManagedActivityResultLauncher<PickVisualMediaRequest, Uri?> {
+   val context = LocalContext.current
+    return rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri != null) {
+            onImagePicked(uri)
+            val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            context.contentResolver.takePersistableUriPermission(uri, flag)
+        } else {
+            Log.e("PhotoPicker", "No image was picked")
+        }
+    }
 }
 
 @Composable
@@ -897,10 +929,7 @@ fun StyledTextField( value: TextFieldValue, label: String) {
             .padding(horizontal = 16.dp)
             .background(DarkBeige, RoundedCornerShape(8.dp)),
         onValueChange = { newText -> inputValue = newText },
-        label = { Text(text = "$label", color = Violet, fontSize = 13.sp) },
-        keyboardOptions = KeyboardOptions.Default.copy(
-            keyboardType = KeyboardType.Text
-        )
+        label = { Text(text = "$label", color = Violet, fontSize = 13.sp) }
     )
 }
 
@@ -913,40 +942,4 @@ fun StyledText(text: String) {
     )
 }
 
-        @Composable
-fun CameraView(mainViewModel: MainViewModel, previewView: PreviewView, imageCapture: ImageCapture, cameraExecutor: ExecutorService, directory: File){
-    Box(contentAlignment = Alignment.BottomCenter, modifier = Modifier.fillMaxSize()){
-        AndroidView({previewView}, modifier = Modifier.fillMaxSize())
 
-        Button(
-            modifier = Modifier.padding(25.dp),
-            onClick = {
-                val photoFile = File(
-                    directory,
-                    SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.US).format(System.currentTimeMillis()) + ".jpg" // Save the photo with the current date
-                )
-
-                imageCapture.takePicture(
-                    ImageCapture.OutputFileOptions.Builder(photoFile).build(),
-                    cameraExecutor,
-                    object : ImageCapture.OnImageSavedCallback {
-                        override fun onError(exception: ImageCaptureException) {
-                            Log.e("camApp", "Error when capturing image")
-                        }
-
-                        override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                            mainViewModel.setNewUri(Uri.fromFile(photoFile))
-                        }
-                    }
-                )
-            }
-        )
-        {
-            androidx.compose.material3.Icon(
-                Icons.Default.AddCircle,
-                "Take Photo",
-                tint = Color.White
-            )
-        }
-    }
-}
