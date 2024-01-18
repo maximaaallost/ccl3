@@ -160,8 +160,15 @@ fun MainView(mainViewModel: MainViewModel) {
     val state = mainViewModel.mainViewState.collectAsState()
     val navController = rememberNavController()
 
+    val bottomBar: (@Composable () -> Unit) =
+        if (state.value.selectedScreen != Screen.AddBook && state.value.selectedScreen != Screen.BookDetails && state.value.selectedScreen !== Screen.Stats) {
+            { BottomNavigationBar(navController, state.value.selectedScreen) }
+        } else {
+            { }
+        }
+
     Scaffold(
-        bottomBar = { BottomNavigationBar(navController, state.value.selectedScreen) }
+        bottomBar = bottomBar
     ) {
         NavHost(
             navController = navController,
@@ -508,7 +515,6 @@ fun GenreScroll() {
     }
 }
 
-
 @Composable
 fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) {
     val book = mainViewModel.selectedBook.value
@@ -605,15 +611,15 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
                                 contentDescription = "Book cover background",
                                 tint = Violet,
                                 modifier = Modifier
-                                    .size(275.dp)
+                                    .size(260.dp)
                             )
 
                             Image(
                                 painter = rememberImagePainter(book.cover),
                                 contentDescription = "Entry Image",
                                 modifier = Modifier
-                                    .height(225.dp)
-                                    .padding(70.dp, 5.dp, 0.dp, 0.dp)
+                                    .height(210.dp)
+                                    .padding(65.dp, 5.dp, 0.dp, 0.dp)
                                     .clip(RoundedCornerShape(10.dp, 0.dp, 0.dp, 0.dp))
                             )
                         }
@@ -658,7 +664,7 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
                 }
             }
 
-            //book review & quote
+            //book review & quote and buttons (delete/edit)
             item{
                 Column(
                     modifier = Modifier.fillMaxWidth()
@@ -735,7 +741,7 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
                     //Buttons: Delete, Edit
                     Row(
                         modifier = Modifier.fillMaxWidth()
-                        .padding(end = 20.dp),
+                        .padding(end = 20.dp, bottom = 40.dp),
                         horizontalArrangement = Arrangement.SpaceAround,
                         verticalAlignment = Alignment.CenterVertically,
                     ){
@@ -746,7 +752,7 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
                             modifier = Modifier
                                 .clip(RoundedCornerShape(8.dp))
                                 .background(DarkBeige)
-                                .width(160.dp),
+                                .width(150.dp),
                             colors = androidx.compose.material3.ButtonDefaults.buttonColors(Color.Transparent),
                         ) {
                             Icon(
@@ -765,7 +771,7 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
                             onClick = {},
                             modifier = Modifier
                                 .clip(RoundedCornerShape(8.dp))
-                                .width(160.dp)
+                                .width(150.dp)
                                 .background(DarkBeige),
                             colors = androidx.compose.material3.ButtonDefaults.buttonColors(Color.Transparent),
                         ) {
