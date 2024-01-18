@@ -722,7 +722,9 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
                         verticalAlignment = Alignment.CenterVertically,
                     ){
                         Button(
-                            onClick = {},
+                            onClick = { mainViewModel.clickDelete(book)
+                                mainViewModel.setSelectedBook(book)
+                                navController.navigate(Screen.Read.route)},
                             modifier = Modifier
                                 .clip(RoundedCornerShape(8.dp))
                                 .background(DarkBeige)
