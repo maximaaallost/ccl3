@@ -39,20 +39,26 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Divider
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Home
@@ -73,6 +79,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
@@ -88,12 +95,16 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.graphics.toColorInt
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -144,7 +155,7 @@ fun MainView(mainViewModel: MainViewModel){
         NavHost(
             navController = navController,
             modifier = Modifier.padding(it),
-            startDestination = Screen.Read.route
+            startDestination = Screen.AddBook.route
         ) {
             composable(Screen.Read.route) {
                 mainViewModel.selectScreen(Screen.Read)
@@ -446,7 +457,6 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                     // If there are entries, show them
                 } else {
                     items(state.value.books.reversed()) { book -> // Reverse the list to show the newest entry on top
-
                         //One Book
                         Column(
                             verticalArrangement = Arrangement.Center,
@@ -457,7 +467,9 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                                 Icon(
                                     painter = painterResource(id = R.drawable.bookcover),
                                     contentDescription = "Book cover background",
-                                    modifier = Modifier.size(225.dp)
+                                    modifier = Modifier.size(225.dp),
+                                    tint = ColorUtils.getColorByName(book.color)
+
                                 )
                                 // Top: Image
                                 Image(
@@ -729,6 +741,29 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
         cover = TextFieldValue(uri.toString())
     }
 
+    val genres = listOf(
+        "Fantasy", "Sci-Fi", "Romance", "New Adult", "Thriller", "Horror", "Erotica",
+        "Manga", "Biography", "Novel", "History", "Non-Fiction"
+    )
+
+    val languages = listOf(
+        "English", "German", "French", "Spanish", "Italian", "Portuguese", "Russian", "Chinese", "Japanese", "Korean"
+    )
+     val mediaTypeList = listOf(
+        "Paperback", "Ebook", "Audiobook"
+     )
+     val shelfList = listOf(
+        "Read", "To be Read", "Wishlist"
+     )
+    val starRatings = listOf(
+        5, 4, 3, 2, 1
+    )
+    var selectedGenre by remember { mutableStateOf(genres[0]) }
+    var selectedLanguage by remember { mutableStateOf(languages[0]) }
+    var selectedMediaType by remember { mutableStateOf(mediaTypeList[0]) }
+    var selectedShelf by remember { mutableStateOf(shelfList[0]) }
+    var selectedRating by remember { mutableStateOf(starRatings[0]) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -740,7 +775,9 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
         Box(modifier = Modifier.fillMaxSize()) {
             Image(
                 painter = painterResource(id = R.drawable.violetswirl),
-                contentDescription = "Decorative Picture" )
+                contentDescription = "Decorative Picture",
+                modifier = Modifier.fillMaxWidth()
+            )
 
             Icon (
                 painter = painterResource(id = R.drawable.goback),
@@ -776,7 +813,6 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
 
         }
 
-
         //Picture upload Button
         Button(onClick = { photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
         modifier = Modifier
@@ -788,7 +824,6 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
         Text(text = "upload cover image", style = TextStyle(fontSize = 15.sp, color = Violet, fontFamily = Poppins), modifier = Modifier.padding(start = 10.dp))
     }
 
-
         Text(text = "Book Color",
             style = TextStyle(fontSize = 16.sp, color = Violet, fontFamily = Poppins, fontWeight = FontWeight.ExtraBold),
             modifier = Modifier
@@ -796,32 +831,64 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
                 .align(Alignment.Start),
         )
 
-        ColorList()
-
-        Button(onClick = { },
-            modifier = Modifier
-                .clip(RoundedCornerShape(8.dp))
-                .align(Alignment.Start)
-                .padding(start = 40.dp),
-            //colors = ButtonDefaults.buttonColors(backgroundColor = Yellow),
-        ) {
-            Icon(painter = painterResource(id = R.drawable.paintbrush), contentDescription = "custom color icon", tint = NonWhite)
-            Text(text = "custom color", style = TextStyle(fontSize = 15.sp, color = NonWhite, fontFamily = Poppins), modifier = Modifier.padding(start = 10.dp))
+        ColorList { selectedColor ->
+            color = TextFieldValue(selectedColor.toString())
         }
 
  Column {
-        StyledTextField(title,"Book Title")
-        StyledTextField(author,"Author")
-        StyledTextField(color, "Color")
-        StyledTextField(genre,"Genre")
-        StyledText("Shelf")
-        StyledTextField(shelf,"Shelf")
-        StyledText("Rate the book")
-        StyledTextField(rating,"Rating")
-        StyledText("Write a review")
-        StyledTextField(review,"Review")
-        StyledText("Quotes")
-        StyledTextField(quote,"'I will not die today' - Harry Potter")
+     StyledTextField(
+         placeholder = "Book Title",
+         value = title.text,
+         onValueChange = { newTitle ->
+             title = TextFieldValue(newTitle)
+         }
+     )
+        StyledTextField(
+            placeholder = "Author",
+            value = author.text,
+            onValueChange = { newAuthor ->
+                author = TextFieldValue(newAuthor)
+            }
+        )
+
+
+     StyledText(text = "Choose a Genre")
+     StyledTextFieldWithDropdown(
+         onValueChange = { newGenre -> selectedGenre = newGenre },
+         items = genres,
+         selectedValue = selectedGenre
+     )
+
+     StyledText(text = "Choose a Shelf")
+        StyledTextFieldWithDropdown(
+            onValueChange = { newShelf -> selectedShelf = newShelf },
+            items = shelfList,
+            selectedValue = selectedShelf
+        )
+
+         StyledText("Rate the book")
+     StyledTextFieldWithDropdown(
+         onValueChange = { newRating ->
+             selectedRating = newRating.replace(" stars", "").toIntOrNull() ?: 0
+         },
+         items = starRatings.map { it.toString() },
+         selectedValue = "$selectedRating stars"
+     )
+
+        StyledTextField(
+            placeholder = "Review",
+            value = review.text,
+            onValueChange = { newReview ->
+                review = TextFieldValue(newReview)
+            }
+        )
+        StyledTextField(
+            placeholder = "Quote",
+            value = quote.text,
+            onValueChange = { newQuote ->
+                quote = TextFieldValue(newQuote)
+            }
+        )
         Button(onClick = {},
          modifier = Modifier
              .clip(RoundedCornerShape(8.dp))
@@ -831,45 +898,157 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
          Icon(imageVector = Icons.Default.Add, contentDescription = "add quote", tint = NonWhite)
          Text(text = "add quote", style = TextStyle(fontSize = 15.sp, color = NonWhite, fontFamily = Poppins), modifier = Modifier.padding(start = 5.dp))
         }
-        StyledTextField(language,"Language")
-        StyledText("Amount of Pages")
-        StyledTextField(pages,"Pages")
-        StyledTextField(days,"Days")
-        StyledTextField(mediaType,"Media Type")
+        StyledText(text = "Choose a Language")
+        StyledTextFieldWithDropdown(
+            onValueChange = { newLanguage -> selectedLanguage = newLanguage },
+            items = languages,
+            selectedValue = selectedLanguage
+        )
+     Row {
+         ShortStyledTextField(
+             placeholder = "Pages",
+             value = pages.text,
+             onValueChange = { newPages ->
+                 pages = TextFieldValue(newPages)
+             }
+         )
+         ShortStyledTextField(
+             placeholder = "Days",
+             value = days.text,
+             onValueChange = { newDays ->
+                 days = TextFieldValue(newDays)
+             }
+         )
+     }
+    StyledText(text = "Choose a Media Type")
+        StyledTextFieldWithDropdown(
+            onValueChange = { newMediaType -> selectedMediaType = newMediaType },
+            items = mediaTypeList,
+            selectedValue = selectedMediaType
+        )
+
  }
 
-        Button(
-            onClick = {
-//                val currentDate = LocalDate.now() // Get the current date
+
+        Box(modifier = Modifier.fillMaxSize()) {
+            Image(
+                painter = painterResource(id = R.drawable.violetswirlbottom),
+                contentDescription = "Decorative Picture",
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Icon (
+                painter = painterResource(id = R.drawable.yellowtick),
+                contentDescription = "Back",
+                tint = Yellow,
+                modifier = Modifier
+                    .padding(end = 60.dp, bottom = 40.dp)
+                    .align(Alignment.BottomEnd)
+                    .size(50.dp)
+                    .background(NonWhite, CircleShape)
+                    .border(4.dp, Yellow, CircleShape)
+                    .clickable {
+                        //                val currentDate = LocalDate.now() // Get the current date
 //                val formattedDate = currentDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) // Save the date in the wished format
 
-                mainViewModel.save(
-                    Book(
-                        title.text,
-                        author.text,
-                        genre.text,
-                        color.text,
-                        cover.text.toString(),
-                        shelf.text,
-                        rating.text.toIntOrNull(),
-                        review.text,
-                        quote.text,
-                        language.text,
-                        pages.text.toIntOrNull(),
-                        days.text.toIntOrNull(),
-                        mediaType.text
-                    )
-                )
-                navController.navigate(Screen.Read.route)
-            },
-            modifier = Modifier.padding(20.dp),
-        ) {
-            Text(text = stringResource(R.string.addscreen_button_save), fontSize = 20.sp, color = Color.White, fontFamily = Poppins)
+                        mainViewModel.save(
+                            Book(
+                                title.text,
+                                author.text,
+                                selectedGenre,
+                                color.text,
+                                cover.text,
+                                selectedShelf,
+                                selectedRating,
+                                review.text,
+                                quote.text,
+                                selectedLanguage,
+                                pages.text.toIntOrNull(),
+                                days.text.toIntOrNull(),
+                                selectedMediaType
+                            )
+                        )
+                        navController.navigate(Screen.Read.route)
+                    }
+                    .size(40.dp)
+
+
+            )
         }
 }
 
 }
 
+@Composable
+fun StyledTextFieldWithDropdown(
+    onValueChange: (String) -> Unit,
+    items: List<String>,
+    selectedValue: String // New parameter to hold the selected value
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Column ( modifier = Modifier
+        .padding(10.dp)){
+    // DropdownMenu
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = { expanded = false },
+        modifier = Modifier
+            .width(300.dp)
+            .background(Violet),
+    ) {
+        items.forEachIndexed { index, item ->
+            DropdownMenuItem(
+                onClick = {
+                    onValueChange(item)
+                    expanded = false
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = item,
+                    style = TextStyle(
+                        fontSize = 16.sp,
+                        color = NonWhite,
+                        fontFamily = Poppins,
+                        fontWeight = FontWeight.Medium
+                    )
+                )
+            }
+        }
+    }
+
+    // DropdownToggle
+    Box(
+        modifier = Modifier
+            .clickable { expanded = !expanded }
+            .background(
+                color = DarkBeige,
+                shape = RoundedCornerShape(8.dp)
+            )
+            .padding(15.dp),
+    ) {
+        Row(
+            modifier = Modifier.width(250.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = selectedValue, // Display the selected value
+                style = TextStyle(
+                    fontSize = 16.sp,
+                    color = Violet,
+                    fontFamily = Poppins,
+                    fontWeight = FontWeight.SemiBold
+                )
+            )
+            Icon(
+                imageVector = Icons.Default.ArrowDropDown,
+                contentDescription = null,
+                tint = Violet
+            )
+        }
+    }
+}
+}
 
 @Composable
 private fun setupPhotoPicker(onImagePicked: (Uri) -> Unit): ManagedActivityResultLauncher<PickVisualMediaRequest, Uri?> {
@@ -885,48 +1064,143 @@ private fun setupPhotoPicker(onImagePicked: (Uri) -> Unit): ManagedActivityResul
     }
 }
 
-@Composable
-fun ColorList() {
-    val colorList = listOf(
-        DarkRed, LightRed, Pink, Orange, Lime, Mint, Turquoise, Blue, DarkBlue
+object ColorUtils {
+    val colorMap = mapOf(
+        "DarkRed" to DarkRed,
+        "LightRed" to LightRed,
+        "Pink" to Pink,
+        "Orange" to Orange,
+        "Lime" to Lime,
+        "Mint" to Mint,
+        "Turquoise" to Turquoise,
+        "Blue" to Blue,
+        "DarkBlue" to DarkBlue
     )
-   Row {
-        Spacer(modifier = Modifier.padding(20.dp))
-        LazyRow {
-            items(colorList) { color ->
-                Icon(
-                    painter = painterResource(id = R.drawable.circle),
-                    contentDescription = null,
-                    tint = color,
+    fun getColorByName(name: String): Color {
+        return colorMap[name] ?: Color.Black // Default to black if the color name is not found
+    }
+}
+@Composable
+fun ColorList(
+    onColorSelected: (String) -> Unit
+) {
+    val colorList = listOf(
+        "DarkRed", "LightRed", "Pink", "Orange", "Lime", "Mint", "Turquoise", "Blue", "DarkBlue"
+    )
+
+    var selectedColor by remember { mutableStateOf(colorList.first()) }
+    Row {
+        Spacer(modifier = Modifier.width(35.dp))
+        LazyRow(content = {
+            items(colorList) { colorName ->
+                val color = ColorUtils.getColorByName(colorName)
+
+                Box(
                     modifier = Modifier
                         .size(60.dp)
                         .padding(5.dp)
+                        .background(color, CircleShape)
+                        .clickable {
+                            selectedColor = colorName
+                            onColorSelected(colorName)
+                        }
+                        .border(
+                            2.dp,
+                            if (selectedColor == colorName) Color.Black else Color.Transparent,
+                            CircleShape
+                        )
+
                 )
             }
-        }
+        })
     }
+
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StyledTextField( value: TextFieldValue, label: String) {
-    var inputValue = value;
-    TextField(
-        value = inputValue,
-//        colors = TextFieldDefaults.textFieldColors(
-//            backgroundColor = DarkBeige,
-//            focusedIndicatorColor = Color.Transparent,
-//            unfocusedIndicatorColor = Color.Transparent,
-//            disabledIndicatorColor = Color.Transparent
-//        ),
+fun ShortStyledTextField(
+    placeholder: String,
+    value: String,
+    onValueChange: (String) -> Unit // This is a lambda that takes a String parameter
+) {
+
+    OutlinedTextField(
         modifier = Modifier
-            .padding(top = 10.dp)
-            .padding(horizontal = 16.dp)
-            .background(DarkBeige, RoundedCornerShape(8.dp)),
-        onValueChange = { newText -> inputValue = newText },
-        label = { Text(text = "$label", color = Violet, fontSize = 13.sp) }
+            .width(150.dp)
+            .padding(10.dp),
+
+        value = value,
+        onValueChange = { newText ->
+            // Instead of directly assigning to 'value', call the provided callback
+            onValueChange(newText)
+        },
+        label = {
+            Text(
+                text = "$placeholder",
+                style = TextStyle(
+                    fontSize = 16.sp,
+                    color = Violet,
+                    fontFamily = Poppins,
+                    fontWeight = FontWeight.SemiBold
+                )
+            )
+        },
+        shape = RoundedCornerShape(8.dp),
+        colors = TextFieldDefaults.textFieldColors(
+            backgroundColor = DarkBeige,
+            cursorColor = Violet,
+            focusedIndicatorColor = Violet,
+            focusedLabelColor = Violet,
+
+            textColor = Violet,
+            unfocusedIndicatorColor = DarkBeige,
+        )
     )
 }
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun StyledTextField(
+    placeholder: String,
+    value: String,
+    onValueChange: (String) -> Unit // This is a lambda that takes a String parameter
+) {
+
+    OutlinedTextField(
+        modifier = Modifier
+            .width(300.dp)
+            .padding(10.dp),
+
+        value = value,
+        onValueChange = { newText ->
+            // Instead of directly assigning to 'value', call the provided callback
+            onValueChange(newText)
+        },
+        label = {
+            Text(
+                text = "$placeholder",
+                style = TextStyle(
+                    fontSize = 16.sp,
+                    color = Violet,
+                    fontFamily = Poppins,
+                    fontWeight = FontWeight.SemiBold
+                )
+            )
+        },
+        shape = RoundedCornerShape(8.dp),
+        colors = TextFieldDefaults.textFieldColors(
+            backgroundColor = DarkBeige,
+            cursorColor = Violet,
+            focusedIndicatorColor = Violet,
+                focusedLabelColor = Violet,
+
+                textColor = Violet,
+                unfocusedIndicatorColor = DarkBeige,
+        )
+    )
+}
+
 
 @Composable
 fun StyledText(text: String) {
