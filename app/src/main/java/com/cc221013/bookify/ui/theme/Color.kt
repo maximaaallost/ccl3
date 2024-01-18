@@ -20,3 +20,7 @@ val Mint = Color(0xFF9FB5A1)
 val Turquoise = Color(0xFF5F8653)
 val Blue = Color(0xFF86B9C0)
 val DarkBlue = Color(0xFF066D7B)
+
+
+val Black = Color(0xFF111111)
+val Grey = Color(0xFF969696)
