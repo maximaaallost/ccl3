@@ -1,6 +1,7 @@
 package com.cc221013.bookify.ui
 
 import android.content.Intent
+import android.graphics.Paint.Align
 import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.ManagedActivityResultLauncher
@@ -74,6 +75,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
@@ -82,6 +84,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -132,6 +135,7 @@ sealed class Screen(val route: String) {
     object TBR : Screen("second")
     object Wishlist : Screen("third")
     object AddBook : Screen("fourth")
+    object BookDetails : Screen("fifth")
 }
 
 
@@ -165,6 +169,10 @@ fun MainView(mainViewModel: MainViewModel) {
             composable(Screen.AddBook.route) {
                 mainViewModel.selectScreen(Screen.AddBook)
                 AddBookScreen(mainViewModel, navController)
+            }
+            composable(Screen.BookDetails.route) {
+                mainViewModel.selectScreen(Screen.BookDetails)
+                BookDetails(mainViewModel, navController)
             }
         }
     }
@@ -312,13 +320,27 @@ fun TopDecoration(navController: NavHostController, titlePage: String, subHeadin
 
 
 @Composable
-fun SmallText(text: String, color: Color) {
+fun SmallText(text: String?, color: Color) {
     Text(
-        text = text,
+        text = text ?: "",
         style = TextStyle(
             fontSize = 13.sp,
             color = color,
             fontFamily = Poppins,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+        )
+    )
+}
+
+@Composable
+fun BigText(text: Int?, color: Color) {
+    Text(
+        text = text?.toString() ?: "",
+        style = TextStyle(
+            fontSize = 24.sp,
+            color = color,
+            fontFamily = Poppins,
+            fontWeight = FontWeight.Bold,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
     )
@@ -411,7 +433,19 @@ fun ReadStats() {
 @Composable
 fun GenreScroll() {
     val genreColors = listOf(
-        Violet, LightViolet, DarkBlue, LightRed, Pink, Grey, Black, DarkRed, Lime, Turquoise, Blue, DarkBeige, Mint
+        Violet,
+        LightViolet,
+        DarkBlue,
+        LightRed,
+        Pink,
+        Grey,
+        Black,
+        DarkRed,
+        Lime,
+        Turquoise,
+        Blue,
+        DarkBeige,
+        Mint
     )
 
     val genreNames = listOf(
@@ -423,7 +457,7 @@ fun GenreScroll() {
     LazyRow(
     ) {
         genreColors.zip(genreNames).forEach { (color, name) ->
-            item{
+            item {
                 Column(
                     modifier = Modifier
                         .clickable {}
@@ -453,6 +487,217 @@ fun GenreScroll() {
 }
 
 
+@Composable
+fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) {
+    val book = mainViewModel.selectedBook.value
+
+    if (book !== null) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+
+            item{
+                //with back button, beigeswirl, rating, title/author and cover image
+                Box(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.beigeswirl),
+                        contentDescription = "Decorative Picture",
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Icon(
+                        painter = painterResource(id = R.drawable.goback),
+                        contentDescription = "Back",
+                        tint = Violet,
+                        modifier = Modifier
+                            .padding(20.dp)
+                            .clickable { navController.navigate(Screen.Read.route) }
+                            .size(40.dp)
+                    )
+                    //Book Information: Rating, Title, Genre
+                    Column(
+                        modifier = Modifier
+                            .padding(top = 70.dp, bottom = 20.dp, start = 20.dp, end = 20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.placeholderstars),
+                                contentDescription = "Star Rating",
+                                modifier = Modifier.width(180.dp)
+                            )
+                            Spacer(modifier = Modifier.height(10.dp))
+                            Text(
+                                text = book.title,
+                                style = TextStyle(
+                                    fontFamily = Calistoga,
+                                    fontSize = 24.sp,
+                                    color = Violet,
+                                    textAlign = TextAlign.Center
+                                )
+                            )
+                            Text(
+                                text = book.author,
+                                style = TextStyle(
+                                    fontFamily = Poppins,
+                                    fontSize = 18.sp,
+                                    color = LightViolet,
+                                    textAlign = TextAlign.Center
+                                )
+                            )
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            Box(
+                                modifier = Modifier
+                                    .width(120.dp)
+                                    .height(30.dp)
+                                    .background(color = Violet, RoundedCornerShape(8.dp))
+                            ) {
+                                Text(
+                                    modifier = Modifier.fillMaxSize(),
+                                    text = book.genre,
+                                    style = TextStyle(
+                                        fontFamily = Poppins,
+                                        fontSize = 18.sp,
+                                        color = NonWhite,
+                                        textAlign = TextAlign.Center,
+                                    )
+                                )
+                            }
+                        }
+
+                        //Book cover
+                        Box(
+                            modifier = Modifier
+                                .padding(top = 20.dp, bottom = 10.dp, start = 20.dp, end = 20.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.bookcover),
+                                contentDescription = "Book cover background",
+                                tint = Violet,
+                                modifier = Modifier
+                                    .size(275.dp)
+                            )
+
+                            Image(
+                                painter = rememberImagePainter(book.cover),
+                                contentDescription = "Entry Image",
+                                modifier = Modifier
+                                    .height(225.dp)
+                                    .padding(70.dp, 5.dp, 0.dp, 0.dp)
+                                    .clip(RoundedCornerShape(10.dp, 0.dp, 0.dp, 0.dp))
+                            )
+                        }
+                    }
+                }
+            }
+
+            item{
+                //book stats: pages, days, paperback
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .padding(20.dp, 0.dp, 20.dp, 0.dp)
+                        .background(color = Violet, RoundedCornerShape(10.dp)),
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        BigText(text = book.pages, color = NonWhite)
+                        SmallText(text = "pages", color = NonWhite)
+                    }
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        BigText(text = book.days, color = NonWhite)
+                        SmallText(text = "days", color = NonWhite)
+                    }
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.bookcover),
+                            contentDescription = "paperback",
+                            tint = NonWhite,
+                            modifier = Modifier.size(38.dp)
+                        )
+                        SmallText(text = book.mediaType, color = NonWhite)
+                    }
+                }
+            }
+
+            item{
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(20.dp, 0.dp, 0.dp, 0.dp)
+                ) {
+                    Spacer(modifier = Modifier.height(15.dp))
+
+                    //AddBoook Details:
+                    //Book Review with heading and review if there is a written review
+                    if (book.review !== null) {
+                        Text(
+                            text = "Review",
+                            style = TextStyle(
+                                fontSize = 18.sp,
+                                color = Violet,
+                                fontFamily = Poppins,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        )
+
+                        Text(
+                            text = book.review,
+                            style = TextStyle(
+                                fontSize = 15.sp,
+                                color = Violet,
+                                fontFamily = Poppins,
+                                fontWeight = FontWeight.Medium,
+                            )
+                        )
+                    }
+                    //Book Quote with heading and review if there is a written Quote
+                    Spacer(modifier = Modifier.height(15.dp))
+                    if (book.quote !== null) {
+                        Text(
+                            text = "Quote",
+                            style = TextStyle(
+                                fontSize = 18.sp,
+                                color = Violet,
+                                fontFamily = Poppins,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        )
+
+                        Text(
+                            text = book.quote,
+                            style = TextStyle(
+                                fontSize = 15.sp,
+                                color = Violet,
+                                fontFamily = Poppins,
+                                fontWeight = FontWeight.Medium,
+                            )
+                        )
+                    }
+
+                }
+            }
+        }
+
+
+    }
+}
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
@@ -460,8 +705,9 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-//            .fillMaxSize()
-//            .fillMaxWidth()
+        modifier = Modifier
+            .fillMaxSize()
+            .height(500.dp)
     ) {
 
         TopDecoration(navController, "Read Books", null)
@@ -504,7 +750,13 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         //One Book
-                        Box() {
+                        Box(
+                            modifier = Modifier
+                                .clickable(onClick = {
+                                    navController.navigate(Screen.BookDetails.route)
+                                    mainViewModel.setSelectedBook(book)
+                                })
+                        ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.bookcover),
                                 contentDescription = "Book cover background",
