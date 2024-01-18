@@ -22,6 +22,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -129,6 +130,9 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.util.concurrent.ExecutorService
+
+
+
 
 sealed class Screen(val route: String) {
     object Read : Screen("first")
@@ -499,8 +503,8 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
 
+            //with back button, beigeswirl, rating, title/author and cover image
             item{
-                //with back button, beigeswirl, rating, title/author and cover image
                 Box(
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -599,8 +603,8 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
                 }
             }
 
+            //book stats: pages, days, paperback
             item{
-                //book stats: pages, days, paperback
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -636,16 +640,17 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
                 }
             }
 
+            //book review & quote
             item{
                 Column(
                     modifier = Modifier.fillMaxWidth()
-                        .padding(20.dp, 0.dp, 0.dp, 0.dp)
+                        .padding(30.dp, 0.dp, 0.dp, 0.dp)
                 ) {
                     Spacer(modifier = Modifier.height(15.dp))
 
                     //AddBoook Details:
                     //Book Review with heading and review if there is a written review
-                    if (book.review !== null) {
+                    if (book.review?.isNotEmpty() == true) {
                         Text(
                             text = "Review",
                             style = TextStyle(
@@ -668,7 +673,7 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
                     }
                     //Book Quote with heading and review if there is a written Quote
                     Spacer(modifier = Modifier.height(15.dp))
-                    if (book.quote !== null) {
+                    if (book.quote?.isNotEmpty() == true)  {
                         Text(
                             text = "Quote",
                             style = TextStyle(
@@ -679,15 +684,83 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
                             )
                         )
 
-                        Text(
-                            text = book.quote,
-                            style = TextStyle(
-                                fontSize = 15.sp,
-                                color = Violet,
-                                fontFamily = Poppins,
-                                fontWeight = FontWeight.Medium,
+                        //Quote
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .background(color = Yellow, RoundedCornerShape(2.dp))
+                                    .width(5.dp)
+                                    .height(40.dp)
                             )
-                        )
+
+                            Text(
+                                text = book.quote,
+                                style = TextStyle(
+                                    fontSize = 15.sp,
+                                    color = Violet,
+                                    fontFamily = Poppins,
+                                    fontWeight = FontWeight.Medium,
+                                ),
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .padding(start = 10.dp, end = 20.dp)
+                            )
+                        }
+
+
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    //Buttons: Delete, Edit
+                    Row(
+                        modifier = Modifier.fillMaxWidth()
+                        .padding(end = 20.dp),
+                        horizontalArrangement = Arrangement.SpaceAround,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ){
+                        Button(
+                            onClick = {},
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(DarkBeige)
+                                .width(160.dp),
+                            colors = androidx.compose.material3.ButtonDefaults.buttonColors(Color.Transparent),
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.delte),
+                                contentDescription = "upload image icon",
+                                tint = DarkRed,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Text(
+                                text = "delete",
+                                style = TextStyle(fontSize = 15.sp, color = Violet, fontFamily = Poppins),
+                                modifier = Modifier.padding(start = 10.dp)
+                            )
+                        }
+                        Button(
+                            onClick = {},
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .width(160.dp)
+                                .background(DarkBeige),
+                            colors = androidx.compose.material3.ButtonDefaults.buttonColors(Color.Transparent),
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.edit),
+                                contentDescription = "upload image icon",
+                                tint = Violet,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Text(
+                                text = "edit",
+                                style = TextStyle(fontSize = 15.sp, color = Violet, fontFamily = Poppins),
+                                modifier = Modifier.padding(start = 10.dp)
+                            )
+                        }
                     }
 
                 }
