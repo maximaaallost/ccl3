@@ -3,6 +3,7 @@ package com.cc221013.bookify.ui
 import android.content.Intent
 import android.graphics.Paint.Align
 import android.net.Uri
+import android.text.style.QuoteSpan
 import android.util.Log
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -62,6 +63,7 @@ import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Home
@@ -75,6 +77,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -603,7 +606,7 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
                             Icon(
                                 painter = painterResource(id = R.drawable.bookcover),
                                 contentDescription = "Book cover background",
-                                tint = Violet,
+                                tint = ColorUtils.getColorByName(book.color),
                                 modifier = Modifier
                                     .size(275.dp)
                             )
@@ -661,7 +664,8 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
             //book review & quote
             item{
                 Column(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(30.dp, 0.dp, 0.dp, 0.dp)
                 ) {
                     Spacer(modifier = Modifier.height(15.dp))
@@ -734,8 +738,9 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
 
                     //Buttons: Delete, Edit
                     Row(
-                        modifier = Modifier.fillMaxWidth()
-                        .padding(end = 20.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(end = 20.dp),
                         horizontalArrangement = Arrangement.SpaceAround,
                         verticalAlignment = Alignment.CenterVertically,
                     ){
@@ -805,36 +810,68 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
 
         TopDecoration(navController, "Read Books", null)
 
-        ReadStats()
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        GenreScroll()
-        Spacer(modifier = Modifier.height(10.dp))
 
 
-        LazyVerticalGrid(
-            modifier = Modifier.fillMaxSize(),
-            columns = GridCells.Fixed(2),
-        ) {
+
+
             if (state.value.books.isEmpty()) { // Show a message if there are no books saved in this shelve
                 // Show a message if there are no entries
-                item {
-                    Text(
-                        text = "No Books saved yet",
-                        style = TextStyle(
-                            fontSize = 15.sp,
-                            color = Color.Gray,
-                            fontFamily = Poppins,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                        ),
+                    Column (
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 40.dp, end = 40.dp, top = 10.dp)
-                    )
+                            .padding(15.dp),
+                     ){
+
+                        Image(
+                            painter = painterResource(id = R.drawable.emptystatepicture),
+                            contentDescription = "Empty State Image",
+                            modifier = Modifier
+                                .height(250.dp)
+                                .padding(top = 40.dp)
+                        )
+
+                        Text(
+                            text = "It seems like you haven't read any books yet",
+                            style = TextStyle(
+                                fontSize = 16.sp,
+                                color = Violet,
+                                fontFamily = Poppins,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 40.dp, end = 40.dp, top = 10.dp, bottom = 10.dp)
+                        )
+                        Button(onClick = { navController.navigate(Screen.AddBook.route) },
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(Violet),
+                            colors = androidx.compose.material3.ButtonDefaults.buttonColors(Color.Transparent),)
+                        {
+                            Text(
+                                text = "Add a new Book",
+                                style = TextStyle(fontSize = 16.sp, color = NonWhite, fontFamily = Poppins, fontWeight = FontWeight.ExtraBold),
+
+                            )
+                        }
+
+
+
                 }
                 // If there are entries, show them
             } else {
+                ReadStats()
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                GenreScroll()
+                Spacer(modifier = Modifier.height(10.dp))
+                LazyVerticalGrid(
+                    modifier = Modifier.fillMaxSize(),
+                    columns = GridCells.Fixed(2),
+                ) {
                 items(state.value.books.reversed()) { book -> // Reverse the list to show the newest entry on top
 
                     //One Book
@@ -916,32 +953,63 @@ fun TBRScreen(mainViewModel: MainViewModel, navController: NavHostController) {
     ) {
         TopDecoration(navController, "TBR", "Books in your shelf")
 
-        GenreScroll()
 
-        Spacer(modifier = Modifier.height(10.dp))
 
-        LazyVerticalGrid(
-            modifier = Modifier.fillMaxSize(),
-            columns = GridCells.Fixed(3),
-        ) {
+
             if (state.value.books.isEmpty()) { // Show a message if there are no books saved in this shelve
                 // Show a message if there are no entries
-                item {
+                Column (
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(15.dp),
+                ){
+
+                    Image(
+                        painter = painterResource(id = R.drawable.emptystatepicture),
+                        contentDescription = "Empty State Image",
+                        modifier = Modifier
+                            .height(250.dp)
+                            .padding(top = 40.dp)
+                    )
+
                     Text(
-                        text = "No Books saved yet",
+                        text = "It seems like you haven't read any books yet",
                         style = TextStyle(
-                            fontSize = 15.sp,
-                            color = Color.Gray,
+                            fontSize = 16.sp,
+                            color = Violet,
                             fontFamily = Poppins,
                             textAlign = androidx.compose.ui.text.style.TextAlign.Center
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 40.dp, end = 40.dp, top = 10.dp)
+                            .padding(start = 40.dp, end = 40.dp, top = 10.dp, bottom = 10.dp)
                     )
+                    Button(onClick = { navController.navigate(Screen.AddBook.route) },
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Violet),
+                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(Color.Transparent),)
+                    {
+                        Text(
+                            text = "Add a new Book",
+                            style = TextStyle(fontSize = 16.sp, color = NonWhite, fontFamily = Poppins, fontWeight = FontWeight.ExtraBold),
+
+                            )
+                    }
+
+
+
                 }
-                // If there are entries, show them
             } else {
+                GenreScroll()
+
+                Spacer(modifier = Modifier.height(10.dp))
+                LazyVerticalGrid(
+                    modifier = Modifier.fillMaxSize(),
+                    columns = GridCells.Fixed(3),
+                ) {
                 items(state.value.books.reversed()) { book -> // Reverse the list to show the newest entry on top
 
                     //One Book
@@ -954,7 +1022,8 @@ fun TBRScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                             Icon(
                                 painter = painterResource(id = R.drawable.bookcover),
                                 contentDescription = "Book cover background",
-                                modifier = Modifier.size(150.dp)
+                                modifier = Modifier.size(150.dp),
+                                tint = ColorUtils.getColorByName(book.color)
                             )
                             // Top: Image
                             Image(
@@ -1015,29 +1084,58 @@ fun WishlistScreen(mainViewModel: MainViewModel, navController: NavHostControlle
     ) {
         TopDecoration(navController, "Wishlist", "Books you want to buy")
 
-        LazyVerticalGrid(
-            modifier = Modifier.fillMaxSize(),
-            columns = GridCells.Fixed(3),
-        ) {
-            if (state.value.books.isEmpty()) { // Show a message if there are no books saved in this shelve
-                // Show a message if there are no entries
-                item {
+
+            if (state.value.books.isEmpty()) {    // Show a message if there are no entries
+                Column (
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(15.dp),
+                ){
+
+                    Image(
+                        painter = painterResource(id = R.drawable.emptystatepicture),
+                        contentDescription = "Empty State Image",
+                        modifier = Modifier
+                            .height(250.dp)
+                            .padding(top = 40.dp)
+                    )
+
                     Text(
-                        text = "No Books saved yet",
+                        text = "It seems like you haven't read any books yet",
                         style = TextStyle(
-                            fontSize = 15.sp,
-                            color = Color.Gray,
+                            fontSize = 16.sp,
+                            color = Violet,
                             fontFamily = Poppins,
                             textAlign = androidx.compose.ui.text.style.TextAlign.Center
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 40.dp, end = 40.dp, top = 10.dp)
+                            .padding(start = 40.dp, end = 40.dp, top = 10.dp, bottom = 10.dp)
                     )
+                    Button(onClick = { navController.navigate(Screen.AddBook.route) },
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Violet),
+                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(Color.Transparent),)
+                    {
+                        Text(
+                            text = "Add a new Book",
+                            style = TextStyle(fontSize = 16.sp, color = NonWhite, fontFamily = Poppins, fontWeight = FontWeight.ExtraBold),
+
+                            )
+                    }
+
                 }
-                // If there are entries, show them
             } else {
+                LazyVerticalGrid(
+                    modifier = Modifier.fillMaxSize(),
+                    columns = GridCells.Fixed(3),
+                ) {
                 items(state.value.books.reversed()) { book -> // Reverse the list to show the newest entry on top
+                if (book.shelf == "Wishlist") {
+
 
                     //One Book
                     Column(
@@ -1049,7 +1147,8 @@ fun WishlistScreen(mainViewModel: MainViewModel, navController: NavHostControlle
                             Icon(
                                 painter = painterResource(id = R.drawable.bookcover),
                                 contentDescription = "Book cover background",
-                                modifier = Modifier.size(150.dp)
+                                modifier = Modifier.size(150.dp),
+                                tint = ColorUtils.getColorByName(book.color)
                             )
                             // Top: Image
                             Image(
@@ -1088,6 +1187,7 @@ fun WishlistScreen(mainViewModel: MainViewModel, navController: NavHostControlle
                             )
 
                         }
+                    }
                     }
 
                 }
@@ -1155,6 +1255,7 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
     var selectedMediaType by remember { mutableStateOf(mediaTypeList[0]) }
     var selectedShelf by remember { mutableStateOf(shelfList[0]) }
     var selectedRating by remember { mutableStateOf(starRatings[0]) }
+    var quotes by remember { mutableStateOf(listOf("")) }
 
     Column(
         modifier = Modifier
@@ -1275,22 +1376,19 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
                 review = TextFieldValue(newReview)
             }
         )
-        StyledTextField(
-            placeholder = "Quote",
-            value = quote.text,
-            onValueChange = { newQuote ->
-                quote = TextFieldValue(newQuote)
-            }
-        )
-        Button(onClick = {},
-         modifier = Modifier
-             .clip(RoundedCornerShape(8.dp))
-             .padding(start = 20.dp)
-         //colors = ButtonDefaults.buttonColors(backgroundColor = Yellow),
-        ) {
-         Icon(imageVector = Icons.Default.Add, contentDescription = "add quote", tint = NonWhite)
-         Text(text = "add quote", style = TextStyle(fontSize = 15.sp, color = NonWhite, fontFamily = Poppins), modifier = Modifier.padding(start = 5.dp))
-        }
+
+     QuoteSection(
+         quotes = quotes,
+         onQuoteAdded = { newQuote ->
+             quotes = quotes.toMutableList().apply { add(newQuote) }
+         },
+         onQuoteRemoved = { index ->
+             quotes = quotes.toMutableList().apply { removeAt(index) }
+         }
+     )
+
+
+
         StyledText(text = "Choose a Language")
         StyledTextFieldWithDropdown(
             onValueChange = { newLanguage -> selectedLanguage = newLanguage },
@@ -1342,7 +1440,7 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
                     .clickable {
                         //val currentDate = LocalDate.now() // Get the current date
                         //val formattedDate = currentDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) // Save the date in the wished format
-
+                        val quotesText = quotes.joinToString(separator = ";")
                         mainViewModel.save(
                             Book(
                                 title.text,
@@ -1353,7 +1451,7 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
                                 selectedShelf,
                                 selectedRating,
                                 review.text,
-                                quote.text,
+                                quotesText,
                                 selectedLanguage,
                                 pages.text.toIntOrNull(),
                                 days.text.toIntOrNull(),
@@ -1370,6 +1468,87 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
 }
 
 }
+@Composable
+fun QuoteSection(
+    quotes: List<String>,
+    onQuoteAdded: (String) -> Unit,
+    onQuoteRemoved: (Int) -> Unit
+) {
+    // Use a list to store individual TextFieldValues for each quote
+    val quoteValues = remember { quotes.map { TextFieldValue(it) }.toMutableList() }
+
+    Column {
+        // Existing quote input
+        StyledTextField(
+            placeholder = "Quote",
+            value = quoteValues.getOrNull(0)?.text ?: "",
+            onValueChange = { newQuote ->
+                quoteValues[0] = TextFieldValue(newQuote)
+                onQuoteAdded(quoteValues[0].text)
+            }
+        )
+
+        // Display additional quote text fields
+        for (i in 1 until quoteValues.size) {
+            Row {
+                StyledTextField(
+                    placeholder = "Quote",
+                    value = quoteValues.getOrNull(i)?.text ?: "",
+                    onValueChange = { newQuote ->
+                        quoteValues[i] = TextFieldValue(newQuote)
+                    }
+                )
+            }
+        }
+
+        // Button to add new quote text field
+        if (quoteValues.size < 10) {
+            Button(
+                onClick = {
+                    // Add an empty quote and a new TextFieldValue
+                    onQuoteAdded("")
+                    quoteValues.add(TextFieldValue(""))
+                },
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .padding(start = 20.dp)
+            ) {
+                Icon(imageVector = Icons.Default.Add, contentDescription = "add quote", tint = NonWhite)
+                Text(
+                    text = "add quote",
+                    style = TextStyle(fontSize = 15.sp, color = NonWhite, fontFamily = Poppins),
+                    modifier = Modifier.padding(start = 5.dp)
+                )
+            }
+        } else {
+            // Display a message or alternative UI when the limit is reached
+            Text("Maximum quotes reached", color = Color.Red)
+        }
+
+        // Button to remove the last quote
+        if (quoteValues.size > 1) {
+            Button(
+                onClick = {
+                    // Remove the last quote and its corresponding TextFieldValue
+                    onQuoteRemoved(quoteValues.size - 1)
+                    quoteValues.removeLast()
+                },
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .padding(start = 20.dp)
+            ) {
+                Icon(imageVector = Icons.Default.Clear, contentDescription = "remove quote", tint = NonWhite)
+                Text(
+                    text = "remove quote",
+                    style = TextStyle(fontSize = 15.sp, color = NonWhite, fontFamily = Poppins),
+                    modifier = Modifier.padding(start = 5.dp)
+                )
+            }
+        }
+        val quotesText = quoteValues.joinToString(separator = ";") { it.text }
+    }
+}
+
 
 @Composable
 fun StyledTextFieldWithDropdown(
@@ -1498,7 +1677,7 @@ fun ColorList(
                         }
                         .border(
                             2.dp,
-                            if (selectedColor == colorName) Color.Black else Color.Transparent,
+                            if (selectedColor == colorName) Violet else Color.Transparent,
                             CircleShape
                         )
 
