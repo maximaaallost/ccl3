@@ -1340,8 +1340,8 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
                     .background(NonWhite, CircleShape)
                     .border(4.dp, Yellow, CircleShape)
                     .clickable {
-                        //                val currentDate = LocalDate.now() // Get the current date
-//                val formattedDate = currentDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) // Save the date in the wished format
+                        //val currentDate = LocalDate.now() // Get the current date
+                        //val formattedDate = currentDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) // Save the date in the wished format
 
                         mainViewModel.save(
                             Book(
