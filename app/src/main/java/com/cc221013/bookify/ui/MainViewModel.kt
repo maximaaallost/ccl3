@@ -15,6 +15,8 @@ class MainViewModel(private val db: DatabaseHandler, private val dbChallenge: Re
     val mainViewState: StateFlow<MainViewState> = _mainViewState.asStateFlow()
     private val _cameraState = MutableStateFlow(CameraState())
     val cameraState: StateFlow<CameraState> = _cameraState.asStateFlow()
+    private val _bookCount = mutableStateOf(0)
+    val bookCount: State<Int> = _bookCount
 
     fun setFilePermission(value: Boolean){
         _cameraState.update { it.copy(filePermissionGranted = value) }
@@ -23,11 +25,24 @@ class MainViewModel(private val db: DatabaseHandler, private val dbChallenge: Re
 
     fun save(book: Book){
         db.insertBook(book)
+        _bookCount.value += 1
     }
 
-    fun saveReadingChallenge(challenge: ReadingChallenge){
-        dbChallenge.insertChallenge(challenge)
+    fun showReadingChallengeDialog() {
+        _mainViewState.update { it.copy(openDialogEditReadingChallenge = true) }
     }
+
+    fun dismissReadingChallengeDialog() {
+        _mainViewState.update { it.copy(openDialogEditReadingChallenge = false) }
+    }
+
+    fun saveReadingChallenge(challenge: ReadingChallenge) {
+        dbChallenge.insertChallenge(challenge)
+        _bookCount.value = 0
+        dismissReadingChallengeDialog()
+
+    }
+
 
     private val _selectedBook = mutableStateOf<Book?>(null)
     val selectedBook: State<Book?> = _selectedBook
@@ -38,6 +53,10 @@ class MainViewModel(private val db: DatabaseHandler, private val dbChallenge: Re
 
     fun getBooks() {
         _mainViewState.update { it.copy(books = db.getBooks()) }
+    }
+
+    fun getChallenges() {
+        _mainViewState.update { it.copy(challenges = dbChallenge.getChallenges()) }
     }
 
     fun selectScreen(screen: Screen){

@@ -81,8 +81,6 @@ dependencies {
     implementation ("com.google.accompanist:accompanist-flowlayout:0.20.0")
     implementation ("com.google.accompanist:accompanist-flowlayout:0.20.0")
 
-
-
     // Coil for async image rendering from local directories or the internet
     implementation("io.coil-kt:coil-compose:1.4.0")
 }
