@@ -4,5 +4,5 @@ data class MainViewState(
     val books: List<Book> = emptyList(),
     val editBook: Book = Book("","","", "", "", "", 0, "", "", "", 0, 0, ""),
     val selectedScreen: Screen = Screen.Read,
-    val openDialog: Boolean = false
+    val openDialogEditReadBook: Boolean = false
 )
