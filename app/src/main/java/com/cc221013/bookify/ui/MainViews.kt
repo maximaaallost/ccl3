@@ -56,6 +56,7 @@ import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
@@ -67,6 +68,7 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material3.AlertDialogDefaults.shape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -80,6 +82,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -112,6 +115,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.Dialog
 import androidx.core.graphics.toColorInt
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -1012,6 +1016,8 @@ fun TBRScreen(mainViewModel: MainViewModel, navController: NavHostController) {
 @Composable
 fun WishlistScreen(mainViewModel: MainViewModel, navController: NavHostController) {
     val state = mainViewModel.mainViewState.collectAsState()
+    val book = mainViewModel.selectedBook.value
+
     Column(
         modifier = Modifier
             .background(NonWhite)
@@ -1035,7 +1041,9 @@ fun WishlistScreen(mainViewModel: MainViewModel, navController: NavHostControlle
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         // One Book
-                        Box() {
+                        Box(
+                            modifier = Modifier.clickable { mainViewModel.dialogEditBook(book) }
+                        ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.bookcover),
                                 contentDescription = "Book cover background",
@@ -1082,6 +1090,10 @@ fun WishlistScreen(mainViewModel: MainViewModel, navController: NavHostControlle
                     }
                 }
             }
+            Column {
+                EditBook(mainViewModel)
+            }
+
         }
     }
 }
@@ -1908,3 +1920,164 @@ fun StyledText(text: String) {
 @Composable
 fun addReadingChallenge(mainViewModel: MainViewModel){
 }
+
+@Composable
+fun EditBook(mainViewModel: MainViewModel) {
+    val state = mainViewModel.mainViewState.collectAsState()
+    val genres = listOf(
+        "Fantasy", "Sci-Fi", "Romance", "New Adult", "Thriller", "Horror", "Erotica",
+        "Manga", "Biography", "Novel", "History", "Non-Fiction"
+    )
+    var selectedGenre by remember { mutableStateOf(genres[0]) }
+
+
+    if (state.value.openDialogEditBook) {
+        var title by rememberSaveable { mutableStateOf(state.value.editBook.title) }
+        var author by rememberSaveable { mutableStateOf(state.value.editBook.author) }
+        var genre by rememberSaveable { mutableStateOf(state.value.editBook.genre) }
+        var color by rememberSaveable { mutableStateOf(state.value.editBook.color) }
+        var cover by rememberSaveable { mutableStateOf(state.value.editBook.cover) }
+        var shelf by rememberSaveable { mutableStateOf(state.value.editBook.shelf) }
+        var rating by rememberSaveable { mutableStateOf(state.value.editBook.rating) }
+        var review by rememberSaveable { mutableStateOf(state.value.editBook.review) }
+        var quote by rememberSaveable { mutableStateOf(state.value.editBook.quote) }
+        var language by rememberSaveable { mutableStateOf(state.value.editBook.language) }
+        var pages by rememberSaveable { mutableStateOf(state.value.editBook.pages) }
+        var days by rememberSaveable { mutableStateOf(state.value.editBook.days) }
+        var mediaType by rememberSaveable { mutableStateOf(state.value.editBook.mediaType) }
+
+
+        // https://developer.android.com/jetpack/compose/components/dialog
+        Dialog(
+            onDismissRequest = { mainViewModel.dismissDialog() }
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth(0.9f),
+                colors = CardDefaults.cardColors(containerColor = Violet),
+                shape = RoundedCornerShape(10.dp),
+                ){
+
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(10.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ){
+                    Text(
+                        text = "Edit your Book",
+                        style =  TextStyle(
+                            fontFamily = Calistoga,
+                            fontSize = 20.sp,
+                            color = NonWhite
+                        ),
+                        modifier = Modifier.padding(start = 20.dp)
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .fillMaxWidth(0.85f),
+                        value = title,
+                        onValueChange = { newValue ->
+                            // Handle the new value
+                            title = newValue
+                        },
+                            label = {
+                                Text(
+                                    text = "Book Title",
+                                    style = TextStyle(
+                                        fontSize = 16.sp,
+                                        color = NonWhite,
+                                        fontFamily = Poppins,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                )
+                            },
+                            shape = RoundedCornerShape(8.dp),
+                            colors = TextFieldDefaults.textFieldColors(
+                                backgroundColor = DarkBeige,
+                                cursorColor = Violet,
+                                focusedIndicatorColor = Violet,
+                                focusedLabelColor = Violet,
+                                textColor = Violet,
+                                unfocusedIndicatorColor = DarkBeige,
+                            )
+                        )
+
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .fillMaxWidth(0.85f),
+                        value = author,
+                        onValueChange = { newValue ->
+                            // Handle the new value
+                            author = newValue
+                        },
+                        label = {
+                            Text(
+                                text = "Author",
+                                style = TextStyle(
+                                    fontSize = 16.sp,
+                                    color = Violet,
+                                    fontFamily = Poppins,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            )
+                        },
+                        shape = RoundedCornerShape(8.dp),
+                        colors = TextFieldDefaults.textFieldColors(
+                            backgroundColor = DarkBeige,
+                            cursorColor = Violet,
+                            focusedIndicatorColor = Violet,
+                            focusedLabelColor = Violet,
+                            textColor = Violet,
+                            unfocusedIndicatorColor = DarkBeige,
+                        )
+                    )
+
+                    StyledTextFieldWithDropdown(
+                        onValueChange = { newGenre -> selectedGenre = newGenre },
+                        items = genres,
+                        selectedValue = selectedGenre
+                    )
+
+
+                androidx.compose.material.Button(
+                    onClick = {
+                        mainViewModel.saveBook(
+                            Book(
+                                title,
+                                author,
+                                genre,
+                                color,
+                                cover,
+                                shelf,
+                                rating,
+                                review,
+                                quote,
+                                language,
+                                pages,
+                                days,
+                                mediaType,
+                                state.value.editBook.id
+                            )
+                        )
+                    }, modifier = Modifier
+                        .padding(top = 10.dp)
+                        .height(45.dp),
+                    shape = CircleShape,
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Yellow
+                    )
+                ) {
+                    Text(
+                        text = "save",
+                        fontSize = 18.sp,
+                        fontFamily = Poppins,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Violet
+                    )
+                }
+            }
+        }
+    }
+}}
