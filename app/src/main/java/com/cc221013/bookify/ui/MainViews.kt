@@ -828,37 +828,56 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
         EmptyState(navController = navController)
     } else {
 
-
         val filteredBooks = state.value.books.filter {
             it.shelf == "Read" && (selectedGenre == "all" || it.genre == selectedGenre)
         }.reversed()
 
+        // Show a message if no books are found in the selected genre
         if (filteredBooks.isEmpty()) {
-            // Show a message if no books are found in the selected genre
-            Text(
-                "No books in this genre", modifier = Modifier
-                    .padding(16.dp), color = LightViolet
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ){
+                TopDecoration(navController, "Read Books", null)
+                ReadStats()
+                Spacer(modifier = Modifier.height(20.dp))
+                GenreScroll(onGenreSelected = { genre ->
+                    selectedGenre = genre
+                })
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    "No books in this genre", modifier = Modifier
+                        .padding(16.dp), color = LightViolet
+                )
+            }
+
         } else {
             LazyVerticalGrid(
                 modifier = Modifier.fillMaxSize(),
                 columns = GridCells.Fixed(2),
             ) {
 
+                //Top Decoration: Read Books
                 item (
                     span = {
                         GridItemSpan(maxLineSpan)
                     }
-                ){
-                    TopDecoration(navController, "Read Books", null)
-                }
+                ){TopDecoration(navController, "Read Books", null)}
+
+                //Read Stats
                 item(
                     span = {
                         GridItemSpan(maxLineSpan)
                     }
                 ){
-                    ReadStats()
+                    Row(
+                        modifier = Modifier.fillMaxWidth(0.9f),
+                        horizontalArrangement = Arrangement.Center
+                    ){
+                        ReadStats()
+                    }
                 }
+
+                //Spacer
                 item(
                     span = {
                         GridItemSpan(maxLineSpan)
@@ -866,6 +885,7 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                 ){
                     Spacer(modifier = Modifier.height(20.dp))
                 }
+                //Genre horizontal scroll
                 item(
                     span = {
                         GridItemSpan(maxLineSpan)
