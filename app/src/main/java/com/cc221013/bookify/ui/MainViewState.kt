@@ -6,6 +6,6 @@ data class MainViewState(
     val editBook: Book = Book("","","", "", "", "", 0, "", "", "", 0, 0, ""),
     val selectedScreen: Screen = Screen.Read,
     val openDialogEditReadBook: Boolean = false,
-    val openDialogEditReadingChallenge: Boolean = false
+    val openDialogEditReadingChallenge: Boolean = false,
     val openDialogEditBook: Boolean = false
 )
