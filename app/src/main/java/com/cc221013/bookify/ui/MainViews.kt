@@ -456,7 +456,7 @@ fun ReadStats() {
 
 //Vertical Scroll to filter Genres
 @Composable
-fun GenreScroll() {
+fun GenreScroll(onGenreSelected: (String) -> Unit) {
     val genreColors = listOf(
         Violet,
         LightViolet,
@@ -485,7 +485,9 @@ fun GenreScroll() {
             item {
                 Column(
                     modifier = Modifier
-                        .clickable {}
+                        .clickable {
+                            onGenreSelected(name)
+                        }
                         .padding(9.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -506,7 +508,6 @@ fun GenreScroll() {
                     )
                 }
             }
-
         }
     }
 }
@@ -800,6 +801,7 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
 @Composable
 fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
     val state = mainViewModel.mainViewState.collectAsState()
+    var selectedGenre by remember { mutableStateOf("all") }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -810,86 +812,91 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
 
         TopDecoration(navController, "Read Books", null)
 
-
-
-
-
         if (state.value.books.isEmpty() || state.value.books.none { it.shelf == "Read" }) {
             EmptyState(navController = navController)
         } else {
-                ReadStats()
+            ReadStats()
 
-                Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-                GenreScroll()
-                Spacer(modifier = Modifier.height(10.dp))
+            GenreScroll(onGenreSelected = { genre ->
+                selectedGenre = genre
+            })
+            Spacer(modifier = Modifier.height(10.dp))
 
+            val filteredBooks = state.value.books.filter {
+                it.shelf == "Read" && (selectedGenre == "all" || it.genre == selectedGenre)
+            }.reversed()
+
+            if (filteredBooks.isEmpty()) {
+                // Show a message if no books are found in the selected genre
+                Text("No books in this genre", modifier = Modifier.padding(16.dp).align(CenterHorizontally), color = LightViolet)
+            } else {
                 LazyVerticalGrid(
                     modifier = Modifier.fillMaxSize(),
                     columns = GridCells.Fixed(2),
                 ) {
-                items(state.value.books.filter { it.shelf == "Read" }.reversed()) { book -> // Reverse the list to show the newest entry on top
-                       //One Book
-                       Column(
-                           verticalArrangement = Arrangement.Center,
-                           horizontalAlignment = Alignment.CenterHorizontally
-                       ) {
-                           //One Book
-                           Box(
-                               modifier = Modifier
-                                   .clickable(onClick = {
-                                       navController.navigate(Screen.BookDetails.route)
-                                       mainViewModel.setSelectedBook(book)
-                                   })
-                           ) {
-                               Icon(
-                                   painter = painterResource(id = R.drawable.bookcover),
-                                   contentDescription = "Book cover background",
-                                   modifier = Modifier.size(225.dp),
-                                   tint = ColorUtils.getColorByName(book.color)
-                               )
-                               // Top: Image
-                               Image(
-                                   painter = rememberImagePainter(data = book.cover),
-                                   contentDescription = "Entry Image",
-                                   modifier = Modifier
-                                       .height(175.dp)
-                                       .padding(50.dp, 5.dp, 0.dp, 0.dp)
-                                       .clip(RoundedCornerShape(10.dp, 0.dp, 0.dp, 0.dp))
-                               )
-                           }
-                           // Middle: Description and Date
-                           Column(
-                               modifier = Modifier
-                                   .width(150.dp),
-                               verticalArrangement = Arrangement.Center,
-                               horizontalAlignment = Alignment.CenterHorizontally
-                           ) {
-                               Text(
-                                   text = book.title,
-                                   style = TextStyle(
-                                       fontSize = 16.sp,
-                                       color = Violet,
-                                       fontFamily = Calistoga,
-                                       textAlign = TextAlign.Center
-                                   ),
-                               )
-                               Text(
-                                   text = book.author,
-                                   style = TextStyle(
-                                       fontSize = 14.sp,
-                                       color = LightViolet,
-                                       fontFamily = Poppins,
-                                       textAlign = TextAlign.Center
-                                   ),
-                               )
-
-                           }
-                       }
+                    items(filteredBooks) { book ->
+                        // One Book
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            // One Book
+                            Box(
+                                modifier = Modifier
+                                    .clickable(onClick = {
+                                        navController.navigate(Screen.BookDetails.route)
+                                        mainViewModel.setSelectedBook(book)
+                                    })
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.bookcover),
+                                    contentDescription = "Book cover background",
+                                    modifier = Modifier.size(225.dp),
+                                    tint = ColorUtils.getColorByName(book.color)
+                                )
+                                // Top: Image
+                                Image(
+                                    painter = rememberImagePainter(data = book.cover),
+                                    contentDescription = "Entry Image",
+                                    modifier = Modifier
+                                        .height(175.dp)
+                                        .padding(50.dp, 5.dp, 0.dp, 0.dp)
+                                        .clip(RoundedCornerShape(10.dp, 0.dp, 0.dp, 0.dp))
+                                )
+                            }
+                            // Middle: Description and Date
+                            Column(
+                                modifier = Modifier
+                                    .width(150.dp),
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = book.title,
+                                    style = TextStyle(
+                                        fontSize = 16.sp,
+                                        color = Violet,
+                                        fontFamily = Calistoga,
+                                        textAlign = TextAlign.Center
+                                    ),
+                                )
+                                Text(
+                                    text = book.author,
+                                    style = TextStyle(
+                                        fontSize = 14.sp,
+                                        color = LightViolet,
+                                        fontFamily = Poppins,
+                                        textAlign = TextAlign.Center
+                                    ),
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
-
     }
 }
 
@@ -897,6 +904,7 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
 @Composable
 fun TBRScreen(mainViewModel: MainViewModel, navController: NavHostController) {
     val state = mainViewModel.mainViewState.collectAsState()
+    var selectedGenre by remember { mutableStateOf("all") }
 
     Column(
         modifier = Modifier
@@ -910,13 +918,24 @@ fun TBRScreen(mainViewModel: MainViewModel, navController: NavHostController) {
             // Show a message if there are no entries or no entries in the TBR shelf
             EmptyState(navController = navController)
         } else {
-            GenreScroll()
+            GenreScroll(onGenreSelected = { genre ->
+                selectedGenre = genre
+            })
             Spacer(modifier = Modifier.height(10.dp)) // Move Spacer here
-            LazyVerticalGrid(
-                modifier = Modifier.fillMaxSize(),
-                columns = GridCells.Fixed(3),
-            ) {
-                items(state.value.books.filter { it.shelf == "To be Read" }.reversed()) { book ->
+
+            val filteredBooks = state.value.books.filter {
+                it.shelf == "To be Read" && (selectedGenre == "all" || it.genre == selectedGenre)
+            }.reversed()
+
+            if (filteredBooks.isEmpty()) {
+                // Show a message if no books are found in the selected genre
+                Text("No books in this genre", modifier = Modifier.padding(16.dp).align(Alignment.CenterHorizontally), color = LightViolet)
+            } else {
+                LazyVerticalGrid(
+                    modifier = Modifier.fillMaxSize(),
+                    columns = GridCells.Fixed(3),
+                ) {
+                    items(filteredBooks) { book ->
                         // One Book
                         Column(
                             verticalArrangement = Arrangement.Center,
@@ -967,11 +986,13 @@ fun TBRScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                                 )
                             }
                         }
+                    }
                 }
             }
         }
     }
 }
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
