@@ -967,39 +967,64 @@ fun TBRScreen(mainViewModel: MainViewModel, navController: NavHostController) {
     val state = mainViewModel.mainViewState.collectAsState()
     var selectedGenre by remember { mutableStateOf("all") }
 
-    Column(
-        modifier = Modifier
-            .background(NonWhite)
-            .fillMaxSize()
-            .fillMaxWidth()
-    ) {
-        TopDecoration(navController, "TBR", "Books in your shelf")
 
         if (state.value.books.isEmpty() || state.value.books.none { it.shelf == "To be Read" }) {
             // Show a message if there are no entries or no entries in the TBR shelf
             EmptyState(navController = navController)
         } else {
-            GenreScroll(onGenreSelected = { genre ->
-                selectedGenre = genre
-            })
-            Spacer(modifier = Modifier.height(10.dp)) // Move Spacer here
-
             val filteredBooks = state.value.books.filter {
                 it.shelf == "To be Read" && (selectedGenre == "all" || it.genre == selectedGenre)
             }.reversed()
 
             if (filteredBooks.isEmpty()) {
                 // Show a message if no books are found in the selected genre
-                Text(
-                    "No books in this genre", modifier = Modifier
-                        .padding(16.dp)
-                        .align(Alignment.CenterHorizontally), color = LightViolet
-                )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ){
+                    TopDecoration(navController, "TBR", "Books to be read")
+                    Spacer(modifier = Modifier.height(20.dp))
+                    GenreScroll(onGenreSelected = { genre ->
+                        selectedGenre = genre
+                    })
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        "No books in this genre", modifier = Modifier
+                            .padding(16.dp), color = LightViolet
+                    )
+                }
             } else {
                 LazyVerticalGrid(
                     modifier = Modifier.fillMaxSize(),
                     columns = GridCells.Fixed(3),
                 ) {
+
+                    //Top Decoration: Read Books
+                    item (
+                        span = {
+                            GridItemSpan(maxLineSpan)
+                        }
+                    ){TopDecoration(navController, "TBR", "Books to be read")}
+
+                    //Spacer
+                    item(
+                        span = {
+                            GridItemSpan(maxLineSpan)
+                        }
+                    ){
+                        Spacer(modifier = Modifier.height(20.dp))
+                    }
+                    //Genre horizontal scroll
+                    item(
+                        span = {
+                            GridItemSpan(maxLineSpan)
+                        }
+                    ){
+                        GenreScroll(onGenreSelected = { genre ->
+                            selectedGenre = genre
+                        })
+                        Spacer(modifier = Modifier.height(10.dp))
+                    }
+
                     items(filteredBooks) { book ->
                         // One Book
                         Column(
@@ -1034,7 +1059,7 @@ fun TBRScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                    text = "${book.title}",
+                                    text = book.title,
                                     style = TextStyle(
                                         fontSize = 14.sp,
                                         color = Violet,
@@ -1043,7 +1068,7 @@ fun TBRScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                                     ),
                                 )
                                 Text(
-                                    text = "${book.author}",
+                                    text = book.author,
                                     style = TextStyle(
                                         fontSize = 12.sp,
                                         color = LightViolet,
@@ -1054,7 +1079,6 @@ fun TBRScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                             }
                         }
                     }
-                }
             }
         }
     }
@@ -1076,7 +1100,6 @@ fun WishlistScreen(mainViewModel: MainViewModel, navController: NavHostControlle
             .fillMaxSize()
             .fillMaxWidth()
     ) {
-        TopDecoration(navController, "Wishlist", "Books you want to buy")
 
         if (state.value.books.isEmpty() || state.value.books.none { it.shelf == "Wishlist" }) {
             // Show a message if there are no entries or no entries in the wishlist shelf
@@ -1086,6 +1109,15 @@ fun WishlistScreen(mainViewModel: MainViewModel, navController: NavHostControlle
                 modifier = Modifier.fillMaxSize(),
                 columns = GridCells.Fixed(3),
             ) {
+
+               item (
+                   span = {
+                       GridItemSpan(maxLineSpan)
+                   }
+               ){
+                   TopDecoration(navController, "Wishlist", "Books you want to buy")
+               }
+
                 items(state.value.books.filter { it.shelf == "Wishlist" }.reversed()) { book ->
                     // One Book
                     Column(
