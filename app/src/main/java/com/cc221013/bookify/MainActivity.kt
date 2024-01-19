@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.cc221013.bookify.data.DatabaseHandler
+import com.cc221013.bookify.data.ReadingChallengeDatabaseHandler
 import com.cc221013.bookify.ui.MainView
 import com.cc221013.bookify.ui.MainViewModel
 import com.google.common.util.concurrent.ListenableFuture
@@ -31,7 +32,8 @@ import java.util.concurrent.Executors
 
 class MainActivity : ComponentActivity() {
     private val db = DatabaseHandler(this)
-    private val mainViewModel = MainViewModel(db)
+    private val dbChallenge = ReadingChallengeDatabaseHandler(this)
+    private val mainViewModel = MainViewModel(db, dbChallenge)
     private val requestFilePermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()){ mainViewModel.setFilePermission(it) }
 
     private fun requestFilePermission(){
