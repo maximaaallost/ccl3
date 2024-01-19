@@ -825,7 +825,10 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
     var selectedGenre by remember { mutableStateOf("all") }
 
     if (state.value.books.isEmpty() || state.value.books.none { it.shelf == "Read" }) {
-        EmptyState(navController = navController)
+        Column(){
+            TopDecoration(navController = navController, titlePage = "Read Books", subHeading = null)
+            EmptyState(navController = navController)
+        }
     } else {
 
         val filteredBooks = state.value.books.filter {
@@ -970,7 +973,10 @@ fun TBRScreen(mainViewModel: MainViewModel, navController: NavHostController) {
 
         if (state.value.books.isEmpty() || state.value.books.none { it.shelf == "To be Read" }) {
             // Show a message if there are no entries or no entries in the TBR shelf
-            EmptyState(navController = navController)
+            Column(){
+                TopDecoration(navController = navController, titlePage = "TBR", subHeading = "Books to be read")
+                EmptyState(navController = navController)
+            }
         } else {
             val filteredBooks = state.value.books.filter {
                 it.shelf == "To be Read" && (selectedGenre == "all" || it.genre == selectedGenre)
@@ -1103,7 +1109,11 @@ fun WishlistScreen(mainViewModel: MainViewModel, navController: NavHostControlle
 
         if (state.value.books.isEmpty() || state.value.books.none { it.shelf == "Wishlist" }) {
             // Show a message if there are no entries or no entries in the wishlist shelf
-            EmptyState(navController = navController)
+            Column(){
+                TopDecoration(navController = navController, titlePage = "Wishlist", subHeading = "Books you want to buy")
+                EmptyState(navController = navController)
+
+            }
         } else {
             LazyVerticalGrid(
                 modifier = Modifier.fillMaxSize(),
@@ -1933,7 +1943,7 @@ fun EmptyState(navController: NavHostController) {
         )
 
         Text(
-            text = "There are books in this shelf yet",
+            text = "There are no books in this shelf yet",
             style = TextStyle(
                 fontSize = 18.sp,
                 color = Violet,
