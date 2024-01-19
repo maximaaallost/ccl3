@@ -830,7 +830,9 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
 
             if (filteredBooks.isEmpty()) {
                 // Show a message if no books are found in the selected genre
-                Text("No books in this genre", modifier = Modifier.padding(16.dp).align(CenterHorizontally), color = LightViolet)
+                Text("No books in this genre", modifier = Modifier
+                    .padding(16.dp)
+                    .align(CenterHorizontally), color = LightViolet)
             } else {
                 LazyVerticalGrid(
                     modifier = Modifier.fillMaxSize(),
@@ -929,7 +931,9 @@ fun TBRScreen(mainViewModel: MainViewModel, navController: NavHostController) {
 
             if (filteredBooks.isEmpty()) {
                 // Show a message if no books are found in the selected genre
-                Text("No books in this genre", modifier = Modifier.padding(16.dp).align(Alignment.CenterHorizontally), color = LightViolet)
+                Text("No books in this genre", modifier = Modifier
+                    .padding(16.dp)
+                    .align(Alignment.CenterHorizontally), color = LightViolet)
             } else {
                 LazyVerticalGrid(
                     modifier = Modifier.fillMaxSize(),
@@ -1704,3 +1708,9 @@ fun StyledText(text: String) {
 }
 
 
+
+// Modal to edit an entry
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun addReadingChallenge(mainViewModel: MainViewModel){
+}

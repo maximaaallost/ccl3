@@ -5,12 +5,13 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.cc221013.bookify.data.DatabaseHandler
+import com.cc221013.bookify.data.ReadingChallengeDatabase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class MainViewModel(private val db: DatabaseHandler): ViewModel() {
+class MainViewModel(private val db: DatabaseHandler, private val dbReadingChallenge: ReadingChallengeDatabase): ViewModel() {
     private val _mainViewState = MutableStateFlow(MainViewState())
     val mainViewState: StateFlow<MainViewState> = _mainViewState.asStateFlow()
     private val _cameraState = MutableStateFlow(CameraState())
@@ -23,6 +24,10 @@ class MainViewModel(private val db: DatabaseHandler): ViewModel() {
 
     fun save(book: Book){
         db.insertBook(book)
+    }
+
+    fun saveReadingChallenge(challenge: ReadingChallenge){
+        dbReadingChallenge.insertChallenge(challenge)
     }
 
     private val _selectedBook = mutableStateOf<Book?>(null)
