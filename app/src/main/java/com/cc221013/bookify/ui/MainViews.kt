@@ -58,6 +58,7 @@ import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme.colors
+import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -149,6 +150,11 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.util.concurrent.ExecutorService
+
+
+import androidx.compose.material.TextField
+import kotlin.collections.isNotEmpty
+import kotlin.math.min
 
 
 sealed class Screen(val route: String) {
@@ -345,6 +351,7 @@ fun TopDecoration(navController: NavHostController, titlePage: String, subHeadin
 
                     }
                 }
+
 
 
             }
@@ -1093,7 +1100,6 @@ fun TBRScreen(mainViewModel: MainViewModel, navController: NavHostController) {
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WishlistScreen(mainViewModel: MainViewModel, navController: NavHostController) {
@@ -1194,9 +1200,11 @@ fun WishlistScreen(mainViewModel: MainViewModel, navController: NavHostControlle
 
 @Composable
 fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController) {
-
+    val readingChallenges = mainViewModel.getChallenges()
+    val state = mainViewModel.mainViewState.collectAsState()
     LazyColumn(
         verticalArrangement = Arrangement.Center,
+        modifier = Modifier.padding(bottom = 20.dp)
     ) {
         item {
             TopDecoration(navController, "Stats", "Your reading in numbers")
@@ -1266,82 +1274,42 @@ fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController) 
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = CenterHorizontally
                     ) {
                         //heading
+                        Spacer(modifier = Modifier.height(10.dp))
                         SmallText(text = "Media Type", color = NonWhite)
+                        Spacer(modifier = Modifier.width(10.dp))
 
-
-                        //Row for Media Tyoe
+                        //Row for Media Type
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(start = 20.dp, end = 20.dp),
                             horizontalArrangement = Arrangement.SpaceAround
                         ) {
-                            //Ebook
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ebook),
-                                    contentDescription = "E-Books",
-                                    tint = NonWhite,
-                                    modifier = Modifier.size(25.dp)
-                                )
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Text(
-                                    text = "10%",
-                                    style = TextStyle(
-                                        fontFamily = Poppins,
-                                        fontWeight = FontWeight.SemiBold,
-                                        fontSize = 14.sp,
-                                        color = NonWhite
+
+                            // Media Type Distribution
+                            MediaTypeDistribution(
+                                mediaTypes = listOf(
+                                    MediaTypeDistributionItem(
+                                        iconResourceId = R.drawable.ebook,
+                                        contentDescription = "E-Books",
+                                        percentage = 10
+                                    ),
+                                    MediaTypeDistributionItem(
+                                        iconResourceId = R.drawable.paperback,
+                                        contentDescription = "Paperback",
+                                        percentage = 20
+                                    ),
+                                    MediaTypeDistributionItem(
+                                        iconResourceId = R.drawable.audiobook,
+                                        contentDescription = "Audio Book",
+                                        percentage = 80
                                     )
                                 )
-                            }
-                            //Paperback
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.paperback),
-                                    contentDescription = "E-Books",
-                                    tint = NonWhite,
-                                    modifier = Modifier.size(25.dp)
-                                )
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Text(
-                                    text = "20%",
-                                    style = TextStyle(
-                                        fontFamily = Poppins,
-                                        fontWeight = FontWeight.SemiBold,
-                                        fontSize = 14.sp,
-                                        color = NonWhite
-                                    )
-                                )
-                            }
-                            //Audio book
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.audiobook),
-                                    contentDescription = "E-Books",
-                                    tint = NonWhite,
-                                    modifier = Modifier.size(25.dp)
-                                )
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Text(
-                                    text = "80%",
-                                    style = TextStyle(
-                                        fontFamily = Poppins,
-                                        fontWeight = FontWeight.SemiBold,
-                                        fontSize = 14.sp,
-                                        color = NonWhite
-                                    )
-                                )
-                            }
+                            )
+
                         }
                     }
                 }
@@ -1370,34 +1338,113 @@ fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController) 
                 Spacer(modifier = Modifier.height(20.dp))
 
 
-                Button(
-                    onClick = { },
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Yellow),
-                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(Color.Transparent),
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.add),
-                        contentDescription = "add icon",
-                        tint = Violet,
-                        modifier = Modifier.size(25.dp)
-                    )
-                    Text(
-                        text = "add reading challenge",
-                        style = TextStyle(fontSize = 15.sp, color = Violet, fontFamily = Poppins),
-                        modifier = Modifier.padding(start = 10.dp)
-                    )
+                // Check if there are reading challenges
+                if (state.value.challenges.isNotEmpty()) {
+                    // Display reading challenge entries
+                    ReadingChallengeEntries(readingChallenges = state.value.challenges, mainViewModel = mainViewModel)
+                } else {
+                    // Display add reading challenge button
+                    AddReadingChallengeButton(mainViewModel)
                 }
 
-            }
 
+
+
+                Spacer(modifier = Modifier.width(10.dp))
+            }
+            addReadingChallengeAlert(mainViewModel)
 
         }
 
     }
 }
 
+@Composable
+fun ReadingChallengeEntries(readingChallenges: List<ReadingChallenge>, mainViewModel: MainViewModel) {
+    Column(
+        modifier = Modifier
+            .background(color = Violet, RoundedCornerShape(10.dp))
+            .width(350.dp)
+            .padding(start = 20.dp, end = 20.dp, top = 10.dp, bottom = 10.dp),
+    ) {
+        // Display reading challenge entries
+        readingChallenges.forEach { challenge ->
+            Text(
+                text = challenge.title,
+                color = NonWhite,
+                fontSize = 20.sp,
+                fontFamily = Poppins,
+                fontWeight = FontWeight.Bold
+            )
+
+            val progressPercentage = calculateProgress(mainViewModel.bookCount.value, challenge.bookCount) * 100
+            SmallText(text = "Progress - ${String.format("%.0f", progressPercentage)}%", color = NonWhite)
+            // Progress Bar
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp, bottom = 12.dp)
+                    .height(20.dp)
+
+            ) {
+                LinearProgressIndicator(
+                    color = Yellow,
+                    backgroundColor = NonWhite,
+                    progress = calculateProgress(mainViewModel.bookCount.value, challenge.bookCount),
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+
+            Row {
+                Column {
+                    SmallText(text = "Goal", color = NonWhite)
+                    Text(text = "${challenge.bookCount} Books", color = NonWhite, fontSize = 20.sp)
+                }
+                Spacer(modifier = Modifier.width(30.dp))
+                Column {
+                    SmallText(text = "Time", color = NonWhite)
+                    Text(text = "${challenge.days} Days", color = NonWhite, fontSize = 20.sp)
+                }
+            }
+
+        }
+    }
+}
+
+// Function to calculate progress percentage
+private fun calculateProgress(bookCount: Int, goalBookCount: Int): Float {
+    return if (goalBookCount > 0) {
+        // Ensure progress doesn't exceed 100%
+        min(1.0f, bookCount.toFloat() / goalBookCount.toFloat())
+    } else {
+        0.0f
+    }
+}
+
+@Composable
+fun AddReadingChallengeButton(mainViewModel: MainViewModel) {
+    // Add Reading Challenge Button
+    Button(
+        onClick = { mainViewModel.showReadingChallengeDialog() },
+        modifier = Modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(Yellow)
+            .padding(bottom = 20.dp),
+        colors = androidx.compose.material3.ButtonDefaults.buttonColors(Color.Transparent),
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.add),
+            contentDescription = "add icon",
+            tint = Violet,
+            modifier = Modifier.size(25.dp)
+        )
+        Text(
+            text = "add reading challenge",
+            style = TextStyle(fontSize = 15.sp, color = Violet, fontFamily = Poppins),
+            modifier = Modifier.padding(start = 10.dp)
+        )
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -1761,6 +1808,7 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
 
 }
 
+
 @Composable
 fun QuoteSection(
     quotes: List<String>,
@@ -1850,6 +1898,57 @@ fun QuoteSection(
     }
 }
 
+@Composable
+fun MediaTypeDistribution(mediaTypes: List<MediaTypeDistributionItem>) {
+    Box(
+        modifier = Modifier
+            .background(color = Violet, RoundedCornerShape(10.dp))
+            .height(80.dp)
+            .width(350.dp)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Row for Media Type
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 20.dp, end = 20.dp),
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                mediaTypes.forEach { item ->
+                    MediaTypeItem(item)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun MediaTypeItem(item: MediaTypeDistributionItem) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            painter = painterResource(id = item.iconResourceId),
+            contentDescription = item.contentDescription,
+            tint = NonWhite,
+            modifier = Modifier.size(25.dp)
+        )
+        Spacer(modifier = Modifier.width(10.dp))
+        Text(
+            text = "${item.percentage}%",
+            style = TextStyle(
+                fontFamily = Poppins,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 14.sp,
+                color = NonWhite
+            )
+        )
+    }
+}
 
 @Composable
 fun StyledTextFieldWithDropdown(
@@ -2148,10 +2247,135 @@ fun StyledText(text: String) {
 }
 
 
+
 // Modal to edit an entry
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun addReadingChallenge(mainViewModel: MainViewModel) {
+fun addReadingChallengeAlert(mainViewModel: MainViewModel) {
+    val state = mainViewModel.mainViewState.collectAsState()
+
+    if (state.value.openDialogEditReadingChallenge) {
+
+        var title by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+            mutableStateOf(
+                TextFieldValue("")
+            )
+        }
+        var days by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+            mutableStateOf(
+                TextFieldValue("")
+            )
+        }
+        var bookCount by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+            mutableStateOf(
+                TextFieldValue("")
+            )
+        }
+
+        Dialog(
+            onDismissRequest = {
+                mainViewModel.dismissReadingChallengeDialog()
+            }
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth(0.95f),
+                colors = CardDefaults.cardColors(containerColor = Violet),
+                shape = RoundedCornerShape(10.dp),
+            ) {
+                Column {
+                    Text(
+                        text = "Set your reading challenge",
+                        style = TextStyle(
+                            fontFamily = Calistoga,
+                            fontSize = 20.sp,
+                            color = NonWhite
+                        ),
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .align(CenterHorizontally)
+                    )
+
+                    // Input fields for title, days, and amount of books
+                    TextField(
+                        modifier = Modifier.padding(10.dp),
+                        value = title,
+                        onValueChange = { newText -> title = newText },
+                        label = { Text(text = "Title") },
+                        colors = TextFieldDefaults.textFieldColors(
+                            textColor = Violet,
+                            backgroundColor = LightBeige,
+                            disabledIndicatorColor = LightBeige,
+                            focusedIndicatorColor = Violet,
+                            errorIndicatorColor = DarkRed
+                        ),
+                        shape = RoundedCornerShape(8.dp)
+                    )
+
+
+                    Row {
+                        TextField(
+                            modifier = Modifier
+                                .padding(10.dp)
+                                .width(130.dp),
+                            value = bookCount,
+                            onValueChange = { newText -> bookCount = newText },
+                            label = { Text(text = "Books") },
+                            colors = TextFieldDefaults.textFieldColors(
+                                textColor = Violet,
+                                backgroundColor = LightBeige,
+                                disabledIndicatorColor = LightBeige,
+                                focusedIndicatorColor = Violet,
+                                errorIndicatorColor = DarkRed
+                            ),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+
+                        TextField(
+                            modifier = Modifier
+                                .padding(10.dp)
+                                .width(130.dp),
+                            value = days,
+                            onValueChange = { newText -> days = newText },
+                            label = { Text(text = "Days") },
+                            colors = TextFieldDefaults.textFieldColors(
+                                textColor = Violet,
+                                backgroundColor = LightBeige,
+                                disabledIndicatorColor = LightBeige,
+                                focusedIndicatorColor = Violet,
+                                errorIndicatorColor = DarkRed
+                            ),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                    }
+
+                    Icon(
+                        painter = painterResource(id = R.drawable.yellowtick),
+                        contentDescription = "Back",
+                        tint = Yellow,
+                        modifier = Modifier
+                            .padding(bottom = 20.dp, top = 15.dp)
+                            .size(50.dp)
+                            .background(NonWhite, CircleShape)
+                            .border(4.dp, Yellow, CircleShape)
+                            .align(CenterHorizontally)
+                            .clickable {
+                                mainViewModel.saveReadingChallenge(
+                                    ReadingChallenge(
+                                        title.text,
+                                        days.text.toIntOrNull() ?: 0,
+                                        bookCount.text.toIntOrNull() ?: 0
+                                    )
+                                )
+                            }
+                            .size(40.dp)
+
+
+                    )
+                }
+            }
+        }
+    }
 }
 
 @Composable
