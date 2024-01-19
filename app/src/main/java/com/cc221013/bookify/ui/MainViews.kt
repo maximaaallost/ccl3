@@ -85,6 +85,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -810,7 +811,7 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
 @Composable
 fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
     val state = mainViewModel.mainViewState.collectAsState()
-
+    var selectedGenre by remember { mutableStateOf("all") }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -1183,7 +1184,8 @@ fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController){
                                     style = TextStyle(
                                         fontFamily = Poppins,
                                         fontWeight = FontWeight.SemiBold,
-                                        fontSize = 14.sp
+                                        fontSize = 14.sp,
+                                        color = NonWhite
                                     )
                                 )
                             }
@@ -1201,7 +1203,8 @@ fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController){
                                     style = TextStyle(
                                         fontFamily = Poppins,
                                         fontWeight = FontWeight.SemiBold,
-                                        fontSize = 14.sp
+                                        fontSize = 14.sp,
+                                        color = NonWhite
                                     )
                                 )
                             }
@@ -1219,7 +1222,8 @@ fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController){
                                     style = TextStyle(
                                         fontFamily = Poppins,
                                         fontWeight = FontWeight.SemiBold,
-                                        fontSize = 14.sp
+                                        fontSize = 14.sp,
+                                        color = NonWhite
                                     )
                                 )
                             }
@@ -1325,6 +1329,7 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
     var selectedMediaType by remember { mutableStateOf(mediaTypeList[0]) }
     var selectedShelf by remember { mutableStateOf(shelfList[0]) }
     var selectedRating by remember { mutableStateOf(starRatings[0]) }
+    var quotes by remember { mutableStateOf(listOf<String>()) }
 
     Column(
         modifier = Modifier
@@ -1445,6 +1450,7 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
                 review = TextFieldValue(newReview)
             }
         )
+
 
      QuoteSection(
          quotes = quotes,
