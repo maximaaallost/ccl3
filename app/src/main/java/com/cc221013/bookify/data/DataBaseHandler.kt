@@ -148,4 +148,5 @@ class DatabaseHandler(context: Context) : SQLiteOpenHelper(context, dbName, null
 
         return allBooks.toList()
     }
+
 }

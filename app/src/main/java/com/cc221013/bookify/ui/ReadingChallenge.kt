@@ -4,6 +4,8 @@ data class ReadingChallenge (
     val title: String,
      val days: Int?,
      val bookCount: Int,
+     val progress: Float,
+     val startDate: String,
      val id: Int = 0
     ) {
 }

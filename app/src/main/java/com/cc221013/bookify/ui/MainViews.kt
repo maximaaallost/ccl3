@@ -153,6 +153,7 @@ import java.util.concurrent.ExecutorService
 
 
 import androidx.compose.material.TextField
+import androidx.compose.runtime.mutableFloatStateOf
 import kotlin.collections.isNotEmpty
 import kotlin.math.min
 
@@ -391,7 +392,11 @@ fun BigText(text: Int?, color: Color) {
 
 //Reading Statistics on Read Page
 @Composable
-fun ReadStats() {
+fun ReadStats(mainViewModel: MainViewModel) {
+    val books = mainViewModel.mainViewState.collectAsState().value.books
+    val state = mainViewModel.mainViewState.collectAsState()
+    val booksRead = books.filter { it.shelf == "Read" }.size
+    val pagesRead = books.filter { it.shelf == "Read" }.sumOf { it.pages?.toInt() ?: 0 }
     Card(
         modifier = Modifier
             .width(370.dp)
@@ -424,7 +429,7 @@ fun ReadStats() {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Text(text = "dd", color = NonWhite)
+                    Text(text = booksRead.toString(), color = NonWhite)
                     SmallText("books", NonWhite)
                 }
                 Spacer(modifier = Modifier.width(10.dp))
@@ -441,7 +446,7 @@ fun ReadStats() {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Text(text = "105.588", color = NonWhite)
+                    Text(text = pagesRead.toString(), color = NonWhite)
                     SmallText("pages", NonWhite)
                 }
                 Spacer(modifier = Modifier.width(10.dp))
@@ -848,7 +853,7 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
                 TopDecoration(navController, "Read Books", null)
-                ReadStats()
+                ReadStats(mainViewModel)
                 Spacer(modifier = Modifier.height(20.dp))
                 GenreScroll(onGenreSelected = { genre ->
                     selectedGenre = genre
@@ -883,7 +888,7 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                         modifier = Modifier.fillMaxWidth(0.9f),
                         horizontalArrangement = Arrangement.Center
                     ){
-                        ReadStats()
+                        ReadStats(mainViewModel)
                     }
                 }
 
@@ -1201,7 +1206,12 @@ fun WishlistScreen(mainViewModel: MainViewModel, navController: NavHostControlle
 @Composable
 fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController) {
     val readingChallenges = mainViewModel.getChallenges()
+    val books = mainViewModel.mainViewState.collectAsState().value.books
     val state = mainViewModel.mainViewState.collectAsState()
+
+    val booksRead = books.filter { it.shelf == "Read" }.size
+    val pagesRead = books.filter { it.shelf == "Read" }.sumOf { it.pages?.toInt() ?: 0 }
+
     LazyColumn(
         verticalArrangement = Arrangement.Center,
         modifier = Modifier.padding(bottom = 20.dp)
@@ -1213,7 +1223,7 @@ fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController) 
 
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
+                horizontalAlignment = CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
 
@@ -1234,9 +1244,9 @@ fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController) 
                         Column(
                             modifier = Modifier.fillMaxSize(),
                             verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            horizontalAlignment = CenterHorizontally
                         ) {
-                            BigText(text = 8, color = NonWhite)
+                            BigText(text = booksRead, color = NonWhite)
                             SmallText(text = "books", color = NonWhite)
                         }
 
@@ -1255,7 +1265,7 @@ fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController) 
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            BigText(text = 178895, color = NonWhite)
+                            BigText(text = pagesRead, color = NonWhite)
                             SmallText(text = "pages", color = NonWhite)
                         }
 
@@ -1376,21 +1386,32 @@ fun ReadingChallengeEntries(readingChallenges: List<ReadingChallenge>, mainViewM
                 fontFamily = Poppins,
                 fontWeight = FontWeight.Bold
             )
+            val startDate = LocalDate.parse(challenge.startDate, DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+            val endDate = challenge.days?.let { startDate.plusDays(it.toLong()) }
+
+            SmallText(text = "Timeframe", color = NonWhite)
+            if (endDate != null) {
+                Text(text = "${challenge.startDate} - ${endDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))}", color = NonWhite, fontSize = 20.sp)
+            }
+
+            Log.i("ChallengeBookCount ReadingChallengeentries", calculateProgress(mainViewModel.bookCount.value, challenge.bookCount).toString())
+            Log.i("BookCount ReadingChallengeentries", mainViewModel.bookCount.value.toString())
+            Log.i("ChallengeBookcount ReadingChallengeentries", challenge.bookCount.toString())
 
             val progressPercentage = calculateProgress(mainViewModel.bookCount.value, challenge.bookCount) * 100
             SmallText(text = "Progress - ${String.format("%.0f", progressPercentage)}%", color = NonWhite)
+
             // Progress Bar
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 8.dp, bottom = 12.dp)
                     .height(20.dp)
-
             ) {
                 LinearProgressIndicator(
                     color = Yellow,
                     backgroundColor = NonWhite,
-                    progress = calculateProgress(mainViewModel.bookCount.value, challenge.bookCount),
+                    progress = challenge.progress,
                     modifier = Modifier.fillMaxSize()
                 )
             }
@@ -1406,13 +1427,12 @@ fun ReadingChallengeEntries(readingChallenges: List<ReadingChallenge>, mainViewM
                     Text(text = "${challenge.days} Days", color = NonWhite, fontSize = 20.sp)
                 }
             }
-
         }
     }
 }
 
 // Function to calculate progress percentage
-private fun calculateProgress(bookCount: Int, goalBookCount: Int): Float {
+fun calculateProgress(bookCount: Int, goalBookCount: Int): Float {
     return if (goalBookCount > 0) {
         // Ensure progress doesn't exceed 100%
         min(1.0f, bookCount.toFloat() / goalBookCount.toFloat())
@@ -1420,6 +1440,7 @@ private fun calculateProgress(bookCount: Int, goalBookCount: Int): Float {
         0.0f
     }
 }
+
 
 @Composable
 fun AddReadingChallengeButton(mainViewModel: MainViewModel) {
@@ -1449,15 +1470,20 @@ fun AddReadingChallengeButton(mainViewModel: MainViewModel) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController) {
-
-
     val camState = mainViewModel.cameraState.collectAsState()
     val photosList = camState.value.photosListState // Get the list of photos taken
+    val state = mainViewModel.mainViewState.collectAsState()
     val lastItem = if (photosList.isNotEmpty()) {
         photosList.last()
     } else {
         Uri.parse("android.resource://com.cc221013.bookify/drawable/placeholdercover")
     }
+
+    var ChallengeTitle by rememberSaveable { mutableStateOf(state.value.editReadingChallenge.title) }
+    var ChallengeBookCount by rememberSaveable { mutableIntStateOf(state.value.editReadingChallenge.bookCount) }
+    var ChallengeDays by rememberSaveable { mutableStateOf(state.value.editReadingChallenge.days) }
+    var ChallengeStartDate by rememberSaveable { mutableStateOf(state.value.editReadingChallenge.startDate) }
+    var ChallengeProgress by rememberSaveable { mutableFloatStateOf(state.value.editReadingChallenge.progress) }
 
     var cover by rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(
@@ -1683,7 +1709,6 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
                 }
             )
 
-
             StyledText(text = "Choose a Genre")
             StyledTextFieldWithDropdown(
                 onValueChange = { newGenre -> selectedGenre = newGenre },
@@ -1715,7 +1740,6 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
                 }
             )
 
-
             QuoteSection(
                 quotes = quotes,
                 onQuoteAdded = { newQuote ->
@@ -1725,8 +1749,6 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
                     quotes = quotes.toMutableList().apply { removeAt(index) }
                 }
             )
-
-
 
             StyledText(text = "Choose a Language")
             StyledTextFieldWithDropdown(
@@ -1780,6 +1802,10 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
                         //val currentDate = LocalDate.now() // Get the current date
                         //val formattedDate = currentDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) // Save the date in the wished format
                         val quotesText = quotes.joinToString(separator = ";")
+                        val progressPercentage = calculateProgress(mainViewModel.bookCount.value, ChallengeBookCount.toInt())
+                        Log.i("progressPercentage AddBookscreen", progressPercentage.toString())
+                        Log.i("bookCount AddBookscreen", mainViewModel.bookCount.value.toString())
+                        Log.i("ChallengeBookCount AddBookscreen", ChallengeBookCount.toString())
                         mainViewModel.save(
                             Book(
                                 title.text,
@@ -1797,11 +1823,20 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
                                 selectedMediaType
                             )
                         )
+                        mainViewModel.updateChallenge(
+                            ReadingChallenge(
+                                ChallengeTitle,
+                                ChallengeDays?.toInt(),
+                                ChallengeBookCount.toInt(),
+                                0.2f,
+//                                progressPercentage,
+                                ChallengeStartDate.toString(),
+                                state.value.editReadingChallenge.id
+                            )
+                        )
                         navController.navigate(Screen.Read.route)
                     }
                     .size(40.dp)
-
-
             )
         }
     }
@@ -2360,11 +2395,16 @@ fun addReadingChallengeAlert(mainViewModel: MainViewModel) {
                             .border(4.dp, Yellow, CircleShape)
                             .align(CenterHorizontally)
                             .clickable {
+                                val currentDate = LocalDate.now() // Get the current date
+                                val formattedDate =
+                                    currentDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
                                 mainViewModel.saveReadingChallenge(
                                     ReadingChallenge(
                                         title.text,
                                         days.text.toIntOrNull() ?: 0,
-                                        bookCount.text.toIntOrNull() ?: 0
+                                        bookCount.text.toIntOrNull() ?: 0,
+                                        0f,
+                                        formattedDate
                                     )
                                 )
                             }

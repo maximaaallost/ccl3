@@ -24,8 +24,10 @@ class MainViewModel(private val db: DatabaseHandler, private val dbChallenge: Re
 
 
     fun save(book: Book){
+        if (book.shelf == "Read") {
+            _bookCount.value += 1
+        }
         db.insertBook(book)
-        _bookCount.value += 1
     }
 
     fun showReadingChallengeDialog() {
@@ -40,7 +42,6 @@ class MainViewModel(private val db: DatabaseHandler, private val dbChallenge: Re
         dbChallenge.insertChallenge(challenge)
         _bookCount.value = 0
         dismissReadingChallengeDialog()
-
     }
 
 
@@ -73,6 +74,13 @@ class MainViewModel(private val db: DatabaseHandler, private val dbChallenge: Re
         _mainViewState.update { it.copy(openDialogEditBook = false) }
         db.updateBook(book)
         getBooks()
+        if (book.shelf == "Read") {
+            _bookCount.value += 1
+        }
+    }
+    fun updateChallenge(challenge: ReadingChallenge){
+        dbChallenge.updateChallenge(challenge)
+        getChallenges()
     }
 
     fun dialogEditBook(book: Book) {
