@@ -164,6 +164,7 @@ sealed class Screen(val route: String) {
     object AddBook : Screen("fourth")
     object BookDetails : Screen("fifth")
     object Stats : Screen("sixth")
+    object EditReadBook : Screen("seventh")
 }
 
 
@@ -208,6 +209,10 @@ fun MainView(mainViewModel: MainViewModel) {
             composable(Screen.BookDetails.route) {
                 mainViewModel.selectScreen(Screen.BookDetails)
                 BookDetails(mainViewModel, navController)
+            }
+            composable(Screen.EditReadBook.route) {
+                mainViewModel.selectScreen(Screen.EditReadBook)
+                EditReadBook(mainViewModel, navController)
             }
             composable(Screen.Stats.route) {
                 mainViewModel.selectScreen(Screen.Stats)
@@ -2317,7 +2322,6 @@ fun StyledText(text: String) {
 }
 
 
-
 // Modal to edit an entry
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -2670,4 +2674,11 @@ fun EditBook(mainViewModel: MainViewModel) {
             }
         }
     }
+}
+
+
+@Composable
+fun EditReadBook(mainViewModel: MainViewModel, navController: NavHostController) {
+    val book = mainViewModel.selectedBook.value
+
 }
