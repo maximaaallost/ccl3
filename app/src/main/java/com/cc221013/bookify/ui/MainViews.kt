@@ -391,7 +391,8 @@ fun BigText(text: Int?, color: Color) {
 
 //Reading Statistics on Read Page
 @Composable
-fun ReadStats() {
+fun ReadStats(navController: NavHostController) {
+
     Card(
         modifier = Modifier
             .width(370.dp)
@@ -448,6 +449,7 @@ fun ReadStats() {
 
                 Column(
                     modifier = Modifier
+                        .clickable { navController.navigate(Screen.Stats.route) }
                         .width(100.dp)
                         .height(80.dp)
                         .clip(RoundedCornerShape(10.dp))
@@ -465,6 +467,7 @@ fun ReadStats() {
                         modifier = Modifier.size(20.dp),
                         tint = Yellow
                     )
+                    Spacer(modifier = Modifier.height(5.dp))
                     SmallText(text = "see more", color = Yellow)
                 }
             }
@@ -879,7 +882,7 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
                 TopDecoration(navController, "Read Books", null)
-                ReadStats()
+                ReadStats(navController)
                 Spacer(modifier = Modifier.height(20.dp))
                 GenreScroll(onGenreSelected = { genre ->
                     selectedGenre = genre
@@ -914,7 +917,7 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                         modifier = Modifier.fillMaxWidth(0.9f),
                         horizontalArrangement = Arrangement.Center
                     ){
-                        ReadStats()
+                        ReadStats(navController)
                     }
                 }
 
