@@ -72,7 +72,6 @@ dependencies {
     implementation ("androidx.activity:activity-ktx:1.3.0")
     implementation ("androidx.fragment:fragment-ktx:1.3.6")
 
-
     // CameraX core library using the camera2 implementation
     val camerax_version = "1.4.0-alpha02"
     implementation("androidx.camera:camera-camera2:${camerax_version}")

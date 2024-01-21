@@ -56,6 +56,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -182,6 +183,9 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import com.cc221013.bookify.data.ReadingChallengeDatabaseHandler
 import kotlinx.coroutines.flow.update
 import kotlin.collections.isNotEmpty
@@ -1238,6 +1242,7 @@ fun WishlistScreen(mainViewModel: MainViewModel, navController: NavHostControlle
 }
 
 
+var genreData: List<PieSlices> = emptyList()
 @Composable
 fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController) {
     val readingChallenges = mainViewModel.getChallenges()
@@ -1288,7 +1293,10 @@ fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController) 
         "Non-Fiction" to Mint
     )
 
-
+    val genreData = calculateGenreDistribution(books.filter { it.shelf == "Read" }.mapNotNull { it.genre }).map { (genre, count) ->
+        val color = genreColors[genre] ?: getRandomColor()
+        PieSlices(count.toFloat(), color)
+    }.toList()
 
     LazyColumn(
         verticalArrangement = Arrangement.Center,
@@ -1388,12 +1396,28 @@ fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController) 
                         .width(350.dp),
                     contentAlignment = Center
                 ) {
-                    Canvas(
-                        modifier = Modifier
-                            .size(400.dp)
-                            .padding(30.dp)
-                    ) {
-                        drawGenrePieChartWithLegend(genreDistribution, genreColors)
+                    Column {
+
+
+                        PieChart(Modifier.size(200.dp, 200.dp), genreData)
+                        Text(
+                            buildAnnotatedString {
+                                genreData.forEachIndexed { index, slice ->
+                                    val percentage =
+                                        (slice.value / calculateTotalPercentage(genreData)) * 100
+                                    withStyle(style = SpanStyle(color = slice.color)) {
+                                        append("${slice.value.toInt()} books - ${percentage.toInt()}%")
+                                    }
+                                    if (index < genreData.size - 1) {
+                                        append("   ")
+                                    }
+                                }
+                            },
+                            modifier = Modifier
+                                .padding(top = 8.dp)
+                                .fillMaxWidth(),
+                            textAlign = TextAlign.Center
+                        )
                     }
                 }
 
@@ -1417,84 +1441,40 @@ fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController) 
     }
 }
 
+
+// Add the following function to calculate the total percentage for genres:
+fun calculateTotalPercentage(slices: List<PieSlices>): Float {
+    return slices.sumByDouble { it.value.toDouble() }.toFloat()
+}
+
+class PieSlices (val value: Float, val color : Color = getRandomColor())
+@Composable
+fun PieChart(modifier: Modifier, slices: List<PieSlices>) {
+    val sum = slices.map { it.value }.sum()
+    Canvas(modifier = modifier) {
+
+        slices.forEachIndexed { index, slice ->
+
+            val start = 360f * slices.take(index).map { it.value }.sum() / sum
+            val sweep = 360f * slice.value / sum
+            drawArc(
+                color = slice.color,
+                startAngle = start,
+                sweepAngle = sweep,
+                useCenter = true
+            )
+        }
+    }
+
+}
+
+
+
 fun calculateGenreDistribution(genres: List<String>): Map<String, Int> {
     return genres.groupBy { it }
         .mapValues { entry -> entry.value.size }
 }
 
-
-fun DrawScope.drawGenrePieChartWithLegend(
-    genreDistribution: Map<String, Int>,
-    genreColors: Map<String, Color>
-) {
-    val totalGenres = genreDistribution.values.sum().toFloat()
-    var currentAngle = 0f
-    val center = center
-
-    // Draw pie chart
-    genreDistribution.forEach { (genre, count) ->
-        val sweepAngle = (count / totalGenres) * 360f
-
-        // Draw pie chart slice
-        drawArc(
-            color = genreColors[genre] ?: getRandomColor(),
-            startAngle = currentAngle,
-            sweepAngle = sweepAngle,
-            useCenter = true,
-            style = Stroke(width = 50.dp.toPx())
-        )
-
-        // Draw inner circle (empty center)
-        drawCircle(
-            color = Violet,
-            radius = 100.dp.toPx(), // Adjust the radius as needed
-            center = center
-        )
-
-        currentAngle += sweepAngle
-    }
-
-    // Draw legend
-    val legendTopMargin = 300.dp.toPx() // Adjust the margin as needed
-    val legendSquareSize = 20.dp.toPx() // Adjust the square size as needed
-    val legendTextMargin = 5.dp.toPx() // Adjust the margin between square and text
-
-    genreDistribution.forEach { (genre, count) ->
-        val percentage = (count / totalGenres) * 100
-        val legendSquareTop = legendTopMargin + 20.dp.toPx() * genreDistribution.keys.indexOf(genre)
-
-        // Draw color square
-        drawRect(
-            color = genreColors[genre] ?: getRandomColor(),
-            size = Size(legendSquareSize, legendSquareSize),
-            topLeft = Offset(center.x - 150.dp.toPx(), legendSquareTop)
-        )
-
-        // Draw genre text
-        drawIntoCanvas {
-            it.nativeCanvas.drawText(
-                "${percentage.toInt()}%",
-                center.x - 150.dp.toPx() + legendSquareSize + legendTextMargin, // Adjust the position
-                legendSquareTop + 15.dp.toPx(),
-                Paint().apply {
-                    color = NonWhite.toArgb()
-                    textSize = 16.sp.toPx()
-                    typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-                }
-            )
-            it.nativeCanvas.drawText(
-                genre.capitalize(),
-                center.x - 150.dp.toPx() + 2 * legendSquareSize + 3 * legendTextMargin, // Adjust the position
-                legendSquareTop + 15.dp.toPx(),
-                Paint().apply {
-                    color = NonWhite.toArgb()
-                    textSize = 16.sp.toPx()
-                    typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-                }
-            )
-        }
-    }
-}
 fun getRandomColor(): Color {
     val random = Random.Default
     return Color(random.nextFloat(), random.nextFloat(), random.nextFloat())
@@ -1580,7 +1560,8 @@ fun ReadingChallengeEntries(readingChallenges: List<ReadingChallenge>, mainViewM
                 Image(
                     painter = painterResource(id = R.drawable.congratulations),
                     contentDescription = "trophy icon",
-                    modifier = Modifier.size(100.dp)
+                    modifier = Modifier
+                        .size(100.dp)
                         .align(Alignment.CenterVertically)
                 )
                 Spacer(modifier = Modifier.width(10.dp))
