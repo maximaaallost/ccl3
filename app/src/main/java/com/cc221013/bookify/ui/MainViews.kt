@@ -2387,8 +2387,6 @@ fun EditBook(mainViewModel: MainViewModel) {
     )
     var selectedGenre by remember { mutableStateOf(genres[0]) }
 
-
-
     if (state.value.openDialogEditBook) {
         var title by rememberSaveable { mutableStateOf(state.value.editBook.title) }
         var author by rememberSaveable { mutableStateOf(state.value.editBook.author) }
@@ -2404,7 +2402,6 @@ fun EditBook(mainViewModel: MainViewModel) {
         var days by rememberSaveable { mutableStateOf(state.value.editBook.days) }
         var mediaType by rememberSaveable { mutableStateOf(state.value.editBook.mediaType) }
 
-
         val shelfList = listOf(
             "Read", "To be Read", "Wishlist"
         )
@@ -2413,7 +2410,6 @@ fun EditBook(mainViewModel: MainViewModel) {
         var selectedShelf by remember { mutableStateOf(shelfList[0]) }
 
 
-        // https://developer.android.com/jetpack/compose/components/dialog
         Dialog(
             onDismissRequest = { mainViewModel.dismissDialog() }
         ) {
@@ -2537,7 +2533,9 @@ fun EditBook(mainViewModel: MainViewModel) {
                     //Delete Book
                     Icon(
                         modifier = Modifier
-                            .clickable { }
+                            .clickable {
+                                mainViewModel.clickDelete(state.value.editBook)
+                            }
                             .fillMaxHeight(0.7f),
                         painter = painterResource(id = R.drawable.delte),
                         contentDescription = "Delete Icon",
