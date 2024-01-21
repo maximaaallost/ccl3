@@ -572,11 +572,41 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
                             modifier = Modifier.fillMaxWidth(),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.placeholderstars),
-                                contentDescription = "Star Rating",
-                                modifier = Modifier.width(180.dp)
-                            )
+                            //stars according to rating
+                            if(book.rating !== null){
+                                if(book.rating == 5){
+                                    Image(
+                                        painterResource(id = R.drawable.fivestars),
+                                        contentDescription = "Five Stars Rating",
+                                        modifier = Modifier.height(30.dp)
+                                    )
+                                } else if(book.rating == 4){
+                                    Image(
+                                        painterResource(id = R.drawable.fourstars),
+                                        contentDescription = "Four Stars Rating",
+                                        modifier = Modifier.height(30.dp)
+                                    )
+                                } else if(book.rating == 3){
+                                    Image(
+                                        painterResource(id = R.drawable.threestars),
+                                        contentDescription = "Three Stars Rating",
+                                        modifier = Modifier.height(30.dp)
+                                    )
+                                } else if(book.rating == 2){
+                                    Image(
+                                        painterResource(id = R.drawable.twostars),
+                                        contentDescription = "Two Stars Rating",
+                                        modifier = Modifier.height(30.dp)
+                                    )
+                                } else if(book.rating == 1){
+                                    Image(
+                                        painterResource(id = R.drawable.onestar),
+                                        contentDescription = "One Star Rating",
+                                        modifier = Modifier.height(30.dp)
+                                    )
+                                }
+                            }
+
                             Spacer(modifier = Modifier.height(10.dp))
                             Text(
                                 text = book.title,
@@ -825,6 +855,7 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
     }
 }
 
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
@@ -943,6 +974,42 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
+
+                            //stars according to rating
+                                if(book.rating !== null){
+                                    if(book.rating == 5){
+                                        Image(
+                                            painterResource(id = R.drawable.fivestars),
+                                            contentDescription = "Five Stars Rating",
+                                            modifier = Modifier.height(30.dp)
+                                        )
+                                    } else if(book.rating == 4){
+                                        Image(
+                                            painterResource(id = R.drawable.fourstars),
+                                            contentDescription = "Four Stars Rating",
+                                            modifier = Modifier.height(30.dp)
+                                        )
+                                    } else if(book.rating == 3){
+                                        Image(
+                                            painterResource(id = R.drawable.threestars),
+                                            contentDescription = "Three Stars Rating",
+                                            modifier = Modifier.height(30.dp)
+                                        )
+                                    } else if(book.rating == 2){
+                                        Image(
+                                            painterResource(id = R.drawable.twostars),
+                                            contentDescription = "Two Stars Rating",
+                                            modifier = Modifier.height(30.dp)
+                                        )
+                                    } else if(book.rating == 1){
+                                        Image(
+                                            painterResource(id = R.drawable.onestar),
+                                            contentDescription = "One Star Rating",
+                                            modifier = Modifier.height(30.dp)
+                                        )
+                                    }
+                                }
+
                             Text(
                                 text = book.title,
                                 style = TextStyle(
@@ -2393,7 +2460,6 @@ fun EditBook(mainViewModel: MainViewModel) {
         var genre by rememberSaveable { mutableStateOf(state.value.editBook.genre) }
         var color by rememberSaveable { mutableStateOf(state.value.editBook.color) }
         var cover by rememberSaveable { mutableStateOf(state.value.editBook.cover) }
-//        var shelf by rememberSaveable { mutableStateOf(state.value.editBook.shelf) }
         var rating by rememberSaveable { mutableStateOf(state.value.editBook.rating) }
         var review by rememberSaveable { mutableStateOf(state.value.editBook.review) }
         var quote by rememberSaveable { mutableStateOf(state.value.editBook.quote) }
