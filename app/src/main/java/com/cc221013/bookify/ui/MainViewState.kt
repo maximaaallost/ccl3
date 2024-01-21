@@ -4,9 +4,10 @@ data class MainViewState(
     val books: List<Book> = emptyList(),
     val challenges: List<ReadingChallenge> = emptyList(),
     val editBook: Book = Book("","","", "", "", "", 0, "", "", "", 0, 0, ""),
-    val editReadingChallenge: ReadingChallenge = ReadingChallenge("",0, 0, 0f, ""),
+    val editReadingChallenge: ReadingChallenge = ReadingChallenge("",0, 0, 0,0f, ""),
     val selectedScreen: Screen = Screen.Read,
     val openDialogEditReadBook: Boolean = false,
     val openDialogEditReadingChallenge: Boolean = false,
-    val openDialogEditBook: Boolean = false
+    val openDialogEditBook: Boolean = false,
+    var finishedChallenge : Boolean = false
 )

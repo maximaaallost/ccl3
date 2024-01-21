@@ -15,7 +15,8 @@ class ReadingChallengeDatabaseHandler(context: Context) : SQLiteOpenHelper(conte
         private const val id = "_id"
         private const val title = "title"
         private const val days = "days"
-        private const val bookCount = "book_count"
+        private const val goalBookCount = "goal_book_count"
+        private const val userBookCount = "user_book_count"
         private const val progress = "progress"
         private const val startDate = "start_date"
 
@@ -26,7 +27,8 @@ class ReadingChallengeDatabaseHandler(context: Context) : SQLiteOpenHelper(conte
         dbChallenge?.execSQL("CREATE TABLE IF NOT EXISTS $tableName ($id INTEGER PRIMARY KEY, " +
                 "$title VARCHAR(50), " +
                 "$days INT(3), " +
-                "$bookCount INT(5),"+
+                "$goalBookCount INT(5),"+
+                "$userBookCount INT(5),"+
                 "$progress FLOAT(10),"+
                 "$startDate VARCHAR(10));")
     }
@@ -41,7 +43,8 @@ class ReadingChallengeDatabaseHandler(context: Context) : SQLiteOpenHelper(conte
         val values = ContentValues()
         values.put(title, challenge.title)
         values.put(days, challenge.days)
-        values.put(bookCount, challenge.bookCount)
+        values.put(goalBookCount, challenge.goalBookCount)
+        values.put(userBookCount, challenge.userBookCount)
         values.put(progress, challenge.progress)
         values.put(startDate, challenge.startDate)
 
@@ -53,7 +56,8 @@ class ReadingChallengeDatabaseHandler(context: Context) : SQLiteOpenHelper(conte
         val values = ContentValues()
         values.put(title, challenge.title)
         values.put(days, challenge.days)
-        values.put(bookCount, challenge.bookCount)
+        values.put(goalBookCount, challenge.goalBookCount)
+        values.put(userBookCount, challenge.userBookCount)
         values.put(progress, challenge.progress)
         values.put(startDate, challenge.startDate)
 
@@ -74,16 +78,18 @@ class ReadingChallengeDatabaseHandler(context: Context) : SQLiteOpenHelper(conte
             val idID = cursor.getColumnIndex(id)
             val titleID = cursor.getColumnIndex(title)
             val daysID = cursor.getColumnIndex(days)
-            val bookCountID = cursor.getColumnIndex(bookCount)
+            val goalBookCountID = cursor.getColumnIndex(goalBookCount)
+            val userBookCountID = cursor.getColumnIndex(userBookCount)
             val progressID = cursor.getColumnIndex(progress)
             val startDateID = cursor.getColumnIndex(startDate)
 
-            if (idID >= 0 && titleID >= 0 && daysID >= 0 && bookCountID >= 0 && progressID >= 0 && startDateID >= 0) {
+            if (idID >= 0 && titleID >= 0 && daysID >= 0 && goalBookCountID >= 0 &&  userBookCountID >= 0 && progressID >= 0 && startDateID >= 0) {
                 allChallenges.add(
                     ReadingChallenge(
                         cursor.getString(titleID),
                         cursor.getInt(daysID),
-                        cursor.getInt(bookCountID),
+                        cursor.getInt(goalBookCountID),
+                        cursor.getInt(userBookCountID),
                         cursor.getFloat(progressID),
                         cursor.getString(startDateID),
                         cursor.getInt(idID)
@@ -94,4 +100,35 @@ class ReadingChallengeDatabaseHandler(context: Context) : SQLiteOpenHelper(conte
 
         return allChallenges.toList()
     }
+//    fun getChallengeById(challengeId: Int): ReadingChallenge? {
+//        val dbChallenge = this.readableDatabase
+//        val cursor = dbChallenge.rawQuery("SELECT * FROM $tableName WHERE $id = ?", arrayOf(challengeId.toString()))
+//
+//        var challenge: ReadingChallenge? = null
+//
+//        if (cursor.moveToFirst()) {
+//            val idID = cursor.getColumnIndex(id)
+//            val titleID = cursor.getColumnIndex(title)
+//            val daysID = cursor.getColumnIndex(days)
+//            val goalBookCountID = cursor.getColumnIndex(goalBookCount)
+//            val userBookCountID = cursor.getColumnIndex(userBookCount)
+//            val progressID = cursor.getColumnIndex(progress)
+//            val startDateID = cursor.getColumnIndex(startDate)
+//
+//            if (idID >= 0 && titleID >= 0 && daysID >= 0 && goalBookCountID >= 0  && userBookCountID >= 0 && progressID >= 0 && startDateID >= 0) {
+//                challenge = ReadingChallenge(
+//                    cursor.getString(titleID),
+//                    cursor.getInt(daysID),
+//                    cursor.getInt(goalBookCountID),
+//                    cursor.getInt(userBookCountID),
+//                    cursor.getFloat(progressID),
+//                    cursor.getString(startDateID),
+//                    cursor.getInt(idID)
+//                )
+//            }
+//        }
+//
+//        cursor.close()
+//        return challenge
+//    }
 }

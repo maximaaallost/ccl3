@@ -182,6 +182,8 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
+import com.cc221013.bookify.data.ReadingChallengeDatabaseHandler
+import kotlinx.coroutines.flow.update
 import kotlin.collections.isNotEmpty
 import kotlin.math.min
 import kotlin.random.Random
@@ -233,7 +235,7 @@ fun MainView(mainViewModel: MainViewModel) {
             }
             composable(Screen.AddBook.route) {
                 mainViewModel.selectScreen(Screen.AddBook)
-                AddBookScreen(mainViewModel, navController)
+                AddBookScreen(mainViewModel, navController, readingChallenges = state.value.challenges)
             }
             composable(Screen.BookDetails.route) {
                 mainViewModel.selectScreen(Screen.BookDetails)
@@ -1397,8 +1399,6 @@ fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController) 
 
 
                 Spacer(modifier = Modifier.height(20.dp))
-
-
                 // Check if there are reading challenges
                 if (state.value.challenges.isNotEmpty()) {
                     // Display reading challenge entries
@@ -1407,12 +1407,9 @@ fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController) 
                     // Display add reading challenge button
                     AddReadingChallengeButton(mainViewModel)
                 }
-
-
-
-
                 Spacer(modifier = Modifier.width(10.dp))
             }
+
             addReadingChallengeAlert(mainViewModel)
 
         }
@@ -1541,61 +1538,174 @@ fun MediaTypeItem(item: MediaTypeDistributionItem) {
     }
 }
 @Composable
+fun AddReadingChallengeButton(mainViewModel: MainViewModel) {
+    // Add Reading Challenge Button
+    Button(
+        onClick = { mainViewModel.showReadingChallengeDialog() },
+        modifier = Modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(Yellow),
+        colors = androidx.compose.material3.ButtonDefaults.buttonColors(Color.Transparent),
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.add),
+            contentDescription = "add icon",
+            tint = Violet,
+            modifier = Modifier.size(25.dp)
+        )
+        Text(
+            text = "add reading challenge",
+            style = TextStyle(fontSize = 15.sp, color = Violet, fontFamily = Poppins),
+            modifier = Modifier.padding(start = 10.dp)
+        )
+    }
+}
+
+@Composable
 fun ReadingChallengeEntries(readingChallenges: List<ReadingChallenge>, mainViewModel: MainViewModel) {
+    val state = mainViewModel.mainViewState.collectAsState()
     Column(
         modifier = Modifier
             .background(color = Violet, RoundedCornerShape(10.dp))
             .width(350.dp)
             .padding(start = 20.dp, end = 20.dp, top = 10.dp, bottom = 10.dp),
     ) {
-        // Display reading challenge entries
+
         readingChallenges.forEach { challenge ->
-            Text(
-                text = challenge.title,
-                color = NonWhite,
-                fontSize = 20.sp,
-                fontFamily = Poppins,
-                fontWeight = FontWeight.Bold
-            )
-            val startDate = LocalDate.parse(challenge.startDate, DateTimeFormatter.ofPattern("dd.MM.yyyy"))
-            val endDate = challenge.days?.let { startDate.plusDays(it.toLong()) }
+        if (state.value.finishedChallenge) {
+            Column {
 
-            SmallText(text = "Timeframe", color = NonWhite)
-            if (endDate != null) {
-                Text(text = "${challenge.startDate} - ${endDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))}", color = NonWhite, fontSize = 20.sp)
-            }
-
-            Log.i("ChallengeBookCount ReadingChallengeentries", calculateProgress(mainViewModel.bookCount.value, challenge.bookCount).toString())
-            Log.i("BookCount ReadingChallengeentries", mainViewModel.bookCount.value.toString())
-            Log.i("ChallengeBookcount ReadingChallengeentries", challenge.bookCount.toString())
-
-            val progressPercentage = calculateProgress(mainViewModel.bookCount.value, challenge.bookCount) * 100
-            SmallText(text = "Progress - ${String.format("%.0f", progressPercentage)}%", color = NonWhite)
-
-            // Progress Bar
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp, bottom = 12.dp)
-                    .height(20.dp)
-            ) {
-                LinearProgressIndicator(
-                    color = Yellow,
-                    backgroundColor = NonWhite,
-                    progress = challenge.progress,
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
 
             Row {
+                Image(
+                    painter = painterResource(id = R.drawable.congratulations),
+                    contentDescription = "trophy icon",
+                    modifier = Modifier.size(100.dp)
+                        .align(Alignment.CenterVertically)
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+
                 Column {
-                    SmallText(text = "Goal", color = NonWhite)
-                    Text(text = "${challenge.bookCount} Books", color = NonWhite, fontSize = 20.sp)
+                    Text(
+                        text = "Congratulations!",
+                        style = TextStyle(
+                            fontSize = 22.sp,
+                            color = NonWhite,
+                            fontFamily = Calistoga,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    )
+                    Text(
+                        text = "You finished your reading challenge!",
+                        style = TextStyle(
+                            fontSize = 14.sp,
+                            color = NonWhite,
+                            fontFamily = Poppins,
+                            fontWeight = FontWeight.Medium,
+                        ),
+                        modifier = Modifier.padding(top = 5.dp, bottom = 5.dp)
+                    )
+                    Button (
+                        onClick = { mainViewModel.deleteChallenge(challenge) },
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Yellow),
+                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(Color.Transparent),
+                    ) {
+                        Text(
+                            text = "Thank you",
+                            style = TextStyle(fontSize = 15.sp, color = Violet, fontFamily = Poppins, fontWeight = FontWeight.SemiBold),
+                        )
+                    }
+
                 }
-                Spacer(modifier = Modifier.width(30.dp))
-                Column {
-                    SmallText(text = "Time", color = NonWhite)
-                    Text(text = "${challenge.days} Days", color = NonWhite, fontSize = 20.sp)
+
+            }
+
+            }
+        }
+            else {
+           //  Display reading challenge entries
+
+                Text(
+                    text = challenge.title,
+                    color = NonWhite,
+                    fontSize = 20.sp,
+                    fontFamily = Poppins,
+                    fontWeight = FontWeight.Bold
+                )
+                val startDate =
+                    LocalDate.parse(challenge.startDate, DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+                val endDate = challenge.days?.let { startDate.plusDays(it.toLong()) }
+
+                SmallText(text = "Timeframe", color = NonWhite)
+                if (endDate != null) {
+                    Text(
+                        text = "${challenge.startDate} - ${
+                            endDate.format(
+                                DateTimeFormatter.ofPattern(
+                                    "dd.MM.yyyy"
+                                )
+                            )
+                        }", color = NonWhite, fontSize = 20.sp
+                    )
+                }
+
+
+//                val progressPercentage = calculateProgress(challenge.userBookCount, challenge.goalBookCount)* 100
+                val progressPercentage = calculateProgress(mainViewModel.internBookCount, challenge.goalBookCount)* 100
+
+//                val updatedUserBookCount = challenge.userBookCount + mainViewModel.internBookCount
+                val updatedUserBookCount = mainViewModel.internBookCount
+
+
+
+                Log.i ("internUserBookCount", mainViewModel.internBookCount.toString())
+                Log.i ("updatedUserBookCount", updatedUserBookCount.toString())
+                Log.i ("progresspercentage", progressPercentage.toString())
+
+
+            mainViewModel.updateChallenge(
+                    challenge.copy(
+                        progress = progressPercentage / 100f, userBookCount = updatedUserBookCount
+                    )
+                )
+
+
+                SmallText(
+                    text = "Progress - ${String.format("%.0f", progressPercentage)}%",
+                    color = NonWhite
+                )
+                state.value.finishedChallenge = progressPercentage >= 100
+                // Progress Bar
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp, bottom = 12.dp)
+                        .height(20.dp)
+                ) {
+                    LinearProgressIndicator(
+                        color = Yellow,
+                        backgroundColor = NonWhite,
+                        progress = progressPercentage / 100f,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+
+                Row {
+                    Column {
+                        SmallText(text = "Goal", color = NonWhite)
+                        Text(
+                            text = "${challenge.goalBookCount} Books",
+                            color = NonWhite,
+                            fontSize = 20.sp
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(30.dp))
+                    Column {
+                        SmallText(text = "Time", color = NonWhite)
+                        Text(text = "${challenge.days} Days", color = NonWhite, fontSize = 20.sp)
+                    }
                 }
             }
         }
@@ -1613,34 +1723,11 @@ fun calculateProgress(bookCount: Int, goalBookCount: Int): Float {
 }
 
 
-@Composable
-fun AddReadingChallengeButton(mainViewModel: MainViewModel) {
-    // Add Reading Challenge Button
-    Button(
-        onClick = { mainViewModel.showReadingChallengeDialog() },
-        modifier = Modifier
-            .clip(RoundedCornerShape(8.dp))
-            .background(Yellow)
-            .padding(bottom = 20.dp),
-        colors = androidx.compose.material3.ButtonDefaults.buttonColors(Color.Transparent),
-    ) {
-        Icon(
-            painter = painterResource(id = R.drawable.add),
-            contentDescription = "add icon",
-            tint = Violet,
-            modifier = Modifier.size(25.dp)
-        )
-        Text(
-            text = "add reading challenge",
-            style = TextStyle(fontSize = 15.sp, color = Violet, fontFamily = Poppins),
-            modifier = Modifier.padding(start = 10.dp)
-        )
-    }
-}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController) {
+fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController, readingChallenges: List<ReadingChallenge>) {
     val camState = mainViewModel.cameraState.collectAsState()
     val photosList = camState.value.photosListState // Get the list of photos taken
     val state = mainViewModel.mainViewState.collectAsState()
@@ -1649,12 +1736,6 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
     } else {
         Uri.parse("android.resource://com.cc221013.bookify/drawable/placeholdercover")
     }
-
-    var ChallengeTitle by rememberSaveable { mutableStateOf(state.value.editReadingChallenge.title) }
-    var ChallengeBookCount by rememberSaveable { mutableIntStateOf(state.value.editReadingChallenge.bookCount) }
-    var ChallengeDays by rememberSaveable { mutableStateOf(state.value.editReadingChallenge.days) }
-    var ChallengeStartDate by rememberSaveable { mutableStateOf(state.value.editReadingChallenge.startDate) }
-    var ChallengeProgress by rememberSaveable { mutableFloatStateOf(state.value.editReadingChallenge.progress) }
 
     var cover by rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(
@@ -1775,6 +1856,7 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
     var selectedRating by remember { mutableStateOf(starRatings[0]) }
     var quotes by remember { mutableStateOf(listOf<String>()) }
 
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -1809,13 +1891,19 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
                 Icon(
                     painter = painterResource(id = R.drawable.bookcover),
                     contentDescription = "Book cover background",
-                    tint = DarkBeige,
+                    tint = ColorUtils.getColorByName(color.text),
                     modifier = Modifier
                         .size(275.dp)
                 )
 
                 Image(
-                    painter = rememberImagePainter(lastItem),
+                    painter = cover.text.let {
+                        if (it.isNotEmpty()) {
+                            rememberImagePainter(data = it)
+                        } else {
+                            painterResource(id = R.drawable.placeholdercover)
+                        }
+                    },
                     contentDescription = "Entry Image",
                     modifier = Modifier
                         .height(225.dp)
@@ -1893,64 +1981,71 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
                 items = shelfList,
                 selectedValue = selectedShelf
             )
+            if (selectedShelf == "Read") {
+                StyledText("Rate the book")
+                StyledTextFieldWithDropdown(
+                    onValueChange = { newRating ->
+                        selectedRating = newRating.replace(" stars", "").toIntOrNull() ?: 0
+                    },
+                    items = starRatings.map { it.toString() },
+                    selectedValue = "$selectedRating stars"
+                )
 
-            StyledText("Rate the book")
-            StyledTextFieldWithDropdown(
-                onValueChange = { newRating ->
-                    selectedRating = newRating.replace(" stars", "").toIntOrNull() ?: 0
-                },
-                items = starRatings.map { it.toString() },
-                selectedValue = "$selectedRating stars"
-            )
-
-            StyledTextField(
-                placeholder = "Review",
-                value = review.text,
-                onValueChange = { newReview ->
-                    review = TextFieldValue(newReview)
-                }
-            )
-
-            QuoteSection(
-                quotes = quotes,
-                onQuoteAdded = { newQuote ->
-                    quotes = quotes.toMutableList().apply { add(newQuote) }
-                },
-                onQuoteRemoved = { index ->
-                    quotes = quotes.toMutableList().apply { removeAt(index) }
-                }
-            )
-
-            StyledText(text = "Choose a Language")
-            StyledTextFieldWithDropdown(
-                onValueChange = { newLanguage -> selectedLanguage = newLanguage },
-                items = languages,
-                selectedValue = selectedLanguage
-            )
-            Row {
-                ShortStyledTextField(
-                    placeholder = "Pages",
-                    value = pages.text,
-                    onValueChange = { newPages ->
-                        pages = TextFieldValue(newPages)
+                StyledTextField(
+                    placeholder = "Review",
+                    value = review.text,
+                    onValueChange = { newReview ->
+                        review = TextFieldValue(newReview)
                     }
                 )
-                ShortStyledTextField(
-                    placeholder = "Days",
-                    value = days.text,
-                    onValueChange = { newDays ->
-                        days = TextFieldValue(newDays)
+
+                QuoteSection(
+                    quotes = quotes,
+                    onQuoteAdded = { newQuote ->
+                        quotes = quotes.toMutableList().apply { add(newQuote) }
+                    },
+                    onQuoteRemoved = { index ->
+                        quotes = quotes.toMutableList().apply { removeAt(index) }
                     }
                 )
+
+                StyledText(text = "Choose a Language")
+                StyledTextFieldWithDropdown(
+                    onValueChange = { newLanguage -> selectedLanguage = newLanguage },
+                    items = languages,
+                    selectedValue = selectedLanguage
+                )
+                Row {
+                    ShortStyledTextField(
+                        placeholder = "Pages",
+                        value = pages.text,
+                        onValueChange = { newPages ->
+                            pages = TextFieldValue(newPages)
+                        }
+                    )
+                    ShortStyledTextField(
+                        placeholder = "Days",
+                        value = days.text,
+                        onValueChange = { newDays ->
+                            days = TextFieldValue(newDays)
+                        }
+                    )
+                }
+                StyledText(text = "Choose a Media Type")
+                StyledTextFieldWithDropdown(
+                    onValueChange = { newMediaType -> selectedMediaType = newMediaType },
+                    items = mediaTypeList,
+                    selectedValue = selectedMediaType
+                )
+
             }
-            StyledText(text = "Choose a Media Type")
-            StyledTextFieldWithDropdown(
-                onValueChange = { newMediaType -> selectedMediaType = newMediaType },
-                items = mediaTypeList,
-                selectedValue = selectedMediaType
-            )
+            }
 
-        }
+
+
+
+
+
 
         Box(modifier = Modifier.fillMaxSize()) {
             Image(
@@ -1973,13 +2068,7 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
                         //val currentDate = LocalDate.now() // Get the current date
                         //val formattedDate = currentDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) // Save the date in the wished format
                         val quotesText = quotes.joinToString(separator = ";")
-                        val progressPercentage = calculateProgress(
-                            mainViewModel.bookCount.value,
-                            ChallengeBookCount.toInt()
-                        )
-                        Log.i("progressPercentage AddBookscreen", progressPercentage.toString())
-                        Log.i("bookCount AddBookscreen", mainViewModel.bookCount.value.toString())
-                        Log.i("ChallengeBookCount AddBookscreen", ChallengeBookCount.toString())
+
                         mainViewModel.save(
                             Book(
                                 title.text,
@@ -1997,18 +2086,35 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
                                 selectedMediaType
                             )
                         )
-                        mainViewModel.updateChallenge(
-                            ReadingChallenge(
-                                ChallengeTitle,
-                                ChallengeDays?.toInt(),
-                                ChallengeBookCount.toInt(),
-                                0.2f,
-//                                progressPercentage,
-                                ChallengeStartDate.toString(),
-                                state.value.editReadingChallenge.id
-                            )
-                        )
+
+//                        val readingChallengeWithId1 =
+//                            mainViewModel.getChallengeByIdAndUpdateState(1)
+//
+//
+//                        if (readingChallengeWithId1 != null) {
+//
+//
+//                        val progressPercentage = readingChallengeWithId1?.let {
+//                            mainViewModel.calculateProgressPercentage(
+//                                it
+//                            )
+//                        }
+//                        if (progressPercentage != null) {
+//                            challengeProgress = progressPercentage
+//                        }
+//
+//                        mainViewModel.updateChallenge(
+//                            ReadingChallenge(
+//                                challengeTitle,
+//                                challengeBookCount,
+//                                challengeDays,
+//                                challengeProgress,
+//                                challengeStartDate,
+//                                state.value.editReadingChallenge.id
+//                            )
+//                        )
                         navController.navigate(Screen.Read.route)
+//                    }
                     }
                     .size(40.dp)
             )
@@ -2016,7 +2122,6 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
     }
 
 }
-
 
 @Composable
 fun QuoteSection(
@@ -2314,7 +2419,7 @@ object ColorUtils {
     )
 
     fun getColorByName(name: String): Color {
-        return colorMap[name] ?: Violet // Default to black if the color name is not found
+        return colorMap[name] ?: DarkBeige // Default to black if the color name is not found
     }
 }
 
@@ -2585,6 +2690,7 @@ fun addReadingChallengeAlert(mainViewModel: MainViewModel) {
                                         title.text,
                                         days.text.toIntOrNull() ?: 0,
                                         bookCount.text.toIntOrNull() ?: 0,
+                                        0,
                                         0f,
                                         formattedDate
                                     )
