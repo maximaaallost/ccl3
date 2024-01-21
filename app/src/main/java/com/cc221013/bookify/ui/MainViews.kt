@@ -1,30 +1,24 @@
 package com.cc221013.bookify.ui
 
 import android.content.Intent
-import android.graphics.Paint.Align
+import android.graphics.Paint
+import android.graphics.Typeface
 import android.net.Uri
-import android.text.style.QuoteSpan
 import android.util.Log
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
-import androidx.camera.view.PreviewView
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -39,49 +33,32 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.AlertDialog
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Create
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material3.AlertDialogDefaults.shape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -94,31 +71,18 @@ import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
-import androidx.core.graphics.toColorInt
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -144,18 +108,83 @@ import com.cc221013.bookify.ui.theme.Poppins
 import com.cc221013.bookify.ui.theme.Turquoise
 import com.cc221013.bookify.ui.theme.Violet
 import com.cc221013.bookify.ui.theme.Yellow
-import java.io.File
-import java.text.SimpleDateFormat
+import com.cc221013.bookify.ui.theme.Yellow300
+import com.cc221013.bookify.ui.theme.Yellow400
+import com.cc221013.bookify.ui.theme.Yellow500
+import com.cc221013.bookify.ui.theme.Yellow600
+import com.cc221013.bookify.ui.theme.Yellow700
+import com.cc221013.bookify.ui.theme.Yellow900
+import com.cc221013.bookify.ui.theme.Red300
+import com.cc221013.bookify.ui.theme.Red400
+import com.cc221013.bookify.ui.theme.Red500
+import com.cc221013.bookify.ui.theme.Red600
+import com.cc221013.bookify.ui.theme.Red700
+import com.cc221013.bookify.ui.theme.Red900
+import com.cc221013.bookify.ui.theme.Turquoise300
+import com.cc221013.bookify.ui.theme.Turquoise400
+import com.cc221013.bookify.ui.theme.Turquoise500
+import com.cc221013.bookify.ui.theme.Turquoise600
+import com.cc221013.bookify.ui.theme.Turquoise700
+import com.cc221013.bookify.ui.theme.Turquoise900
+import com.cc221013.bookify.ui.theme.Blue300
+import com.cc221013.bookify.ui.theme.Blue400
+import com.cc221013.bookify.ui.theme.Blue500
+import com.cc221013.bookify.ui.theme.Blue600
+import com.cc221013.bookify.ui.theme.Blue700
+import com.cc221013.bookify.ui.theme.Blue900
+import com.cc221013.bookify.ui.theme.Green300
+import com.cc221013.bookify.ui.theme.Green400
+import com.cc221013.bookify.ui.theme.Green500
+import com.cc221013.bookify.ui.theme.Green600
+import com.cc221013.bookify.ui.theme.Green700
+import com.cc221013.bookify.ui.theme.Green900
+import com.cc221013.bookify.ui.theme.Purple300
+import com.cc221013.bookify.ui.theme.Purple400
+import com.cc221013.bookify.ui.theme.Purple500
+import com.cc221013.bookify.ui.theme.Purple600
+import com.cc221013.bookify.ui.theme.Purple700
+import com.cc221013.bookify.ui.theme.Purple900
+import com.cc221013.bookify.ui.theme.Pink300
+import com.cc221013.bookify.ui.theme.Pink400
+import com.cc221013.bookify.ui.theme.Pink500
+import com.cc221013.bookify.ui.theme.Pink600
+import com.cc221013.bookify.ui.theme.Pink700
+import com.cc221013.bookify.ui.theme.Pink900
+import com.cc221013.bookify.ui.theme.Orange300
+import com.cc221013.bookify.ui.theme.Orange400
+import com.cc221013.bookify.ui.theme.Orange500
+import com.cc221013.bookify.ui.theme.Orange600
+import com.cc221013.bookify.ui.theme.Orange700
+import com.cc221013.bookify.ui.theme.Orange900
+import com.cc221013.bookify.ui.theme.Brown300
+import com.cc221013.bookify.ui.theme.Brown400
+import com.cc221013.bookify.ui.theme.Brown500
+import com.cc221013.bookify.ui.theme.Brown600
+import com.cc221013.bookify.ui.theme.Brown700
+import com.cc221013.bookify.ui.theme.Brown900
+import com.cc221013.bookify.ui.theme.Grey300
+import com.cc221013.bookify.ui.theme.Grey400
+import com.cc221013.bookify.ui.theme.Grey500
+import com.cc221013.bookify.ui.theme.Grey600
+import com.cc221013.bookify.ui.theme.Grey700
+import com.cc221013.bookify.ui.theme.Grey900
+
+
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.Locale
-import java.util.concurrent.ExecutorService
 
 
-import androidx.compose.material.TextField
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import kotlin.collections.isNotEmpty
 import kotlin.math.min
+import kotlin.random.Random
 
 
 sealed class Screen(val route: String) {
@@ -392,7 +421,7 @@ fun BigText(text: Int?, color: Color) {
 
 //Reading Statistics on Read Page
 @Composable
-fun ReadStats(mainViewModel: MainViewModel) {
+fun ReadStats(mainViewModel: MainViewModel, navController: NavHostController) {
     val books = mainViewModel.mainViewState.collectAsState().value.books
     val state = mainViewModel.mainViewState.collectAsState()
     val booksRead = books.filter { it.shelf == "Read" }.size
@@ -400,7 +429,8 @@ fun ReadStats(mainViewModel: MainViewModel) {
     Card(
         modifier = Modifier
             .width(370.dp)
-            .clip(RoundedCornerShape(10.dp)),
+            .clip(RoundedCornerShape(10.dp))
+            .padding(start = 10.dp, end = 10.dp),
         colors = CardDefaults.cardColors(containerColor = Violet)
     ) {
 
@@ -460,13 +490,14 @@ fun ReadStats(mainViewModel: MainViewModel) {
                             BorderStroke(2.dp, SolidColor(Yellow)),
                             shape = RoundedCornerShape(10.dp)
                         )
-                        .padding(10.dp),
+                        .padding(10.dp)
+                        .clickable { navController.navigate(Screen.Stats.route) },
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.add),
-                        contentDescription = "hey",
+                        contentDescription = "Plus",
                         modifier = Modifier.size(20.dp),
                         tint = Yellow
                     )
@@ -484,56 +515,57 @@ fun GenreScroll(onGenreSelected: (String) -> Unit) {
     val genreColors = listOf(
         Violet,
         LightViolet,
-        DarkBlue,
-        LightRed,
-        Pink,
-        Grey,
-        Black,
-        DarkRed,
-        Lime,
-        Turquoise,
-        Blue,
+        LightBeige,
         DarkBeige,
-        Mint
+        DarkRed,
+        LightRed,
+        DarkBlue,
+        Blue,
+        Turquoise,
+        Mint,
+        Green300,
+        Orange,
+        Yellow
     )
 
     val genreNames = listOf(
-        "all",
+        "All",
         "Fantasy", "Sci-Fi", "Romance", "New Adult", "Thriller", "Horror", "Erotica",
         "Manga", "Biography", "Novel", "History", "Non-Fiction"
     )
 
     LazyRow(
-    ) {
-        genreColors.zip(genreNames).forEach { (color, name) ->
-            item {
-                Column(
-                    modifier = Modifier
-                        .clickable {
-                            onGenreSelected(name)
-                        }
-                        .padding(9.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.bookcover),
-                        tint = color,
-                        contentDescription = "book cover",
-                        modifier = Modifier.size(50.dp)
-                    )
-                    Text(
-                        text = name,
-                        style = TextStyle(
-                            fontFamily = Poppins,
-                            fontSize = 12.sp,
-                            color = Violet
-                        ),
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
+        content = {
+            genreColors.zip(genreNames).forEach { (color, name) ->
+                item {
+                    Column(
+                        modifier = Modifier
+                            .clickable {
+                                onGenreSelected(name)
+                            }
+                            .padding(12.dp),
+                        horizontalAlignment = CenterHorizontally
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.bookcover),
+                            contentDescription = "book cover",
+                            modifier = Modifier.size(50.dp),
+                            tint = color
+                        )
+                        Text(
+                            text = name,
+                            style = TextStyle(
+                                fontFamily = Poppins,
+                                fontSize = 12.sp,
+                                color = Violet
+                            ),
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
                 }
             }
         }
-    }
+    )
 }
 
 @Composable
@@ -853,7 +885,7 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
                 TopDecoration(navController, "Read Books", null)
-                ReadStats(mainViewModel)
+                ReadStats(mainViewModel, navController)
                 Spacer(modifier = Modifier.height(20.dp))
                 GenreScroll(onGenreSelected = { genre ->
                     selectedGenre = genre
@@ -888,7 +920,7 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                         modifier = Modifier.fillMaxWidth(0.9f),
                         horizontalArrangement = Arrangement.Center
                     ){
-                        ReadStats(mainViewModel)
+                        ReadStats(mainViewModel, navController)
                     }
                 }
 
@@ -1203,6 +1235,7 @@ fun WishlistScreen(mainViewModel: MainViewModel, navController: NavHostControlle
     }
 }
 
+
 @Composable
 fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController) {
     val readingChallenges = mainViewModel.getChallenges()
@@ -1211,6 +1244,49 @@ fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController) 
 
     val booksRead = books.filter { it.shelf == "Read" }.size
     val pagesRead = books.filter { it.shelf == "Read" }.sumOf { it.pages?.toInt() ?: 0 }
+
+    val mediaTypes = listOf("Ebook", "Audiobook", "Paperback")
+
+    val mediaTypePercentages = mediaTypes.map { mediaType ->
+        val mediaTypeCount = books.filter { it.shelf == "Read" && it.mediaType == mediaType }.size
+        val percentage = if (booksRead > 0) {
+            (mediaTypeCount.toFloat() / booksRead.toFloat()) * 100
+        } else {
+            0f
+        }
+        val iconResourceId = when (mediaType) {
+            "Ebook" -> R.drawable.ebook
+            "Audiobook" -> R.drawable.audiobook
+            "Paperback" -> R.drawable.paperback
+            else -> 0
+        }
+        MediaTypeDistributionItem(
+            iconResourceId = iconResourceId,
+            contentDescription = mediaType,
+            percentage = percentage.toInt()
+        )
+    }
+    val genres = books.mapNotNull { it.genre }
+    val genreDistribution = calculateGenreDistribution(genres)
+
+    // Mapping each genre to its corresponding color
+    val genreColors = mapOf(
+        "all" to Violet,
+        "Fantasy" to LightViolet,
+        "Sci-Fi" to DarkBlue,
+        "Romance" to LightRed,
+        "New Adult" to Pink,
+        "Thriller" to Grey,
+        "Horror" to Black,
+        "Erotica" to DarkRed,
+        "Manga" to Lime,
+        "Biography" to Turquoise,
+        "Novel" to Blue,
+        "History" to DarkBeige,
+        "Non-Fiction" to Mint
+    )
+
+
 
     LazyColumn(
         verticalArrangement = Arrangement.Center,
@@ -1286,45 +1362,21 @@ fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController) 
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = CenterHorizontally
                     ) {
-                        //heading
                         Spacer(modifier = Modifier.height(10.dp))
                         SmallText(text = "Media Type", color = NonWhite)
                         Spacer(modifier = Modifier.width(10.dp))
 
-                        //Row for Media Type
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(start = 20.dp, end = 20.dp),
                             horizontalArrangement = Arrangement.SpaceAround
                         ) {
-
                             // Media Type Distribution
-                            MediaTypeDistribution(
-                                mediaTypes = listOf(
-                                    MediaTypeDistributionItem(
-                                        iconResourceId = R.drawable.ebook,
-                                        contentDescription = "E-Books",
-                                        percentage = 10
-                                    ),
-                                    MediaTypeDistributionItem(
-                                        iconResourceId = R.drawable.paperback,
-                                        contentDescription = "Paperback",
-                                        percentage = 20
-                                    ),
-                                    MediaTypeDistributionItem(
-                                        iconResourceId = R.drawable.audiobook,
-                                        contentDescription = "Audio Book",
-                                        percentage = 80
-                                    )
-                                )
-                            )
-
+                            MediaTypeDistribution(mediaTypes = mediaTypePercentages)
                         }
                     }
                 }
-
-
                 Spacer(modifier = Modifier.height(20.dp))
 
                 //Data Vis for Genre
@@ -1334,16 +1386,15 @@ fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController) 
                         .width(350.dp),
                     contentAlignment = Center
                 ) {
-                    Box(
+                    Canvas(
                         modifier = Modifier
-                            .size(300.dp)
+                            .size(400.dp)
                             .padding(30.dp)
-                            .background(Yellow, CircleShape),
-                        contentAlignment = Center
                     ) {
-                        Text(text = "Genre")
+                        drawGenrePieChartWithLegend(genreDistribution, genreColors)
                     }
                 }
+
 
                 Spacer(modifier = Modifier.height(20.dp))
 
@@ -1369,6 +1420,126 @@ fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController) 
     }
 }
 
+fun calculateGenreDistribution(genres: List<String>): Map<String, Int> {
+    return genres.groupBy { it }
+        .mapValues { entry -> entry.value.size }
+}
+
+
+fun DrawScope.drawGenrePieChartWithLegend(
+    genreDistribution: Map<String, Int>,
+    genreColors: Map<String, Color>
+) {
+    val totalGenres = genreDistribution.values.sum().toFloat()
+    var currentAngle = 0f
+    val center = center
+
+    // Draw pie chart
+    genreDistribution.forEach { (genre, count) ->
+        val sweepAngle = (count / totalGenres) * 360f
+
+        // Draw pie chart slice
+        drawArc(
+            color = genreColors[genre] ?: getRandomColor(),
+            startAngle = currentAngle,
+            sweepAngle = sweepAngle,
+            useCenter = true,
+            style = Stroke(width = 50.dp.toPx())
+        )
+
+        // Draw inner circle (empty center)
+        drawCircle(
+            color = Violet,
+            radius = 100.dp.toPx(), // Adjust the radius as needed
+            center = center
+        )
+
+        currentAngle += sweepAngle
+    }
+
+    // Draw legend
+    val legendTopMargin = 300.dp.toPx() // Adjust the margin as needed
+    val legendSquareSize = 20.dp.toPx() // Adjust the square size as needed
+    val legendTextMargin = 5.dp.toPx() // Adjust the margin between square and text
+
+    genreDistribution.forEach { (genre, count) ->
+        val percentage = (count / totalGenres) * 100
+        val legendSquareTop = legendTopMargin + 20.dp.toPx() * genreDistribution.keys.indexOf(genre)
+
+        // Draw color square
+        drawRect(
+            color = genreColors[genre] ?: getRandomColor(),
+            size = Size(legendSquareSize, legendSquareSize),
+            topLeft = Offset(center.x - 150.dp.toPx(), legendSquareTop)
+        )
+
+        // Draw genre text
+        drawIntoCanvas {
+            it.nativeCanvas.drawText(
+                "${percentage.toInt()}%",
+                center.x - 150.dp.toPx() + legendSquareSize + legendTextMargin, // Adjust the position
+                legendSquareTop + 15.dp.toPx(),
+                Paint().apply {
+                    color = NonWhite.toArgb()
+                    textSize = 16.sp.toPx()
+                    typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+                }
+            )
+            it.nativeCanvas.drawText(
+                genre.capitalize(),
+                center.x - 150.dp.toPx() + 2 * legendSquareSize + 3 * legendTextMargin, // Adjust the position
+                legendSquareTop + 15.dp.toPx(),
+                Paint().apply {
+                    color = NonWhite.toArgb()
+                    textSize = 16.sp.toPx()
+                    typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+                }
+            )
+        }
+    }
+}
+fun getRandomColor(): Color {
+    val random = Random.Default
+    return Color(random.nextFloat(), random.nextFloat(), random.nextFloat())
+}
+
+@Composable
+fun MediaTypeDistribution(mediaTypes: List<MediaTypeDistributionItem>) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 20.dp, end = 20.dp),
+        horizontalArrangement = Arrangement.SpaceAround
+    ) {
+        mediaTypes.forEach { item ->
+            MediaTypeItem(item)
+        }
+    }
+}
+
+@Composable
+fun MediaTypeItem(item: MediaTypeDistributionItem) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            painter = painterResource(id = item.iconResourceId),
+            contentDescription = item.contentDescription,
+            tint = NonWhite,
+            modifier = Modifier.size(25.dp)
+        )
+        Spacer(modifier = Modifier.width(10.dp))
+        Text(
+            text = "${item.percentage}%",
+            style = TextStyle(
+                fontFamily = Poppins,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 14.sp,
+                color = NonWhite
+            )
+        )
+    }
+}
 @Composable
 fun ReadingChallengeEntries(readingChallenges: List<ReadingChallenge>, mainViewModel: MainViewModel) {
     Column(
@@ -1802,7 +1973,10 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
                         //val currentDate = LocalDate.now() // Get the current date
                         //val formattedDate = currentDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) // Save the date in the wished format
                         val quotesText = quotes.joinToString(separator = ";")
-                        val progressPercentage = calculateProgress(mainViewModel.bookCount.value, ChallengeBookCount.toInt())
+                        val progressPercentage = calculateProgress(
+                            mainViewModel.bookCount.value,
+                            ChallengeBookCount.toInt()
+                        )
                         Log.i("progressPercentage AddBookscreen", progressPercentage.toString())
                         Log.i("bookCount AddBookscreen", mainViewModel.bookCount.value.toString())
                         Log.i("ChallengeBookCount AddBookscreen", ChallengeBookCount.toString())
@@ -1933,57 +2107,7 @@ fun QuoteSection(
     }
 }
 
-@Composable
-fun MediaTypeDistribution(mediaTypes: List<MediaTypeDistributionItem>) {
-    Box(
-        modifier = Modifier
-            .background(color = Violet, RoundedCornerShape(10.dp))
-            .height(80.dp)
-            .width(350.dp)
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Row for Media Type
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 20.dp, end = 20.dp),
-                horizontalArrangement = Arrangement.SpaceAround
-            ) {
-                mediaTypes.forEach { item ->
-                    MediaTypeItem(item)
-                }
-            }
-        }
-    }
-}
 
-@Composable
-fun MediaTypeItem(item: MediaTypeDistributionItem) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            painter = painterResource(id = item.iconResourceId),
-            contentDescription = item.contentDescription,
-            tint = NonWhite,
-            modifier = Modifier.size(25.dp)
-        )
-        Spacer(modifier = Modifier.width(10.dp))
-        Text(
-            text = "${item.percentage}%",
-            style = TextStyle(
-                fontFamily = Poppins,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 14.sp,
-                color = NonWhite
-            )
-        )
-    }
-}
 
 @Composable
 fun StyledTextFieldWithDropdown(
@@ -2127,15 +2251,66 @@ private fun setupPhotoPicker(onImagePicked: (Uri) -> Unit): ManagedActivityResul
 
 object ColorUtils {
     val colorMap = mapOf(
-        "DarkRed" to DarkRed,
-        "LightRed" to LightRed,
-        "Pink" to Pink,
-        "Orange" to Orange,
-        "Lime" to Lime,
-        "Mint" to Mint,
-        "Turquoise" to Turquoise,
-        "Blue" to Blue,
-        "DarkBlue" to DarkBlue
+        "Red900" to Red900,
+        "Red700" to Red700,
+        "Red600" to Red600,
+        "Red500" to Red500,
+        "Red400" to Red400,
+        "Red300" to Red300,
+        "Orange900" to Orange900,
+        "Orange700" to Orange700,
+        "Orange600" to Orange600,
+        "Orange500" to Orange500,
+        "Orange400" to Orange400,
+        "Orange300" to Orange300,
+        "Yellow900" to Yellow900,
+        "Yellow700" to Yellow700,
+        "Yellow600" to Yellow600,
+        "Yellow500" to Yellow500,
+        "Yellow400" to Yellow400,
+        "Yellow300" to Yellow300,
+        "Green900" to Green900,
+        "Green700" to Green700,
+        "Green600" to Green600,
+        "Green500" to Green500,
+        "Green400" to Green400,
+        "Green300" to Green300,
+        "Turquoise900" to Turquoise900,
+        "Turquoise700" to Turquoise700,
+        "Turquoise600" to Turquoise600,
+        "Turquoise500" to Turquoise500,
+        "Turquoise400" to Turquoise400,
+        "Turquoise300" to Turquoise300,
+        "Blue900" to Blue900,
+        "Blue700" to Blue700,
+        "Blue600" to Blue600,
+        "Blue500" to Blue500,
+        "Blue400" to Blue400,
+        "Blue300" to Blue300,
+        "Purple900" to Purple900,
+        "Purple700" to Purple700,
+        "Purple600" to Purple600,
+        "Purple500" to Purple500,
+        "Purple400" to Purple400,
+        "Purple300" to Purple300,
+        "Pink900" to Pink900,
+        "Pink700" to Pink700,
+        "Pink600" to Pink600,
+        "Pink500" to Pink500,
+        "Pink400" to Pink400,
+        "Pink300" to Pink300,
+        "Brown900" to Brown900,
+        "Brown700" to Brown700,
+        "Brown600" to Brown600,
+        "Brown500" to Brown500,
+        "Brown400" to Brown400,
+        "Brown300" to Brown300,
+        "Grey900" to Grey900,
+        "Grey700" to Grey700,
+        "Grey600" to Grey600,
+        "Grey500" to Grey500,
+        "Grey400" to Grey400,
+        "Grey300" to Grey300
     )
 
     fun getColorByName(name: String): Color {
@@ -2148,7 +2323,16 @@ fun ColorList(
     onColorSelected: (String) -> Unit
 ) {
     val colorList = listOf(
-        "DarkRed", "LightRed", "Pink", "Orange", "Lime", "Mint", "Turquoise", "Blue", "DarkBlue"
+        "Red900", "Red700", "Red600", "Red500", "Red400", "Red300",
+        "Orange900", "Orange700", "Orange600", "Orange500", "Orange400", "Orange300",
+        "Yellow900", "Yellow700", "Yellow600", "Yellow500", "Yellow400", "Yellow300",
+        "Green900", "Green700", "Green600", "Green500", "Green400", "Green300",
+        "Turquoise900", "Turquoise700", "Turquoise600", "Turquoise500", "Turquoise400", "Turquoise300",
+        "Blue900", "Blue700", "Blue600", "Blue500", "Blue400", "Blue300",
+        "Purple900", "Purple700", "Purple600", "Purple500", "Purple400", "Purple300",
+        "Pink900", "Pink700", "Pink600", "Pink500", "Pink400", "Pink300",
+        "Brown900", "Brown700", "Brown600", "Brown500", "Brown400", "Brown300",
+        "Grey900", "Grey700", "Grey600", "Grey500", "Grey400", "Grey300"
     )
 
     var selectedColor by remember { mutableStateOf(colorList.first()) }
@@ -2157,7 +2341,6 @@ fun ColorList(
         LazyRow(content = {
             items(colorList) { colorName ->
                 val color = ColorUtils.getColorByName(colorName)
-
                 Box(
                     modifier = Modifier
                         .size(60.dp)
@@ -2177,7 +2360,6 @@ fun ColorList(
             }
         })
     }
-
 }
 
 
