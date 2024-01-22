@@ -1368,13 +1368,11 @@ fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController) 
                         .width(350.dp)
                 ) {
                     Column(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier.fillMaxSize().padding(bottom = 10.dp),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = CenterHorizontally
                     ) {
-                        Spacer(modifier = Modifier.height(10.dp))
-                        SmallText(text = "Media Type", color = NonWhite)
-                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(text = "Media Type", color = NonWhite, modifier = Modifier.padding(10.dp))
 
                         Row(
                             modifier = Modifier
@@ -1390,36 +1388,48 @@ fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController) 
                 Spacer(modifier = Modifier.height(20.dp))
 
                 //Data Vis for Genre
+
+                fun getGenreForColor(color: Color): String {
+                    return genreColors.entries.find { it.value == color }?.key ?: ""
+                }
+
                 Box(
                     modifier = Modifier
                         .background(color = Violet, RoundedCornerShape(10.dp))
                         .width(350.dp),
                     contentAlignment = Center
                 ) {
-                    Column {
+                    Column (
+                        modifier = Modifier.fillMaxSize().padding(bottom = 10.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = CenterHorizontally
+                    ){
 
+                        Text(text = "Genre Distribution", color = NonWhite, modifier = Modifier.padding(10.dp))
 
-                        PieChart(Modifier.size(200.dp, 200.dp), genreData)
+                        PieChart(Modifier.size(250.dp, 250.dp), genreData)
                         Text(
                             buildAnnotatedString {
-                                genreData.forEachIndexed { index, slice ->
-                                    val percentage =
-                                        (slice.value / calculateTotalPercentage(genreData)) * 100
+                                genreData.forEach { slice ->
+                                    val genre = getGenreForColor(slice.color)
+                                    val percentage = (slice.value / calculateTotalPercentage(genreData)) * 100
+
                                     withStyle(style = SpanStyle(color = slice.color)) {
-                                        append("${slice.value.toInt()} books - ${percentage.toInt()}%")
+                                        append("${percentage.toInt()}% ")
                                     }
-                                    if (index < genreData.size - 1) {
-                                        append("   ")
+                                    withStyle(style = SpanStyle(color = NonWhite)) {
+                                        append(genre)
                                     }
                                 }
                             },
                             modifier = Modifier
-                                .padding(top = 8.dp)
+                                .padding(8.dp)
                                 .fillMaxWidth(),
                             textAlign = TextAlign.Center
                         )
                     }
                 }
+
 
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -1457,18 +1467,34 @@ fun PieChart(modifier: Modifier, slices: List<PieSlices>) {
 
             val start = 360f * slices.take(index).map { it.value }.sum() / sum
             val sweep = 360f * slice.value / sum
+
+            // Draw the outer arc
             drawArc(
                 color = slice.color,
                 startAngle = start,
                 sweepAngle = sweep,
                 useCenter = true
             )
+
+            // Calculate the center and radius for the inner circle (donut hole)
+            val centerX = size.width / 2f
+            val centerY = size.height / 2f
+            val radius = size.width.coerceAtMost(size.height) / 4f // Adjust the factor for the size of the hole
+
+            // Draw the inner circle with a fixed color (Violet in this case)
+            drawCircle(color = Violet, radius = radius, center = Offset(centerX, centerY))
         }
     }
-
 }
 
-
+fun getGenreName(index: Int): String {
+    val genres = listOf(
+        "all", "Fantasy", "Sci-Fi", "Romance", "New Adult",
+        "Thriller", "Horror", "Erotica", "Manga", "Biography",
+        "Novel", "History", "Non-Fiction"
+    )
+    return genres[index]
+}
 
 fun calculateGenreDistribution(genres: List<String>): Map<String, Int> {
     return genres.groupBy { it }
@@ -1641,9 +1667,9 @@ fun ReadingChallengeEntries(readingChallenges: List<ReadingChallenge>, mainViewM
 
 
 
-                Log.i ("internUserBookCount", mainViewModel.internBookCount.toString())
-                Log.i ("updatedUserBookCount", updatedUserBookCount.toString())
-                Log.i ("progresspercentage", progressPercentage.toString())
+//                Log.i ("internUserBookCount", mainViewModel.internBookCount.toString())
+//                Log.i ("updatedUserBookCount", updatedUserBookCount.toString())
+//                Log.i ("progresspercentage", progressPercentage.toString())
 
 
             mainViewModel.updateChallenge(
@@ -2526,7 +2552,6 @@ fun StyledTextField(
             cursorColor = Violet,
             focusedIndicatorColor = Violet,
             focusedLabelColor = Violet,
-
             textColor = Violet,
             unfocusedIndicatorColor = DarkBeige,
         )
