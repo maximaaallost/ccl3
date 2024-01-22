@@ -1,5 +1,6 @@
 package com.cc221013.bookify.ui
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -29,11 +30,18 @@ class MainViewModel(private val db: DatabaseHandler, private val dbChallenge: Re
         dbChallenge.insertChallenge(challenge)
         dismissReadingChallengeDialog()
     }
-    fun save(book: Book){
-        if (book.shelf == "Read") {
-            internBookCount += 1
-        }
+    fun save(book: Book, readingChallenges: List<ReadingChallenge>){
         db.insertBook(book)
+        var newBookCount  = 0;
+        readingChallenges.forEach { challenge ->
+            Log.i ("challenge", challenge.title)
+            newBookCount = (challenge.userBookCount + 1)
+            updateChallenge(
+                challenge.copy(
+                    userBookCount = newBookCount,
+                )
+            )
+        }
     }
 
     fun showReadingChallengeDialog() {
@@ -58,15 +66,6 @@ class MainViewModel(private val db: DatabaseHandler, private val dbChallenge: Re
         _mainViewState.update { it.copy(books = db.getBooks()) }
     }
 
-//    fun getChallengeByIdAndUpdateState(challengeId: Int): ReadingChallenge? {
-//        val challenge = dbChallenge.getChallengeById(challengeId)
-//
-//        if (challenge != null) {
-//            _mainViewState.update { it.copy(challenges = listOf(challenge)) }
-//        }
-//
-//        return challenge
-//    }
 
 
     fun getChallenges() {
@@ -88,12 +87,19 @@ class MainViewModel(private val db: DatabaseHandler, private val dbChallenge: Re
     }
 
 
-    fun saveBook(book: Book){
+    fun saveBook(book: Book, readingChallenges: List<ReadingChallenge>){
         _mainViewState.update { it.copy(openDialogEditBook = false) }
         db.updateBook(book)
         getBooks()
-        if (book.shelf == "Read") {
-            internBookCount += 1
+        var newBookCount  = 0;
+        readingChallenges.forEach { challenge ->
+            Log.i ("challenge", challenge.title)
+            newBookCount = (challenge.userBookCount + 1)
+            updateChallenge(
+                challenge.copy(
+                     userBookCount = newBookCount,
+                )
+            )
         }
     }
     fun updateChallenge(challenge: ReadingChallenge){

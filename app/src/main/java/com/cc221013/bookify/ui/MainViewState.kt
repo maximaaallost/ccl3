@@ -9,5 +9,4 @@ data class MainViewState(
     val openDialogEditReadBook: Boolean = false,
     val openDialogEditReadingChallenge: Boolean = false,
     val openDialogEditBook: Boolean = false,
-    var finishedChallenge : Boolean = false
 )
