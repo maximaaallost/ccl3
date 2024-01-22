@@ -707,12 +707,31 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.bookcover),
-                            contentDescription = "paperback",
-                            tint = NonWhite,
-                            modifier = Modifier.size(38.dp)
-                        )
+                        if(book.mediaType == "Paperback"){
+                            Icon(
+                                painter = painterResource(id = R.drawable.paperback),
+                                contentDescription = book.mediaType,
+                                tint = NonWhite,
+                                modifier = Modifier.size(30.dp)
+                            )
+                        } else if (book.mediaType == "Ebook") {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ebook),
+                                contentDescription = book.mediaType,
+                                tint = NonWhite,
+                                modifier = Modifier.size(30.dp)
+                            )
+                        } else if( book.mediaType == "Audiobook") {
+                            Icon(
+                                painter = painterResource(id = R.drawable.audiobook),
+                                contentDescription = book.mediaType,
+                                tint = NonWhite,
+                                modifier = Modifier.size(30.dp)
+                            )
+                        }
+                        
+                        Spacer(modifier = Modifier.height(10.dp))
+
                         SmallText(text = book.mediaType, color = NonWhite)
                     }
                 }
@@ -830,7 +849,10 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
                             )
                         }
                         Button(
-                            onClick = {},
+                            onClick = {
+                                mainViewModel.setSelectedBook(book)
+                                navController.navigate(Screen.EditReadBook.route)
+                            },
                             modifier = Modifier
                                 .clip(RoundedCornerShape(8.dp))
                                 .width(150.dp)
@@ -2680,5 +2702,101 @@ fun EditBook(mainViewModel: MainViewModel) {
 @Composable
 fun EditReadBook(mainViewModel: MainViewModel, navController: NavHostController) {
     val book = mainViewModel.selectedBook.value
+    val state = mainViewModel.mainViewState.collectAsState()
+
+        var title by rememberSaveable { mutableStateOf(state.value.editBook.title) }
+        var author by rememberSaveable { mutableStateOf(state.value.editBook.author) }
+        var genre by rememberSaveable { mutableStateOf(state.value.editBook.genre) }
+        var color by rememberSaveable { mutableStateOf(state.value.editBook.color) }
+        var cover by rememberSaveable { mutableStateOf(state.value.editBook.cover) }
+        var rating by rememberSaveable { mutableStateOf(state.value.editBook.rating) }
+        var shelf by rememberSaveable { mutableStateOf(state.value.editBook.shelf) }
+        var review by rememberSaveable { mutableStateOf(state.value.editBook.review) }
+        var quote by rememberSaveable { mutableStateOf(state.value.editBook.quote) }
+        var language by rememberSaveable { mutableStateOf(state.value.editBook.language) }
+        var pages by rememberSaveable { mutableStateOf(state.value.editBook.pages) }
+        var days by rememberSaveable { mutableStateOf(state.value.editBook.days) }
+        var mediaType by rememberSaveable { mutableStateOf(state.value.editBook.mediaType) }
+
+    Column(){
+
+            TextField(
+                modifier = Modifier
+                    .padding(top = 10.dp, start = 10.dp, end = 10.dp),
+                shape = RoundedCornerShape(8.dp),
+                value = title,
+                onValueChange = { newText -> title = newText },
+                colors = TextFieldDefaults.textFieldColors(
+                    textColor = Violet,
+                    backgroundColor = DarkBeige,
+                    focusedIndicatorColor = Yellow,
+                    unfocusedIndicatorColor = Violet,
+                    disabledIndicatorColor = LightBeige,
+                    errorIndicatorColor = DarkRed,
+                ),
+                textStyle = TextStyle(
+                    fontFamily = Poppins,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Violet
+                )
+            )
+
+
+        androidx.compose.material.Button(
+            onClick = {
+                mainViewModel.saveReadBook(
+                    Book(
+                        title,
+                        author,
+                        genre,
+                        color,
+                        cover,
+                        shelf,
+                        rating,
+                        review,
+                        quote,
+                        language,
+                        pages,
+                        days,
+                        mediaType,
+                        state.value.editBook.id
+                    )
+                )
+                if (book != null) {
+                    mainViewModel.setSelectedBook(book)
+                    navController.navigate(Screen.BookDetails.route)
+                }
+            }, modifier = Modifier
+                .padding(top = 10.dp)
+                .height(45.dp)
+                .border(2.dp, NonWhite, shape = RoundedCornerShape(20.dp)),
+            shape = CircleShape,
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Violet
+            )
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.confirm),
+                    tint = NonWhite,
+                    contentDescription = "Confirm Icon",
+                    modifier = Modifier.size(15.dp)
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                    text = "confirm",
+                    fontSize = 16.sp,
+                    fontFamily = Poppins,
+                    fontWeight = FontWeight.SemiBold,
+                    color = NonWhite
+                )
+            }
+
+        }
+    }
+
 
 }
