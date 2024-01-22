@@ -200,6 +200,7 @@ sealed class Screen(val route: String) {
     object AddBook : Screen("fourth")
     object BookDetails : Screen("fifth")
     object Stats : Screen("sixth")
+    object EditReadBook : Screen("seventh")
 }
 
 
@@ -244,6 +245,10 @@ fun MainView(mainViewModel: MainViewModel) {
             composable(Screen.BookDetails.route) {
                 mainViewModel.selectScreen(Screen.BookDetails)
                 BookDetails(mainViewModel, navController)
+            }
+            composable(Screen.EditReadBook.route) {
+                mainViewModel.selectScreen(Screen.EditReadBook)
+                EditReadBook(mainViewModel, navController)
             }
             composable(Screen.Stats.route) {
                 mainViewModel.selectScreen(Screen.Stats)
@@ -507,6 +512,7 @@ fun ReadStats(mainViewModel: MainViewModel, navController: NavHostController) {
                         modifier = Modifier.size(20.dp),
                         tint = Yellow
                     )
+                    Spacer(modifier = Modifier.height(5.dp))
                     SmallText(text = "see more", color = Yellow)
                 }
             }
@@ -521,17 +527,17 @@ fun GenreScroll(onGenreSelected: (String) -> Unit) {
     val genreColors = listOf(
         Violet,
         LightViolet,
-        LightBeige,
-        DarkBeige,
-        DarkRed,
-        LightRed,
         DarkBlue,
-        Blue,
+        LightRed,
+        Pink,
+        Grey,
+        Black,
+        DarkRed,
+        Lime,
         Turquoise,
-        Mint,
-        Green300,
-        Orange,
-        Yellow
+        Blue,
+        DarkBeige,
+        Mint
     )
 
     val genreNames = listOf(
@@ -615,11 +621,41 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
                             modifier = Modifier.fillMaxWidth(),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.placeholderstars),
-                                contentDescription = "Star Rating",
-                                modifier = Modifier.width(180.dp)
-                            )
+                            //stars according to rating
+                            if(book.rating !== null){
+                                if(book.rating == 5){
+                                    Image(
+                                        painterResource(id = R.drawable.fivestars),
+                                        contentDescription = "Five Stars Rating",
+                                        modifier = Modifier.height(30.dp)
+                                    )
+                                } else if(book.rating == 4){
+                                    Image(
+                                        painterResource(id = R.drawable.fourstars),
+                                        contentDescription = "Four Stars Rating",
+                                        modifier = Modifier.height(30.dp)
+                                    )
+                                } else if(book.rating == 3){
+                                    Image(
+                                        painterResource(id = R.drawable.threestars),
+                                        contentDescription = "Three Stars Rating",
+                                        modifier = Modifier.height(30.dp)
+                                    )
+                                } else if(book.rating == 2){
+                                    Image(
+                                        painterResource(id = R.drawable.twostars),
+                                        contentDescription = "Two Stars Rating",
+                                        modifier = Modifier.height(30.dp)
+                                    )
+                                } else if(book.rating == 1){
+                                    Image(
+                                        painterResource(id = R.drawable.onestar),
+                                        contentDescription = "One Star Rating",
+                                        modifier = Modifier.height(30.dp)
+                                    )
+                                }
+                            }
+
                             Spacer(modifier = Modifier.height(10.dp))
                             Text(
                                 text = book.title,
@@ -712,12 +748,31 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.bookcover),
-                            contentDescription = "paperback",
-                            tint = NonWhite,
-                            modifier = Modifier.size(38.dp)
-                        )
+                        if(book.mediaType == "Paperback"){
+                            Icon(
+                                painter = painterResource(id = R.drawable.paperback),
+                                contentDescription = book.mediaType,
+                                tint = NonWhite,
+                                modifier = Modifier.size(30.dp)
+                            )
+                        } else if (book.mediaType == "Ebook") {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ebook),
+                                contentDescription = book.mediaType,
+                                tint = NonWhite,
+                                modifier = Modifier.size(30.dp)
+                            )
+                        } else if( book.mediaType == "Audiobook") {
+                            Icon(
+                                painter = painterResource(id = R.drawable.audiobook),
+                                contentDescription = book.mediaType,
+                                tint = NonWhite,
+                                modifier = Modifier.size(30.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
                         SmallText(text = book.mediaType, color = NonWhite)
                     }
                 }
@@ -835,7 +890,10 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
                             )
                         }
                         Button(
-                            onClick = {},
+                            onClick = {
+                                mainViewModel.setSelectedBook(book)
+                                navController.navigate(Screen.EditReadBook.route)
+                            },
                             modifier = Modifier
                                 .clip(RoundedCornerShape(8.dp))
                                 .width(150.dp)
@@ -867,6 +925,7 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
 
     }
 }
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -986,6 +1045,42 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
+
+                            //stars according to rating
+                                if(book.rating !== null){
+                                    if(book.rating == 5){
+                                        Image(
+                                            painterResource(id = R.drawable.fivestars),
+                                            contentDescription = "Five Stars Rating",
+                                            modifier = Modifier.height(30.dp)
+                                        )
+                                    } else if(book.rating == 4){
+                                        Image(
+                                            painterResource(id = R.drawable.fourstars),
+                                            contentDescription = "Four Stars Rating",
+                                            modifier = Modifier.height(30.dp)
+                                        )
+                                    } else if(book.rating == 3){
+                                        Image(
+                                            painterResource(id = R.drawable.threestars),
+                                            contentDescription = "Three Stars Rating",
+                                            modifier = Modifier.height(30.dp)
+                                        )
+                                    } else if(book.rating == 2){
+                                        Image(
+                                            painterResource(id = R.drawable.twostars),
+                                            contentDescription = "Two Stars Rating",
+                                            modifier = Modifier.height(30.dp)
+                                        )
+                                    } else if(book.rating == 1){
+                                        Image(
+                                            painterResource(id = R.drawable.onestar),
+                                            contentDescription = "One Star Rating",
+                                            modifier = Modifier.height(30.dp)
+                                        )
+                                    }
+                                }
+
                             Text(
                                 text = book.title,
                                 style = TextStyle(
@@ -2575,7 +2670,6 @@ fun StyledText(text: String) {
 }
 
 
-
 // Modal to edit an entry
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -2721,15 +2815,12 @@ fun EditBook(mainViewModel: MainViewModel) {
     )
     var selectedGenre by remember { mutableStateOf(genres[0]) }
 
-
-
     if (state.value.openDialogEditBook) {
         var title by rememberSaveable { mutableStateOf(state.value.editBook.title) }
         var author by rememberSaveable { mutableStateOf(state.value.editBook.author) }
         var genre by rememberSaveable { mutableStateOf(state.value.editBook.genre) }
         var color by rememberSaveable { mutableStateOf(state.value.editBook.color) }
         var cover by rememberSaveable { mutableStateOf(state.value.editBook.cover) }
-//        var shelf by rememberSaveable { mutableStateOf(state.value.editBook.shelf) }
         var rating by rememberSaveable { mutableStateOf(state.value.editBook.rating) }
         var review by rememberSaveable { mutableStateOf(state.value.editBook.review) }
         var quote by rememberSaveable { mutableStateOf(state.value.editBook.quote) }
@@ -2737,7 +2828,6 @@ fun EditBook(mainViewModel: MainViewModel) {
         var pages by rememberSaveable { mutableStateOf(state.value.editBook.pages) }
         var days by rememberSaveable { mutableStateOf(state.value.editBook.days) }
         var mediaType by rememberSaveable { mutableStateOf(state.value.editBook.mediaType) }
-
 
         val shelfList = listOf(
             "Read", "To be Read", "Wishlist"
@@ -2747,7 +2837,6 @@ fun EditBook(mainViewModel: MainViewModel) {
         var selectedShelf by remember { mutableStateOf(shelfList[0]) }
 
 
-        // https://developer.android.com/jetpack/compose/components/dialog
         Dialog(
             onDismissRequest = { mainViewModel.dismissDialog() }
         ) {
@@ -2871,7 +2960,9 @@ fun EditBook(mainViewModel: MainViewModel) {
                     //Delete Book
                     Icon(
                         modifier = Modifier
-                            .clickable { }
+                            .clickable {
+                                mainViewModel.clickDelete(state.value.editBook)
+                            }
                             .fillMaxHeight(0.7f),
                         painter = painterResource(id = R.drawable.delte),
                         contentDescription = "Delete Icon",
@@ -2937,4 +3028,107 @@ fun EditBook(mainViewModel: MainViewModel) {
             }
         }
     }
+}
+
+
+@Composable
+fun EditReadBook(mainViewModel: MainViewModel, navController: NavHostController) {
+    val book = mainViewModel.selectedBook.value
+    val state = mainViewModel.mainViewState.collectAsState()
+
+        var title by rememberSaveable { mutableStateOf(state.value.editBook.title) }
+        var author by rememberSaveable { mutableStateOf(state.value.editBook.author) }
+        var genre by rememberSaveable { mutableStateOf(state.value.editBook.genre) }
+        var color by rememberSaveable { mutableStateOf(state.value.editBook.color) }
+        var cover by rememberSaveable { mutableStateOf(state.value.editBook.cover) }
+        var rating by rememberSaveable { mutableStateOf(state.value.editBook.rating) }
+        var shelf by rememberSaveable { mutableStateOf(state.value.editBook.shelf) }
+        var review by rememberSaveable { mutableStateOf(state.value.editBook.review) }
+        var quote by rememberSaveable { mutableStateOf(state.value.editBook.quote) }
+        var language by rememberSaveable { mutableStateOf(state.value.editBook.language) }
+        var pages by rememberSaveable { mutableStateOf(state.value.editBook.pages) }
+        var days by rememberSaveable { mutableStateOf(state.value.editBook.days) }
+        var mediaType by rememberSaveable { mutableStateOf(state.value.editBook.mediaType) }
+
+    Column(){
+
+            TextField(
+                modifier = Modifier
+                    .padding(top = 10.dp, start = 10.dp, end = 10.dp),
+                shape = RoundedCornerShape(8.dp),
+                value = title,
+                onValueChange = { newText -> title = newText },
+                colors = TextFieldDefaults.textFieldColors(
+                    textColor = Violet,
+                    backgroundColor = DarkBeige,
+                    focusedIndicatorColor = Yellow,
+                    unfocusedIndicatorColor = Violet,
+                    disabledIndicatorColor = LightBeige,
+                    errorIndicatorColor = DarkRed,
+                ),
+                textStyle = TextStyle(
+                    fontFamily = Poppins,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Violet
+                )
+            )
+
+
+        androidx.compose.material.Button(
+            onClick = {
+                mainViewModel.saveReadBook(
+                    Book(
+                        title,
+                        author,
+                        genre,
+                        color,
+                        cover,
+                        shelf,
+                        rating,
+                        review,
+                        quote,
+                        language,
+                        pages,
+                        days,
+                        mediaType,
+                        state.value.editBook.id
+                    )
+                )
+                if (book != null) {
+                    mainViewModel.setSelectedBook(book)
+                    navController.navigate(Screen.BookDetails.route)
+                }
+            }, modifier = Modifier
+                .padding(top = 10.dp)
+                .height(45.dp)
+                .border(2.dp, NonWhite, shape = RoundedCornerShape(20.dp)),
+            shape = CircleShape,
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Violet
+            )
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.confirm),
+                    tint = NonWhite,
+                    contentDescription = "Confirm Icon",
+                    modifier = Modifier.size(15.dp)
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                    text = "confirm",
+                    fontSize = 16.sp,
+                    fontFamily = Poppins,
+                    fontWeight = FontWeight.SemiBold,
+                    color = NonWhite
+                )
+            }
+
+        }
+    }
+
+
 }
