@@ -1,5 +1,6 @@
 package com.cc221013.bookify.data
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
@@ -94,6 +95,7 @@ class DatabaseHandler(context: Context) : SQLiteOpenHelper(context, dbName, null
         db.delete(tableName,"_id = ?", arrayOf(book.id.toString()))
     }
 
+    @SuppressLint("Recycle")
     fun getBooks(): List<Book>{
         var allBooks = mutableListOf<Book>()
 

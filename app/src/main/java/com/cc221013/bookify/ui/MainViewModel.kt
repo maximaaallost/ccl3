@@ -45,8 +45,6 @@ class MainViewModel(private val db: DatabaseHandler, private val dbChallenge: Re
     }
 
 
-
-
     private val _selectedBook = mutableStateOf<Book?>(null)
     val selectedBook: State<Book?> = _selectedBook
 
@@ -57,17 +55,6 @@ class MainViewModel(private val db: DatabaseHandler, private val dbChallenge: Re
     fun getBooks() {
         _mainViewState.update { it.copy(books = db.getBooks()) }
     }
-
-//    fun getChallengeByIdAndUpdateState(challengeId: Int): ReadingChallenge? {
-//        val challenge = dbChallenge.getChallengeById(challengeId)
-//
-//        if (challenge != null) {
-//            _mainViewState.update { it.copy(challenges = listOf(challenge)) }
-//        }
-//
-//        return challenge
-//    }
-
 
     fun getChallenges() {
         _mainViewState.update { it.copy(challenges = dbChallenge.getChallenges()) }
@@ -90,27 +77,30 @@ class MainViewModel(private val db: DatabaseHandler, private val dbChallenge: Re
 
     fun saveBook(book: Book){
         _mainViewState.update { it.copy(openDialogEditBook = false) }
+        _mainViewState.update { it.copy(openDialogEditReadBook = false) }
+
         db.updateBook(book)
         getBooks()
         if (book.shelf == "Read") {
             internBookCount += 1
         }
     }
+
+
     fun updateChallenge(challenge: ReadingChallenge){
         dbChallenge.updateChallenge(challenge)
         getChallenges()
     }
-
-    fun saveReadBook(book: Book){
-        db.updateBook(book)
-        getBooks()
-    }
-
     fun dialogEditBook(book: Book) {
         _mainViewState.update { it.copy(openDialogEditBook = true, editBook = book) }
     }
 
+    fun dialogEditReadBook(book: Book) {
+        _mainViewState.update { it.copy(openDialogEditReadBook = true, editBook = book) }
+    }
+
     fun dismissDialog(){
         _mainViewState.update { it.copy(openDialogEditBook = false) }
+        _mainViewState.update { it.copy(openDialogEditReadBook = false) }
     }
 }
