@@ -1420,7 +1420,7 @@ fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController) 
 
     LazyColumn(
         verticalArrangement = Arrangement.Center,
-        modifier = Modifier.padding(bottom = 20.dp)
+//        modifier = Modifier.padding(bottom = 20.dp)
     ) {
         item {
             TopDecoration(navController, "Stats", "Your reading in numbers")
@@ -1572,6 +1572,7 @@ fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController) 
                 if (state.value.challenges.isNotEmpty()) {
                     // Display reading challenge entries
                     ReadingChallengeEntries(readingChallenges = state.value.challenges, mainViewModel = mainViewModel)
+
                 } else {
                     // Display add reading challenge button
                     AddReadingChallengeButton(mainViewModel)
@@ -1692,6 +1693,7 @@ fun AddReadingChallengeButton(mainViewModel: MainViewModel) {
             modifier = Modifier.padding(start = 10.dp)
         )
     }
+    Spacer(modifier = Modifier.height(20.dp))
 }
 
 @Composable
@@ -1701,7 +1703,7 @@ fun ReadingChallengeEntries(readingChallenges: List<ReadingChallenge>, mainViewM
         modifier = Modifier
             .background(color = Violet, RoundedCornerShape(10.dp))
             .width(350.dp)
-            .padding(end = 20.dp, top = 10.dp, bottom = 10.dp),
+            .padding(end = 20.dp, top = 10.dp, bottom = 20.dp),
     ) {
 
         readingChallenges.forEach { challenge ->
@@ -1931,6 +1933,7 @@ fun ReadingChallengeEntries(readingChallenges: List<ReadingChallenge>, mainViewM
 
         }
     }
+    Spacer(modifier = Modifier.height(20.dp))
 }
 
 // Function to calculate progress percentage
