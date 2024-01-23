@@ -3247,8 +3247,8 @@ fun EditReadBook(mainViewModel: MainViewModel, navController: NavHostController,
         var days by rememberSaveable { mutableStateOf(state.value.editBook.days) }
         var mediaType by rememberSaveable { mutableStateOf(state.value.editBook.mediaType) }
         val genres = listOf(
-            "Fantasy", "Sci-Fi", "Romance", "New Adult", "Thriller", "Horror", "Erotica",
-            "Manga", "Biography", "Novel", "History", "Non-Fiction"
+            "Biography", "Erotica", "Fantasy", "History", "Horror", "Manga", "New Adult",
+            "Non-Fiction", "Novel", "Romance", "Sci-Fi", "Thriller"
         )
         var selectedGenre by remember { mutableStateOf(genres[0]) }
 
