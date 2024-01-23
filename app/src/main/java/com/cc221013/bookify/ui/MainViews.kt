@@ -66,6 +66,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Alignment.Companion.CenterStart
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -506,15 +507,15 @@ fun ReadStats(mainViewModel: MainViewModel, navController: NavHostController) {
 fun GenreScroll(onGenreSelected: (String) -> Unit, navController: NavHostController, route: String) {
     val genreColors = listOf(
         Violet,
-        LightViolet,
+        Turquoise,
         DarkBlue,
         Pink600,
+        LightViolet,
         Pink,
         Grey,
         Orange700,
         DarkRed,
         Lime,
-        Turquoise,
         Blue,
         DarkBeige,
         Mint
@@ -522,8 +523,8 @@ fun GenreScroll(onGenreSelected: (String) -> Unit, navController: NavHostControl
 
     val genreNames = listOf(
         "All",
-        "Fantasy", "Sci-Fi", "Romance", "New Adult", "Thriller", "Horror", "Erotica",
-        "Manga", "Biography", "Novel", "History", "Non-Fiction"
+        "Biography", "Erotica", "Fantasy", "History", "Horror", "Manga", "New Adult",
+        "Non-Fiction", "Novel", "Romance", "Sci-Fi", "Thriller"
     )
 
     LazyRow(
@@ -831,7 +832,10 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
                                     ),
                                     modifier = Modifier
                                         .fillMaxHeight()
-                                        .padding(start = 10.dp, end = if (index == quoteParts.size - 1) 20.dp else 0.dp) // Add padding to the last item
+                                        .padding(
+                                            start = 10.dp,
+                                            end = if (index == quoteParts.size - 1) 20.dp else 0.dp
+                                        ) // Add padding to the last item
                                 )
                             }
                             Spacer(modifier = Modifier.height(6.dp)) // Add space between rows
@@ -1302,7 +1306,7 @@ fun WishlistScreen(mainViewModel: MainViewModel, navController: NavHostControlle
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = "${book.title}",
+                                text = book.title,
                                 style = TextStyle(
                                     fontSize = 14.sp,
                                     color = Violet,
@@ -1311,7 +1315,7 @@ fun WishlistScreen(mainViewModel: MainViewModel, navController: NavHostControlle
                                 ),
                             )
                             Text(
-                                text = "${book.author}",
+                                text = book.author,
                                 style = TextStyle(
                                     fontSize = 12.sp,
                                     color = LightViolet,
@@ -1368,19 +1372,20 @@ fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController) 
 
     // Mapping each genre to its corresponding color
     val genreColors = mapOf(
+
         "all" to Violet,
-        "Fantasy" to LightViolet,
-        "Sci-Fi" to DarkBlue,
-        "Romance" to Pink600,
-        "New Adult" to Pink,
-        "Thriller" to Grey,
-        "Horror" to Orange700,
-        "Erotica" to DarkRed,
-        "Manga" to Lime,
         "Biography" to Turquoise,
-        "Novel" to Blue,
-        "History" to DarkBeige,
-        "Non-Fiction" to Mint
+        "Erotica" to DarkBlue,
+        "Fantasy" to Pink600,
+        "History" to LightViolet,
+        "Horror" to Pink,
+        "Manga" to Grey,
+        "New Adult" to Orange700,
+        "Non-Fiction" to DarkRed,
+        "Novel" to Lime,
+        "Romance" to Blue,
+        "Sci-Fi" to DarkBeige,
+        "Thriller" to Mint
     )
 
     val genreData = calculateGenreDistribution(books.filter { it.shelf == "Read" }.mapNotNull { it.genre }).map { (genre, count) ->
@@ -1978,21 +1983,22 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
     }
 
     val genres = listOf(
-        "Fantasy", "Sci-Fi", "Romance", "New Adult", "Thriller", "Horror", "Erotica",
-        "Manga", "Biography", "Novel", "History", "Non-Fiction"
+        "Biography", "Erotica", "Fantasy", "History", "Horror", "Manga", "New Adult",
+        "Non-Fiction", "Novel", "Romance", "Sci-Fi", "Thriller"
     )
 
     val languages = listOf(
         "English",
-        "German",
         "French",
-        "Spanish",
+        "German",
         "Italian",
+        "Japanese",
+        "Korean",
+        "Mandarin",
         "Portuguese",
         "Russian",
-        "Chinese",
-        "Japanese",
-        "Korean"
+        "Spanish"
+
     )
     val mediaTypeList = listOf(
         "Paperback", "Ebook", "Audiobook"
@@ -2035,8 +2041,6 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
                     .padding(20.dp)
                     .clickable { navController.navigate(Screen.Read.route) }
                     .size(40.dp)
-
-
             )
             Box(
                 modifier = Modifier
@@ -2161,7 +2165,9 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
                         quote = TextFieldValue(newQuote)
                     }
                 )
-                Row(modifier = Modifier.width(300.dp).padding(start = 15.dp)) {
+                Row(modifier = Modifier
+                    .width(300.dp)
+                    .padding(start = 15.dp)) {
                     Icon(painter = painterResource(id = R.drawable.info), contentDescription = "info icon", tint = LightViolet, modifier = Modifier.size(16.dp))
                     Text(
                         text = "to insert more than one quote add a semicolon between them",
@@ -2210,47 +2216,107 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
             }
             }
 
-        //Bottom Swirl
-        Box(modifier = Modifier.fillMaxSize()) {
-            Image(
-                painter = painterResource(id = R.drawable.bottomswirl),
-                contentDescription = "Decorative Picture",
-                modifier = Modifier.fillMaxWidth()
-            )
+            Spacer(modifier = Modifier.height(10.dp))
 
-            Icon(
-                painter = painterResource(id = R.drawable.yellowtick),
-                contentDescription = "Back",
-                tint = Yellow,
-                modifier = Modifier
-                    .padding(end = 60.dp, bottom = 40.dp)
-                    .align(Alignment.BottomEnd)
-                    .size(50.dp)
-                    .background(NonWhite, CircleShape)
-                    .border(4.dp, Yellow, CircleShape)
-                    .clickable {
-                        mainViewModel.save(
-                            Book(
-                                title.text,
-                                author.text,
-                                selectedGenre,
-                                color.text,
-                                cover.text,
-                                selectedShelf,
-                                selectedRating,
-                                review.text,
-                                quote.text,
-                                selectedLanguage,
-                                pages.text.toIntOrNull(),
-                                days.text.toIntOrNull(),
-                                selectedMediaType
-                            ), readingChallenges
+            //Only proceed if there is an uploaded cover image, book title and author
+            if(
+                title.text.isEmpty() || author.text.isEmpty() || cover.text.isEmpty()
+            ){
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    if (title.text.isEmpty() && author.text.isEmpty() && cover.text.isEmpty()) {
+                        SmallText(text = "Please fill out the book title", color = DarkRed)
+                        SmallText(text = "Please fill out the author", color = DarkRed)
+                        SmallText(text = "Please upload a cover image to proceed", color = DarkRed)
+                    } else if(title.text.isEmpty() && author.text.isEmpty()){
+                        SmallText(text = "Please fill out the book title", color = DarkRed)
+                        SmallText(text = "Please fill out the author", color = DarkRed)
+                    } else if(title.text.isEmpty() && cover.text.isEmpty()){
+                        SmallText(text = "Please fill out the book title", color = DarkRed)
+                        SmallText(text = "Please upload a cover image to proceed", color = DarkRed)
+                    } else if(author.text.isEmpty() && cover.text.isEmpty()){
+                        SmallText(text = "Please fill out the author", color = DarkRed)
+                        SmallText(text = "Please upload a cover image to proceed", color = DarkRed)
+                    } else if (title.text.isEmpty()) {
+                        SmallText(text = "Please fill out the book title", color = DarkRed)
+                    } else if (author.text.isEmpty()) {
+                        SmallText(text = "Please fill out the author", color = DarkRed)
+                    } else if (cover.text.isEmpty()) {
+                        SmallText(text = "Please upload a cover image to proceed", color = DarkRed)
+                    }
+                }
+                Spacer (modifier = Modifier.height(10.dp))
+
+                Box(modifier = Modifier.fillMaxSize(),
+                    contentAlignment = CenterStart
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.bottomswirl),
+                        contentDescription = "Decorative Picture",
+                        tint = Violet,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                        Icon(
+                            painter = painterResource(id = R.drawable.yellowtick),
+                            contentDescription = "Back",
+                            tint = Grey,
+                            modifier = Modifier
+                                .padding(end = 60.dp, bottom = 40.dp)
+                                .align(Alignment.BottomEnd)
+                                .size(50.dp)
+                                .background(NonWhite, CircleShape)
+                                .border(4.dp, Grey, CircleShape)
+                                .size(40.dp)
                         )
 
-                        navController.navigate(Screen.Read.route)
-                    }
-                    .size(40.dp)
-            )
+                }
+            }
+            else {
+                //Bottom Swirl
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Image(
+                        painter = painterResource(id = R.drawable.bottomswirl),
+                        contentDescription = "Decorative Picture",
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                //confirm
+                Icon(
+                    painter = painterResource(id = R.drawable.yellowtick),
+                    contentDescription = "Back",
+                    tint = Yellow,
+                    modifier = Modifier
+                        .padding(end = 60.dp, bottom = 40.dp)
+                        .align(Alignment.BottomEnd)
+                        .size(50.dp)
+                        .background(NonWhite, CircleShape)
+                        .border(4.dp, Yellow, CircleShape)
+                        .clickable {
+                            mainViewModel.save(
+                                Book(
+                                    title.text,
+                                    author.text,
+                                    selectedGenre,
+                                    color.text,
+                                    cover.text,
+                                    selectedShelf,
+                                    selectedRating,
+                                    review.text,
+                                    quote.text,
+                                    selectedLanguage,
+                                    pages.text.toIntOrNull(),
+                                    days.text.toIntOrNull(),
+                                    selectedMediaType
+                                ), readingChallenges
+                            )
+
+                            navController.navigate(Screen.Read.route)
+                        }
+                        .size(40.dp)
+                )
+            }
+
         }
     }
 
@@ -2684,11 +2750,10 @@ fun StyledTextField(
     )
 }
 
-
 @Composable
 fun StyledText(text: String) {
     Text(
-        text = "$text",
+        text = text,
         style = TextStyle(
             fontSize = 16.sp,
             color = Violet,
@@ -3115,15 +3180,15 @@ fun EditReadBook(mainViewModel: MainViewModel, navController: NavHostController,
 
         val languages = listOf(
             "English",
-            "German",
             "French",
-            "Spanish",
+            "German",
             "Italian",
+            "Japanese",
+            "Korean",
+            "Mandarin",
             "Portuguese",
             "Russian",
-            "Chinese",
-            "Japanese",
-            "Korean"
+            "Spanish"
         )
         var languageChanged by remember { mutableStateOf(false) }
         var selectedLanguage by remember { mutableStateOf(languages[0]) }
