@@ -1047,28 +1047,30 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                                         Image(
                                             painterResource(id = R.drawable.fourstars),
                                             contentDescription = "Four Stars Rating",
-                                            modifier = Modifier.height(30.dp)
+                                            modifier = Modifier.height(25.dp)
                                         )
                                     } else if(book.rating == 3){
                                         Image(
                                             painterResource(id = R.drawable.threestars),
                                             contentDescription = "Three Stars Rating",
-                                            modifier = Modifier.height(30.dp)
+                                            modifier = Modifier.height(25.dp)
                                         )
                                     } else if(book.rating == 2){
                                         Image(
                                             painterResource(id = R.drawable.twostars),
                                             contentDescription = "Two Stars Rating",
-                                            modifier = Modifier.height(30.dp)
+                                            modifier = Modifier.height(25.dp)
                                         )
                                     } else if(book.rating == 1){
                                         Image(
                                             painterResource(id = R.drawable.onestar),
                                             contentDescription = "One Star Rating",
-                                            modifier = Modifier.height(30.dp)
+                                            modifier = Modifier.height(25.dp)
                                         )
                                     }
                                 }
+
+                            Spacer(modifier = Modifier.height(3.dp))
 
                             Text(
                                 text = book.title,
@@ -1088,6 +1090,8 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                                     textAlign = TextAlign.Center
                                 ),
                             )
+
+                            Spacer(modifier = Modifier.height(10.dp))
                         }
                     }
                 }
