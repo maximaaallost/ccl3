@@ -1952,8 +1952,9 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
     ) {
         //with back button, violetswirl and cover image
         Box(modifier = Modifier.fillMaxSize()) {
-            Image(
-                painter = painterResource(id = R.drawable.violetswirl),
+            Icon(
+                painter = painterResource(id = R.drawable.beigeswirl),
+                tint = Violet,
                 contentDescription = "Decorative Picture",
                 modifier = Modifier.fillMaxWidth()
             )
@@ -2000,7 +2001,6 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
 
         }
 
-
         //Picture upload Button
         Button(
             onClick = { photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
@@ -2021,6 +2021,7 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
             )
         }
 
+        //Color list to choose the color for the book cover
         Text(
             text = "Book Color",
             style = TextStyle(
@@ -2033,11 +2034,11 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
                 .padding(top = 20.dp, start = 45.dp)
                 .align(Alignment.Start),
         )
-
         ColorList { selectedColor ->
             color = TextFieldValue(selectedColor.toString())
         }
 
+        //INput fields for Title, author, genre, shelf, rate the book, review, quote, language, pages, days und paperback
         Column {
             StyledTextField(
                 placeholder = "Book Title",
@@ -2127,15 +2128,10 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
             }
             }
 
-
-
-
-
-
-
+        //Bottom Swirl
         Box(modifier = Modifier.fillMaxSize()) {
             Image(
-                painter = painterResource(id = R.drawable.violetswirlbottom),
+                painter = painterResource(id = R.drawable.bottomswirl),
                 contentDescription = "Decorative Picture",
                 modifier = Modifier.fillMaxWidth()
             )
