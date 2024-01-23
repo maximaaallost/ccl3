@@ -2127,10 +2127,11 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
                     },
                     contentDescription = "Entry Image",
                     modifier = Modifier
-                        .height(225.dp)
+                        .height(210.dp)
                         .padding(65.dp, 5.dp, 0.dp, 0.dp)
                         .clip(RoundedCornerShape(10.dp, 0.dp, 0.dp, 0.dp))
                 )
+
             }
 
         }
