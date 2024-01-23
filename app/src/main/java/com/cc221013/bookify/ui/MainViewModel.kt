@@ -53,8 +53,6 @@ class MainViewModel(private val db: DatabaseHandler, private val dbChallenge: Re
     }
 
 
-
-
     private val _selectedBook = mutableStateOf<Book?>(null)
     val selectedBook: State<Book?> = _selectedBook
 
@@ -89,6 +87,8 @@ class MainViewModel(private val db: DatabaseHandler, private val dbChallenge: Re
 
     fun saveBook(book: Book, readingChallenges: List<ReadingChallenge>){
         _mainViewState.update { it.copy(openDialogEditBook = false) }
+        _mainViewState.update { it.copy(openDialogEditReadBook = false) }
+
         db.updateBook(book)
         getBooks()
         var newBookCount  = 0;
@@ -102,21 +102,21 @@ class MainViewModel(private val db: DatabaseHandler, private val dbChallenge: Re
             )
         }
     }
+
     fun updateChallenge(challenge: ReadingChallenge){
         dbChallenge.updateChallenge(challenge)
         getChallenges()
     }
-
-    fun saveReadBook(book: Book){
-        db.updateBook(book)
-        getBooks()
-    }
-
     fun dialogEditBook(book: Book) {
         _mainViewState.update { it.copy(openDialogEditBook = true, editBook = book) }
     }
 
+    fun dialogEditReadBook(book: Book) {
+        _mainViewState.update { it.copy(openDialogEditReadBook = true, editBook = book) }
+    }
+
     fun dismissDialog(){
         _mainViewState.update { it.copy(openDialogEditBook = false) }
+        _mainViewState.update { it.copy(openDialogEditReadBook = false) }
     }
 }
