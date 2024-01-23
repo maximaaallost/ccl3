@@ -2906,8 +2906,8 @@ fun addReadingChallengeAlert(mainViewModel: MainViewModel) {
 fun EditBook(mainViewModel: MainViewModel, readingChallenges: List<ReadingChallenge>) {
     val state = mainViewModel.mainViewState.collectAsState()
     val genres = listOf(
-        "Fantasy", "Sci-Fi", "Romance", "New Adult", "Thriller", "Horror", "Erotica",
-        "Manga", "Biography", "Novel", "History", "Non-Fiction"
+        "Biography", "Erotica", "Fantasy", "History", "Horror", "Manga", "New Adult",
+        "Non-Fiction", "Novel", "Romance", "Sci-Fi", "Thriller"
     )
     var selectedGenre by remember { mutableStateOf(genres[0]) }
 
