@@ -97,7 +97,6 @@ class ReadingChallengeDatabaseHandler(context: Context) : SQLiteOpenHelper(conte
                 )
             }
         }
-
         return allChallenges.toList()
     }
 //    fun getChallengeById(challengeId: Int): ReadingChallenge? {

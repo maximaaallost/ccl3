@@ -567,7 +567,7 @@ fun GenreScroll(onGenreSelected: (String) -> Unit, navController: NavHostControl
 @Composable
 fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) {
     val book = mainViewModel.selectedBook.value
-
+    val state = mainViewModel.mainViewState.collectAsState()
     if (book !== null) {
         LazyColumn(
             modifier = Modifier
@@ -911,7 +911,7 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
 
     }
     Column {
-        EditReadBook(mainViewModel, navController)
+        EditReadBook(mainViewModel, navController, readingChallenges = state.value.challenges)
     }
 }
 
@@ -1226,7 +1226,7 @@ fun TBRScreen(mainViewModel: MainViewModel, navController: NavHostController) {
         }
     }
     Column {
-        EditBook(mainViewModel)
+        EditBook(mainViewModel, readingChallenges = state.value.challenges)
     }
 }
 
@@ -1321,7 +1321,7 @@ fun WishlistScreen(mainViewModel: MainViewModel, navController: NavHostControlle
                 }
             }
             Column {
-                EditBook(mainViewModel)
+                EditBook(mainViewModel, readingChallenges = state.value.challenges)
             }
 
         }
@@ -3001,7 +3001,7 @@ fun EditBook(mainViewModel: MainViewModel, readingChallenges: List<ReadingChalle
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
-                                painter = painterResource(id = R.drawable.delte),
+                                painter = painterResource(id = R.drawable.delete),
                                 tint = DarkRed,
                                 contentDescription = "Confirm Icon",
                                 modifier = Modifier.size(15.dp)
