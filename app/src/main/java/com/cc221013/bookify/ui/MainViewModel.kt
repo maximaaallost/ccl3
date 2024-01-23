@@ -5,6 +5,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.navigation.NavController
 import com.cc221013.bookify.data.DatabaseHandler
 import com.cc221013.bookify.data.ReadingChallengeDatabaseHandler
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,13 +19,10 @@ class MainViewModel(private val db: DatabaseHandler, private val dbChallenge: Re
     val mainViewState: StateFlow<MainViewState> = _mainViewState.asStateFlow()
     private val _cameraState = MutableStateFlow(CameraState())
     val cameraState: StateFlow<CameraState> = _cameraState.asStateFlow()
-    var internBookCount = 0
-
 
     fun setFilePermission(value: Boolean){
         _cameraState.update { it.copy(filePermissionGranted = value) }
     }
-
 
     fun saveReadingChallenge(challenge: ReadingChallenge) {
         dbChallenge.insertChallenge(challenge)
@@ -52,6 +50,9 @@ class MainViewModel(private val db: DatabaseHandler, private val dbChallenge: Re
         _mainViewState.update { it.copy(openDialogEditReadingChallenge = false) }
     }
 
+    fun clickCancel(){
+        _mainViewState.update { it.copy(openAlert = false, openReadBookAlert = false) }
+    }
 
     private val _selectedBook = mutableStateOf<Book?>(null)
     val selectedBook: State<Book?> = _selectedBook
@@ -78,7 +79,16 @@ class MainViewModel(private val db: DatabaseHandler, private val dbChallenge: Re
         db.deleteBook(book)
         getBooks()
     }
-
+    fun deleteReadBookAlert(book: Book){
+        _mainViewState.update { it.copy(openDialogEditBook = false) }
+        _mainViewState.update { it.copy(openDialogEditReadBook = false) }
+        _mainViewState.update { it.copy(openReadBookAlert = true, editBook = book) }
+    }
+    fun deleteAlert(book: Book){
+        _mainViewState.update { it.copy(openDialogEditBook = false) }
+        _mainViewState.update { it.copy(openDialogEditReadBook = false) }
+        _mainViewState.update { it.copy(openAlert = true, editBook = book) }
+    }
     fun deleteChallenge(challenge: ReadingChallenge){
         dbChallenge.deleteChallenge(challenge)
         getChallenges()
@@ -118,5 +128,7 @@ class MainViewModel(private val db: DatabaseHandler, private val dbChallenge: Re
     fun dismissDialog(){
         _mainViewState.update { it.copy(openDialogEditBook = false) }
         _mainViewState.update { it.copy(openDialogEditReadBook = false) }
+        _mainViewState.update { it.copy(openReadBookAlert = false) }
+        _mainViewState.update { it.copy(openAlert = false) }
     }
 }

@@ -37,6 +37,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.DropdownMenu
@@ -50,10 +51,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.materialIcon
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -170,6 +174,7 @@ import java.time.format.DateTimeFormatter
 
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
@@ -568,12 +573,24 @@ fun GenreScroll(onGenreSelected: (String) -> Unit, navController: NavHostControl
 fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) {
     val book = mainViewModel.selectedBook.value
     val state = mainViewModel.mainViewState.collectAsState()
+    var title by rememberSaveable { mutableStateOf(state.value.editBook.title) }
+    var author by rememberSaveable { mutableStateOf(state.value.editBook.author) }
+    var genre by rememberSaveable { mutableStateOf(state.value.editBook.genre) }
+    var color by rememberSaveable { mutableStateOf(state.value.editBook.color) }
+    var cover by rememberSaveable { mutableStateOf(state.value.editBook.cover) }
+    var rating by rememberSaveable { mutableStateOf(state.value.editBook.rating) }
+    var review by rememberSaveable { mutableStateOf(state.value.editBook.review) }
+    var quote by rememberSaveable { mutableStateOf(state.value.editBook.quote) }
+    var language by rememberSaveable { mutableStateOf(state.value.editBook.language) }
+    var pages by rememberSaveable { mutableStateOf(state.value.editBook.pages) }
+    var days by rememberSaveable { mutableStateOf(state.value.editBook.days) }
+    var mediaType by rememberSaveable { mutableStateOf(state.value.editBook.mediaType) }
     if (book !== null) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
+            horizontalAlignment = CenterHorizontally,
         ) {
 
             //with back button, beigeswirl, rating, title/author and cover image
@@ -831,7 +848,10 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
                                     ),
                                     modifier = Modifier
                                         .fillMaxHeight()
-                                        .padding(start = 10.dp, end = if (index == quoteParts.size - 1) 20.dp else 0.dp) // Add padding to the last item
+                                        .padding(
+                                            start = 10.dp,
+                                            end = if (index == quoteParts.size - 1) 20.dp else 0.dp
+                                        ) // Add padding to the last item
                                 )
                             }
                             Spacer(modifier = Modifier.height(6.dp)) // Add space between rows
@@ -850,9 +870,10 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
                     ) {
                         Button(
                             onClick = {
-                                mainViewModel.clickDelete(book)
                                 mainViewModel.setSelectedBook(book)
-                                navController.navigate(Screen.Read.route)
+//                                mainViewModel.clickDelete(book)
+                                mainViewModel.deleteReadBookAlert(book)
+
                             },
                             modifier = Modifier
                                 .clip(RoundedCornerShape(8.dp))
@@ -912,6 +933,11 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
     }
     Column {
         EditReadBook(mainViewModel, navController, readingChallenges = state.value.challenges)
+    }
+    Column {
+        if (book != null) {
+            deleteReadBookAlert(mainViewModel, book, navController)
+        }
     }
 }
 
@@ -1032,7 +1058,7 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                             modifier = Modifier
                                 .width(150.dp),
                             verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            horizontalAlignment = CenterHorizontally
                         ) {
 
                             //stars according to rating
@@ -1068,6 +1094,7 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                                             modifier = Modifier.height(30.dp)
                                         )
                                     }
+                                    else { }
                                 }
 
                             Text(
@@ -1093,7 +1120,6 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                 }
             }
         }
-
 
     }
 }
@@ -1480,47 +1506,53 @@ fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController) 
                 fun getGenreForColor(color: Color): String {
                     return genreColors.entries.find { it.value == color }?.key ?: ""
                 }
-
-                Box(
-                    modifier = Modifier
-                        .background(color = Violet, RoundedCornerShape(10.dp))
-                        .width(350.dp),
-                    contentAlignment = Center
-                ) {
-                    Column (
+                if (booksRead != 0) {
+                    Box(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .padding(bottom = 10.dp),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = CenterHorizontally
+                            .background(color = Violet, RoundedCornerShape(10.dp))
+                            .width(350.dp),
+                        contentAlignment = Center
                     ) {
-                        Text(text = "Genre Distribution", color = NonWhite, modifier = Modifier.padding(10.dp))
-
-                        PieChart(Modifier.size(250.dp, 250.dp), genreData)
-
-                        Column {
-                            Spacer(modifier = Modifier.height(10.dp))
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(bottom = 10.dp),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = CenterHorizontally
+                        ) {
                             Text(
-                                buildAnnotatedString {
-                                    genreData.forEach { slice ->
-                                        val genre = getGenreForColor(slice.color)
-                                        val percentage = (slice.value / calculateTotalPercentage(genreData)) * 100
-
-                                        withStyle(style = SpanStyle(color = slice.color)) {
-                                            append("${percentage.toInt()}% ")
-                                        }
-                                        withStyle(style = SpanStyle(color = NonWhite)) {
-                                            append(genre)
-                                        }
-                                        append("\n")
-                                    }
-                                },
-                                modifier = Modifier
-                                    .padding(8.dp)
-                                    .fillMaxWidth()
-                                    .align(Alignment.Start), // Align the legend to the left
-                                textAlign = TextAlign.Center
+                                text = "Genre Distribution",
+                                color = NonWhite,
+                                modifier = Modifier.padding(10.dp)
                             )
+
+                            PieChart(Modifier.size(250.dp, 250.dp), genreData)
+
+                            Column {
+                                Spacer(modifier = Modifier.height(10.dp))
+                                Text(
+                                    buildAnnotatedString {
+                                        genreData.forEach { slice ->
+                                            val genre = getGenreForColor(slice.color)
+                                            val percentage =
+                                                (slice.value / calculateTotalPercentage(genreData)) * 100
+
+                                            withStyle(style = SpanStyle(color = slice.color)) {
+                                                append("${percentage.toInt()}% ")
+                                            }
+                                            withStyle(style = SpanStyle(color = NonWhite)) {
+                                                append(genre)
+                                            }
+                                            append("\n")
+                                        }
+                                    },
+                                    modifier = Modifier
+                                        .padding(8.dp)
+                                        .fillMaxWidth()
+                                        .align(Alignment.Start), // Align the legend to the left
+                                    textAlign = TextAlign.Center
+                                )
+                            }
                         }
                     }
                 }
@@ -1671,7 +1703,7 @@ fun ReadingChallengeEntries(readingChallenges: List<ReadingChallenge>, mainViewM
             val currentDate = LocalDate.now() // Get the current date
 
 
-
+            //Check if Timeframe is over
              if (currentDate >= endDate) {
             Column {
 
@@ -1714,10 +1746,26 @@ fun ReadingChallengeEntries(readingChallenges: List<ReadingChallenge>, mainViewM
                                 .background(Yellow),
                             colors = androidx.compose.material3.ButtonDefaults.buttonColors(Color.Transparent),
                         ) {
-                            Text(
-                                text = "I will try again",
-                                style = TextStyle(fontSize = 15.sp, color = Violet, fontFamily = Poppins, fontWeight = FontWeight.SemiBold),
-                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.close),
+                                    tint = Violet,
+                                    contentDescription = "Close Icon",
+                                    modifier = Modifier.size(15.dp)
+                                )
+                                Spacer (modifier = Modifier.width(10.dp))
+                                Text(
+                                    text = "close",
+                                    style = TextStyle(
+                                        fontSize = 18.sp,
+                                        color = Violet,
+                                        fontFamily = Poppins,
+                                        fontWeight = FontWeight.SemiBold
+                                    ),
+                                )
+                            }
                         }
 
                     }
@@ -1726,9 +1774,6 @@ fun ReadingChallengeEntries(readingChallenges: List<ReadingChallenge>, mainViewM
 
             }
         }
-
-
-
 
             //Congratulation message
             else if (challenge.progress >= 1.0f) {
@@ -1772,10 +1817,26 @@ fun ReadingChallengeEntries(readingChallenges: List<ReadingChallenge>, mainViewM
                             .background(Yellow),
                         colors = androidx.compose.material3.ButtonDefaults.buttonColors(Color.Transparent),
                     ) {
-                        Text(
-                            text = "Thank you",
-                            style = TextStyle(fontSize = 15.sp, color = Violet, fontFamily = Poppins, fontWeight = FontWeight.SemiBold),
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.close),
+                                tint = Violet,
+                                contentDescription = "Close Icon",
+                                modifier = Modifier.size(15.dp)
+                            )
+                            Spacer (modifier = Modifier.width(10.dp))
+                            Text(
+                                text = "close",
+                                style = TextStyle(
+                                    fontSize = 18.sp,
+                                    color = Violet,
+                                    fontFamily = Poppins,
+                                    fontWeight = FontWeight.SemiBold
+                                ),
+                            )
+                        }
                     }
 
                 }
@@ -1786,78 +1847,80 @@ fun ReadingChallengeEntries(readingChallenges: List<ReadingChallenge>, mainViewM
         }
 
 
-
-        else {
-           //  Display reading challenge entries
-
-                Text(
-                    text = challenge.title,
-                    color = NonWhite,
-                    fontSize = 20.sp,
-                    fontFamily = Poppins,
-                    fontWeight = FontWeight.Bold
-                )
-
-
-                SmallText(text = "Timeframe", color = NonWhite)
-                if (endDate != null) {
-                    Text(
-                        text = "${challenge.startDate} - ${
-                            endDate.format(
-                                DateTimeFormatter.ofPattern(
-                                    "dd.MM.yyyy"
-                                )
-                            )
-                        }", color = NonWhite, fontSize = 20.sp
-                    )
-                }
-
-
-            val progressPercentage = calculateProgress(challenge.userBookCount, challenge.goalBookCount)* 100
-
-
-            mainViewModel.updateChallenge(
-                    challenge.copy(
-                        progress = progressPercentage / 100f
-                    )
-                )
-
-
-                SmallText(
-                    text = "Progress - ${String.format("%.0f", progressPercentage)}%",
-                    color = NonWhite
-                )
-                // Progress Bar
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp, bottom = 12.dp)
-                        .height(20.dp)
+            //Display Reading Challenge Entry
+            else {
+                Column (modifier = Modifier.padding(start = 20.dp)
                 ) {
-                    LinearProgressIndicator(
-                        color = Yellow,
-                        backgroundColor = NonWhite,
-                        progress = progressPercentage / 100f,
-                        modifier = Modifier.fillMaxSize()
+                    Text(
+                        text = challenge.title,
+                        color = NonWhite,
+                        fontSize = 20.sp,
+                        fontFamily = Poppins,
+                        fontWeight = FontWeight.Bold
                     )
-                }
 
-                Row {
-                    Column {
-                        SmallText(text = "Goal", color = NonWhite)
+
+                    SmallText(text = "Timeframe", color = NonWhite)
+                    if (endDate != null) {
                         Text(
-                            text = "${challenge.goalBookCount} Books",
-                            color = NonWhite,
-                            fontSize = 20.sp
+                            text = "${challenge.startDate} - ${
+                                endDate.format(
+                                    DateTimeFormatter.ofPattern(
+                                        "dd.MM.yyyy"
+                                    )
+                                )
+                            }", color = NonWhite, fontSize = 20.sp
                         )
                     }
-                    Spacer(modifier = Modifier.width(30.dp))
-                    Column {
-                        SmallText(text = "Time", color = NonWhite)
-                        Text(text = "${challenge.days} Days", color = NonWhite, fontSize = 20.sp)
+
+
+                    val progressPercentage = calculateProgress(challenge.userBookCount, challenge.goalBookCount)* 100
+
+
+                    mainViewModel.updateChallenge(
+                        challenge.copy(
+                            progress = progressPercentage / 100f
+                        )
+                    )
+
+
+                    SmallText(
+                        text = "Progress - ${String.format("%.0f", progressPercentage)}%",
+                        color = NonWhite
+                    )
+                    // Progress Bar
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp, bottom = 12.dp)
+                            .height(20.dp)
+                    ) {
+                        LinearProgressIndicator(
+                            color = Yellow,
+                            backgroundColor = NonWhite,
+                            progress = progressPercentage / 100f,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+
+                    Row {
+                        Column {
+                            SmallText(text = "Goal", color = NonWhite)
+                            Text(
+                                text = "${challenge.goalBookCount} Books",
+                                color = NonWhite,
+                                fontSize = 20.sp
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(30.dp))
+                        Column {
+                            SmallText(text = "Time", color = NonWhite)
+                            Text(text = "${challenge.days} Days", color = NonWhite, fontSize = 20.sp)
+                        }
                     }
                 }
-            }
+                }
+
         }
     }
 }
@@ -2157,7 +2220,9 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
                         quote = TextFieldValue(newQuote)
                     }
                 )
-                Row(modifier = Modifier.width(300.dp).padding(start = 15.dp)) {
+                Row(modifier = Modifier
+                    .width(300.dp)
+                    .padding(start = 15.dp)) {
                     Icon(painter = painterResource(id = R.drawable.info), contentDescription = "info icon", tint = LightViolet, modifier = Modifier.size(16.dp))
                     Text(
                         text = "to insert more than one quote add a semicolon between them",
@@ -2450,17 +2515,26 @@ fun EmptyState(navController: NavHostController) {
             onClick = { navController.navigate(Screen.AddBook.route) },
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))
-                .background(Violet),
+                .background(Yellow),
             colors = androidx.compose.material3.ButtonDefaults.buttonColors(Color.Transparent),
         )
         {
+            Icon(
+                painter = painterResource(id = R.drawable.add),
+                contentDescription = "add icon",
+                tint = Violet,
+                modifier = Modifier.size(25.dp)
+            )
+
+            Spacer(modifier = Modifier.width(10.dp))
+
             Text(
-                text = "Add a new Book",
+                text = "add a new book",
                 style = TextStyle(
                     fontSize = 16.sp,
-                    color = NonWhite,
+                    color = Violet,
                     fontFamily = Poppins,
-                    fontWeight = FontWeight.ExtraBold
+                    fontWeight = FontWeight.Medium
                 ),
 
                 )
@@ -2859,6 +2933,7 @@ fun EditBook(mainViewModel: MainViewModel, readingChallenges: List<ReadingChalle
         val shelfList = listOf(
             "Read", "To be Read", "Wishlist"
         )
+
         var shelfChanged by remember { mutableStateOf(false) }
         var shelf by rememberSaveable { mutableStateOf(state.value.editBook.shelf) }
         var selectedShelf by remember { mutableStateOf(shelfList[0]) }
@@ -2986,8 +3061,9 @@ fun EditBook(mainViewModel: MainViewModel, readingChallenges: List<ReadingChalle
                     //Delete Book
                     androidx.compose.material.Button(
                         onClick = {
-                            mainViewModel.clickDelete(state.value.editBook)
-                            mainViewModel.dismissDialog()
+//                            mainViewModel.clickDelete(state.value.editBook)
+                            mainViewModel.deleteAlert(state.value.editBook)
+//                            mainViewModel.dismissDialog()
 
                         }, modifier = Modifier
                             .padding(top = 10.dp)
@@ -3078,12 +3154,14 @@ fun EditBook(mainViewModel: MainViewModel, readingChallenges: List<ReadingChalle
             }
         }
     }
+    Column {
+        deleteAlert(mainViewModel, state.value.editBook)
+    }
 }
 
 
 @Composable
 fun EditReadBook(mainViewModel: MainViewModel, navController: NavHostController, readingChallenges: List<ReadingChallenge>) {
-    val book = mainViewModel.selectedBook.value
     val state = mainViewModel.mainViewState.collectAsState()
 
     if (state.value.openDialogEditReadBook) {
@@ -3475,3 +3553,260 @@ fun EditReadBook(mainViewModel: MainViewModel, navController: NavHostController,
     }
 
 }}
+
+@Composable
+fun deleteReadBookAlert(mainViewModel: MainViewModel, book: Book, navController: NavHostController) {
+    val state = mainViewModel.mainViewState.collectAsState()
+
+    if (state.value.openReadBookAlert) {
+
+        Dialog(
+            onDismissRequest = { mainViewModel.dismissDialog() }
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 5.dp, end = 5.dp),
+                colors = CardDefaults.cardColors(containerColor = Violet),
+                shape = RoundedCornerShape(10.dp),
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "Are you sure you want to delete this entry?",
+                        style = TextStyle(
+                            fontFamily = Poppins,
+                            fontSize = 18.sp,
+                            color = NonWhite
+                        ),
+                        modifier = Modifier.padding(start = 20.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+
+                        Row(
+                            modifier = Modifier
+                                .padding(bottom = 20.dp)
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            //Delete Book
+                            androidx.compose.material.Button(
+                                onClick = {
+                                    mainViewModel.clickCancel()
+                                }, modifier = Modifier
+                                    .padding(top = 10.dp)
+                                    .height(45.dp)
+                                    .border(2.dp, NonWhite, shape = RoundedCornerShape(20.dp)),
+                                shape = CircleShape,
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = Violet
+                                )
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        Icons.Default.Clear,
+                                        tint = NonWhite,
+                                        contentDescription = "Cancel Icon",
+                                        modifier = Modifier.size(25.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Text(
+                                        text = "cancel",
+                                        fontSize = 16.sp,
+                                        fontFamily = Poppins,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = NonWhite
+                                    )
+                                }
+
+                            }
+
+                            Spacer(modifier = Modifier.width(20.dp))
+
+                            androidx.compose.material.Button(
+                                onClick = {
+                                    mainViewModel.clickDelete(state.value.editBook)
+                                    navController.navigate(Screen.Read.route)
+                                    mainViewModel.dismissDialog()
+                                }, modifier = Modifier
+                                    .padding(top = 10.dp)
+                                    .height(45.dp)
+                                    .border(2.dp, DarkRed, shape = RoundedCornerShape(20.dp)),
+                                shape = CircleShape,
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = Violet
+                                )
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.delete),
+                                        tint = DarkRed,
+                                        contentDescription = "Confirm Icon",
+                                        modifier = Modifier.size(15.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Text(
+                                        text = "delete",
+                                        fontSize = 16.sp,
+                                        fontFamily = Poppins,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = NonWhite
+                                    )
+                                }
+
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+// Alert to delete an entry
+@Composable
+fun deleteAlert(mainViewModel: MainViewModel, book: Book) {
+    val state = mainViewModel.mainViewState.collectAsState()
+
+    if (state.value.openAlert) {
+
+        Dialog(
+            onDismissRequest = { mainViewModel.dismissDialog() }
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 5.dp, end = 5.dp),
+                colors = CardDefaults.cardColors(containerColor = Violet),
+                shape = RoundedCornerShape(10.dp),
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "Are you sure you want to delete this entry?",
+                        style = TextStyle(
+                            fontFamily = Poppins,
+                            fontSize = 18.sp,
+                            color = NonWhite
+                        ),
+                        modifier = Modifier.padding(start = 20.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+
+                        Row(
+                            modifier = Modifier
+                                .padding(bottom = 20.dp)
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            //Delete Book
+                            androidx.compose.material.Button(
+                                onClick = {
+                                    mainViewModel.clickCancel()
+                                }, modifier = Modifier
+                                    .padding(top = 10.dp)
+                                    .height(45.dp)
+                                    .border(2.dp, NonWhite, shape = RoundedCornerShape(20.dp)),
+                                shape = CircleShape,
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = Violet
+                                )
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        Icons.Default.Clear,
+                                        tint = NonWhite,
+                                        contentDescription = "Cancel Icon",
+                                        modifier = Modifier.size(25.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Text(
+                                        text = "cancel",
+                                        fontSize = 16.sp,
+                                        fontFamily = Poppins,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = NonWhite
+                                    )
+                                }
+
+                            }
+                            
+                            Spacer(modifier = Modifier.width(20.dp))
+
+                            androidx.compose.material.Button(
+                                onClick = {
+                                    mainViewModel.clickDelete(state.value.editBook)
+                                    mainViewModel.dismissDialog()
+                                }, modifier = Modifier
+                                    .padding(top = 10.dp)
+                                    .height(45.dp)
+                                    .border(2.dp, DarkRed, shape = RoundedCornerShape(20.dp)),
+                                shape = CircleShape,
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = Violet
+                                )
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.delete),
+                                        tint = DarkRed,
+                                        contentDescription = "Confirm Icon",
+                                        modifier = Modifier.size(15.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Text(
+                                        text = "delete",
+                                        fontSize = 16.sp,
+                                        fontFamily = Poppins,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = NonWhite
+                                    )
+                                }
+
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+
+
+
