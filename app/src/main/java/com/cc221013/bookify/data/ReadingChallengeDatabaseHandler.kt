@@ -99,35 +99,5 @@ class ReadingChallengeDatabaseHandler(context: Context) : SQLiteOpenHelper(conte
         }
         return allChallenges.toList()
     }
-//    fun getChallengeById(challengeId: Int): ReadingChallenge? {
-//        val dbChallenge = this.readableDatabase
-//        val cursor = dbChallenge.rawQuery("SELECT * FROM $tableName WHERE $id = ?", arrayOf(challengeId.toString()))
-//
-//        var challenge: ReadingChallenge? = null
-//
-//        if (cursor.moveToFirst()) {
-//            val idID = cursor.getColumnIndex(id)
-//            val titleID = cursor.getColumnIndex(title)
-//            val daysID = cursor.getColumnIndex(days)
-//            val goalBookCountID = cursor.getColumnIndex(goalBookCount)
-//            val userBookCountID = cursor.getColumnIndex(userBookCount)
-//            val progressID = cursor.getColumnIndex(progress)
-//            val startDateID = cursor.getColumnIndex(startDate)
-//
-//            if (idID >= 0 && titleID >= 0 && daysID >= 0 && goalBookCountID >= 0  && userBookCountID >= 0 && progressID >= 0 && startDateID >= 0) {
-//                challenge = ReadingChallenge(
-//                    cursor.getString(titleID),
-//                    cursor.getInt(daysID),
-//                    cursor.getInt(goalBookCountID),
-//                    cursor.getInt(userBookCountID),
-//                    cursor.getFloat(progressID),
-//                    cursor.getString(startDateID),
-//                    cursor.getInt(idID)
-//                )
-//            }
-//        }
-//
-//        cursor.close()
-//        return challenge
-//    }
+
 }
