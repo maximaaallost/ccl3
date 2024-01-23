@@ -2987,6 +2987,7 @@ fun EditBook(mainViewModel: MainViewModel, readingChallenges: List<ReadingChalle
                     androidx.compose.material.Button(
                         onClick = {
                             mainViewModel.clickDelete(state.value.editBook)
+                            mainViewModel.dismissDialog()
 
                         }, modifier = Modifier
                             .padding(top = 10.dp)
