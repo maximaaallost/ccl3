@@ -36,6 +36,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.BottomNavigation
@@ -70,6 +71,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Alignment.Companion.CenterStart
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -177,6 +179,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.withStyle
 import kotlin.collections.isNotEmpty
 import kotlin.math.min
@@ -511,15 +514,15 @@ fun ReadStats(mainViewModel: MainViewModel, navController: NavHostController) {
 fun GenreScroll(onGenreSelected: (String) -> Unit, navController: NavHostController, route: String) {
     val genreColors = listOf(
         Violet,
-        LightViolet,
+        Turquoise,
         DarkBlue,
         Pink600,
+        LightViolet,
         Pink,
         Grey,
         Orange700,
         DarkRed,
         Lime,
-        Turquoise,
         Blue,
         DarkBeige,
         Mint
@@ -527,8 +530,8 @@ fun GenreScroll(onGenreSelected: (String) -> Unit, navController: NavHostControl
 
     val genreNames = listOf(
         "All",
-        "Fantasy", "Sci-Fi", "Romance", "New Adult", "Thriller", "Horror", "Erotica",
-        "Manga", "Biography", "Novel", "History", "Non-Fiction"
+        "Biography", "Erotica", "Fantasy", "History", "Horror", "Manga", "New Adult",
+        "Non-Fiction", "Novel", "Romance", "Sci-Fi", "Thriller"
     )
 
     LazyRow(
@@ -1073,29 +1076,31 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                                         Image(
                                             painterResource(id = R.drawable.fourstars),
                                             contentDescription = "Four Stars Rating",
-                                            modifier = Modifier.height(30.dp)
+                                            modifier = Modifier.height(25.dp)
                                         )
                                     } else if(book.rating == 3){
                                         Image(
                                             painterResource(id = R.drawable.threestars),
                                             contentDescription = "Three Stars Rating",
-                                            modifier = Modifier.height(30.dp)
+                                            modifier = Modifier.height(25.dp)
                                         )
                                     } else if(book.rating == 2){
                                         Image(
                                             painterResource(id = R.drawable.twostars),
                                             contentDescription = "Two Stars Rating",
-                                            modifier = Modifier.height(30.dp)
+                                            modifier = Modifier.height(25.dp)
                                         )
                                     } else if(book.rating == 1){
                                         Image(
                                             painterResource(id = R.drawable.onestar),
                                             contentDescription = "One Star Rating",
-                                            modifier = Modifier.height(30.dp)
+                                            modifier = Modifier.height(25.dp)
                                         )
                                     }
                                     else { }
                                 }
+
+                            Spacer(modifier = Modifier.height(3.dp))
 
                             Text(
                                 text = book.title,
@@ -1115,6 +1120,8 @@ fun ReadScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                                     textAlign = TextAlign.Center
                                 ),
                             )
+
+                            Spacer(modifier = Modifier.height(10.dp))
                         }
                     }
                 }
@@ -1324,7 +1331,7 @@ fun WishlistScreen(mainViewModel: MainViewModel, navController: NavHostControlle
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = "${book.title}",
+                                text = book.title,
                                 style = TextStyle(
                                     fontSize = 14.sp,
                                     color = Violet,
@@ -1333,7 +1340,7 @@ fun WishlistScreen(mainViewModel: MainViewModel, navController: NavHostControlle
                                 ),
                             )
                             Text(
-                                text = "${book.author}",
+                                text = book.author,
                                 style = TextStyle(
                                     fontSize = 12.sp,
                                     color = LightViolet,
@@ -1390,19 +1397,20 @@ fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController) 
 
     // Mapping each genre to its corresponding color
     val genreColors = mapOf(
+
         "all" to Violet,
-        "Fantasy" to LightViolet,
-        "Sci-Fi" to DarkBlue,
-        "Romance" to Pink600,
-        "New Adult" to Pink,
-        "Thriller" to Grey,
-        "Horror" to Orange700,
-        "Erotica" to DarkRed,
-        "Manga" to Lime,
         "Biography" to Turquoise,
-        "Novel" to Blue,
-        "History" to DarkBeige,
-        "Non-Fiction" to Mint
+        "Erotica" to DarkBlue,
+        "Fantasy" to Pink600,
+        "History" to LightViolet,
+        "Horror" to Pink,
+        "Manga" to Grey,
+        "New Adult" to Orange700,
+        "Non-Fiction" to DarkRed,
+        "Novel" to Lime,
+        "Romance" to Blue,
+        "Sci-Fi" to DarkBeige,
+        "Thriller" to Mint
     )
 
     val genreData = calculateGenreDistribution(books.filter { it.shelf == "Read" }.mapNotNull { it.genre }).map { (genre, count) ->
@@ -2037,21 +2045,22 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
     }
 
     val genres = listOf(
-        "Fantasy", "Sci-Fi", "Romance", "New Adult", "Thriller", "Horror", "Erotica",
-        "Manga", "Biography", "Novel", "History", "Non-Fiction"
+        "Biography", "Erotica", "Fantasy", "History", "Horror", "Manga", "New Adult",
+        "Non-Fiction", "Novel", "Romance", "Sci-Fi", "Thriller"
     )
 
     val languages = listOf(
         "English",
-        "German",
         "French",
-        "Spanish",
+        "German",
         "Italian",
+        "Japanese",
+        "Korean",
+        "Mandarin",
         "Portuguese",
         "Russian",
-        "Chinese",
-        "Japanese",
-        "Korean"
+        "Spanish"
+
     )
     val mediaTypeList = listOf(
         "Paperback", "Ebook", "Audiobook"
@@ -2094,8 +2103,6 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
                     .padding(20.dp)
                     .clickable { navController.navigate(Screen.Read.route) }
                     .size(40.dp)
-
-
             )
             Box(
                 modifier = Modifier
@@ -2271,47 +2278,107 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
             }
             }
 
-        //Bottom Swirl
-        Box(modifier = Modifier.fillMaxSize()) {
-            Image(
-                painter = painterResource(id = R.drawable.bottomswirl),
-                contentDescription = "Decorative Picture",
-                modifier = Modifier.fillMaxWidth()
-            )
+            Spacer(modifier = Modifier.height(10.dp))
 
-            Icon(
-                painter = painterResource(id = R.drawable.yellowtick),
-                contentDescription = "Back",
-                tint = Yellow,
-                modifier = Modifier
-                    .padding(end = 60.dp, bottom = 40.dp)
-                    .align(Alignment.BottomEnd)
-                    .size(50.dp)
-                    .background(NonWhite, CircleShape)
-                    .border(4.dp, Yellow, CircleShape)
-                    .clickable {
-                        mainViewModel.save(
-                            Book(
-                                title.text,
-                                author.text,
-                                selectedGenre,
-                                color.text,
-                                cover.text,
-                                selectedShelf,
-                                selectedRating,
-                                review.text,
-                                quote.text,
-                                selectedLanguage,
-                                pages.text.toIntOrNull(),
-                                days.text.toIntOrNull(),
-                                selectedMediaType
-                            ), readingChallenges
+            //Only proceed if there is an uploaded cover image, book title and author
+            if(
+                title.text.isEmpty() || author.text.isEmpty() || cover.text.isEmpty()
+            ){
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    if (title.text.isEmpty() && author.text.isEmpty() && cover.text.isEmpty()) {
+                        SmallText(text = "Please fill out the book title", color = DarkRed)
+                        SmallText(text = "Please fill out the author", color = DarkRed)
+                        SmallText(text = "Please upload a cover image to proceed", color = DarkRed)
+                    } else if(title.text.isEmpty() && author.text.isEmpty()){
+                        SmallText(text = "Please fill out the book title", color = DarkRed)
+                        SmallText(text = "Please fill out the author", color = DarkRed)
+                    } else if(title.text.isEmpty() && cover.text.isEmpty()){
+                        SmallText(text = "Please fill out the book title", color = DarkRed)
+                        SmallText(text = "Please upload a cover image to proceed", color = DarkRed)
+                    } else if(author.text.isEmpty() && cover.text.isEmpty()){
+                        SmallText(text = "Please fill out the author", color = DarkRed)
+                        SmallText(text = "Please upload a cover image to proceed", color = DarkRed)
+                    } else if (title.text.isEmpty()) {
+                        SmallText(text = "Please fill out the book title", color = DarkRed)
+                    } else if (author.text.isEmpty()) {
+                        SmallText(text = "Please fill out the author", color = DarkRed)
+                    } else if (cover.text.isEmpty()) {
+                        SmallText(text = "Please upload a cover image to proceed", color = DarkRed)
+                    }
+                }
+                Spacer (modifier = Modifier.height(10.dp))
+
+                Box(modifier = Modifier.fillMaxSize(),
+                    contentAlignment = CenterStart
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.bottomswirl),
+                        contentDescription = "Decorative Picture",
+                        tint = Violet,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                        Icon(
+                            painter = painterResource(id = R.drawable.yellowtick),
+                            contentDescription = "Back",
+                            tint = Grey,
+                            modifier = Modifier
+                                .padding(end = 60.dp, bottom = 40.dp)
+                                .align(Alignment.BottomEnd)
+                                .size(50.dp)
+                                .background(NonWhite, CircleShape)
+                                .border(4.dp, Grey, CircleShape)
+                                .size(40.dp)
                         )
 
-                        navController.navigate(Screen.Read.route)
-                    }
-                    .size(40.dp)
-            )
+                }
+            }
+            else {
+                //Bottom Swirl
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Image(
+                        painter = painterResource(id = R.drawable.bottomswirl),
+                        contentDescription = "Decorative Picture",
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                //confirm
+                Icon(
+                    painter = painterResource(id = R.drawable.yellowtick),
+                    contentDescription = "Back",
+                    tint = Yellow,
+                    modifier = Modifier
+                        .padding(end = 60.dp, bottom = 40.dp)
+                        .align(Alignment.BottomEnd)
+                        .size(50.dp)
+                        .background(NonWhite, CircleShape)
+                        .border(4.dp, Yellow, CircleShape)
+                        .clickable {
+                            mainViewModel.save(
+                                Book(
+                                    title.text,
+                                    author.text,
+                                    selectedGenre,
+                                    color.text,
+                                    cover.text,
+                                    selectedShelf,
+                                    selectedRating,
+                                    review.text,
+                                    quote.text,
+                                    selectedLanguage,
+                                    pages.text.toIntOrNull(),
+                                    days.text.toIntOrNull(),
+                                    selectedMediaType
+                                ), readingChallenges
+                            )
+
+                            navController.navigate(Screen.Read.route)
+                        }
+                        .size(40.dp)
+                )
+            }
+
         }
     }
 
@@ -2678,20 +2745,20 @@ fun ShortStyledTextField(
     value: String,
     onValueChange: (String) -> Unit // This is a lambda that takes a String parameter
 ) {
-
     OutlinedTextField(
         modifier = Modifier
             .width(150.dp)
             .padding(10.dp),
-
         value = value,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         onValueChange = { newText ->
             // Instead of directly assigning to 'value', call the provided callback
             onValueChange(newText)
         },
+
         label = {
             Text(
-                text = "$placeholder",
+                text = placeholder,
                 style = TextStyle(
                     fontSize = 16.sp,
                     color = Violet,
@@ -2709,7 +2776,7 @@ fun ShortStyledTextField(
 
             textColor = Violet,
             unfocusedIndicatorColor = DarkBeige,
-        )
+        ),
     )
 }
 
@@ -2754,11 +2821,10 @@ fun StyledTextField(
     )
 }
 
-
 @Composable
 fun StyledText(text: String) {
     Text(
-        text = "$text",
+        text = text,
         style = TextStyle(
             fontSize = 16.sp,
             color = Violet,
@@ -2842,6 +2908,7 @@ fun addReadingChallengeAlert(mainViewModel: MainViewModel) {
                                 .padding(10.dp)
                                 .width(130.dp),
                             value = bookCount,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             onValueChange = { newText -> bookCount = newText },
                             label = { Text(text = "Books") },
                             colors = TextFieldDefaults.textFieldColors(
@@ -2859,6 +2926,7 @@ fun addReadingChallengeAlert(mainViewModel: MainViewModel) {
                                 .padding(10.dp)
                                 .width(130.dp),
                             value = days,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             onValueChange = { newText -> days = newText },
                             label = { Text(text = "Days") },
                             colors = TextFieldDefaults.textFieldColors(
@@ -2911,8 +2979,8 @@ fun addReadingChallengeAlert(mainViewModel: MainViewModel) {
 fun EditBook(mainViewModel: MainViewModel, readingChallenges: List<ReadingChallenge>) {
     val state = mainViewModel.mainViewState.collectAsState()
     val genres = listOf(
-        "Fantasy", "Sci-Fi", "Romance", "New Adult", "Thriller", "Horror", "Erotica",
-        "Manga", "Biography", "Novel", "History", "Non-Fiction"
+        "Biography", "Erotica", "Fantasy", "History", "Horror", "Manga", "New Adult",
+        "Non-Fiction", "Novel", "Romance", "Sci-Fi", "Thriller"
     )
     var selectedGenre by remember { mutableStateOf(genres[0]) }
 
@@ -3189,15 +3257,15 @@ fun EditReadBook(mainViewModel: MainViewModel, navController: NavHostController,
 
         val languages = listOf(
             "English",
-            "German",
             "French",
-            "Spanish",
+            "German",
             "Italian",
+            "Japanese",
+            "Korean",
+            "Mandarin",
             "Portuguese",
             "Russian",
-            "Chinese",
-            "Japanese",
-            "Korean"
+            "Spanish"
         )
         var languageChanged by remember { mutableStateOf(false) }
         var selectedLanguage by remember { mutableStateOf(languages[0]) }
