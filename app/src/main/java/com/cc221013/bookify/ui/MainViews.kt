@@ -2839,6 +2839,7 @@ fun addReadingChallengeAlert(mainViewModel: MainViewModel) {
                                 .padding(10.dp)
                                 .width(130.dp),
                             value = bookCount,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             onValueChange = { newText -> bookCount = newText },
                             label = { Text(text = "Books") },
                             colors = TextFieldDefaults.textFieldColors(
@@ -2856,6 +2857,7 @@ fun addReadingChallengeAlert(mainViewModel: MainViewModel) {
                                 .padding(10.dp)
                                 .width(130.dp),
                             value = days,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             onValueChange = { newText -> days = newText },
                             label = { Text(text = "Days") },
                             colors = TextFieldDefaults.textFieldColors(
