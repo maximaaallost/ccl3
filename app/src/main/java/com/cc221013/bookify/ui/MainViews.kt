@@ -36,6 +36,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.ButtonDefaults
@@ -173,6 +174,7 @@ import java.time.format.DateTimeFormatter
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.withStyle
 import kotlin.collections.isNotEmpty
 import kotlin.math.min
@@ -2674,20 +2676,20 @@ fun ShortStyledTextField(
     value: String,
     onValueChange: (String) -> Unit // This is a lambda that takes a String parameter
 ) {
-
     OutlinedTextField(
         modifier = Modifier
             .width(150.dp)
             .padding(10.dp),
-
         value = value,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         onValueChange = { newText ->
             // Instead of directly assigning to 'value', call the provided callback
             onValueChange(newText)
         },
+
         label = {
             Text(
-                text = "$placeholder",
+                text = placeholder,
                 style = TextStyle(
                     fontSize = 16.sp,
                     color = Violet,
@@ -2705,7 +2707,7 @@ fun ShortStyledTextField(
 
             textColor = Violet,
             unfocusedIndicatorColor = DarkBeige,
-        )
+        ),
     )
 }
 
