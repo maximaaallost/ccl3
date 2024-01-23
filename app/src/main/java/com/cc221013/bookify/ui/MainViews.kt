@@ -1,8 +1,6 @@
 package com.cc221013.bookify.ui
 
 import android.content.Intent
-import android.graphics.Paint
-import android.graphics.Typeface
 import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.ManagedActivityResultLauncher
@@ -56,13 +54,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -102,7 +98,6 @@ import com.cc221013.bookify.ui.theme.LightViolet
 import com.cc221013.bookify.ui.theme.Lime
 import com.cc221013.bookify.ui.theme.Mint
 import com.cc221013.bookify.ui.theme.NonWhite
-import com.cc221013.bookify.ui.theme.Orange
 import com.cc221013.bookify.ui.theme.Pink
 import com.cc221013.bookify.ui.theme.Poppins
 import com.cc221013.bookify.ui.theme.Turquoise
@@ -168,7 +163,6 @@ import com.cc221013.bookify.ui.theme.Grey500
 import com.cc221013.bookify.ui.theme.Grey600
 import com.cc221013.bookify.ui.theme.Grey700
 import com.cc221013.bookify.ui.theme.Grey900
-import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavHostController
 
 
@@ -177,19 +171,10 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
-import com.cc221013.bookify.data.ReadingChallengeDatabaseHandler
-import kotlinx.coroutines.flow.update
 import kotlin.collections.isNotEmpty
 import kotlin.math.min
 import kotlin.random.Random
@@ -2936,7 +2921,7 @@ fun EditBook(mainViewModel: MainViewModel) {
                         }, modifier = Modifier
                             .padding(top = 10.dp)
                             .height(45.dp)
-                            .border(2.dp, NonWhite, shape = RoundedCornerShape(20.dp)),
+                            .border(2.dp, DarkRed, shape = RoundedCornerShape(20.dp)),
                         shape = CircleShape,
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = Violet
@@ -2962,17 +2947,6 @@ fun EditBook(mainViewModel: MainViewModel) {
                         }
 
                     }
-//                    Icon(
-//                        modifier = Modifier
-//                            .clickable {
-//                                mainViewModel.clickDelete(state.value.editBook)
-//                                mainViewModel.dismissDialog()
-//                            }
-//                            .size(30.dp),
-//                        painter = painterResource(id = R.drawable.delte),
-//                        contentDescription = "Delete Icon",
-//                        tint = DarkRed
-//                    )
 
                     Spacer(modifier = Modifier.width(30.dp))
 
