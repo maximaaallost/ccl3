@@ -84,7 +84,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -169,6 +168,9 @@ import com.cc221013.bookify.ui.theme.Grey500
 import com.cc221013.bookify.ui.theme.Grey600
 import com.cc221013.bookify.ui.theme.Grey700
 import com.cc221013.bookify.ui.theme.Grey900
+import androidx.compose.runtime.LaunchedEffect
+import androidx.navigation.NavHostController
+
 
 
 import java.time.LocalDate
@@ -3039,7 +3041,6 @@ fun EditReadBook(mainViewModel: MainViewModel, navController: NavHostController)
     val book = mainViewModel.selectedBook.value
     val state = mainViewModel.mainViewState.collectAsState()
 
-
     if (state.value.openDialogEditReadBook) {
         var title by rememberSaveable { mutableStateOf(state.value.editBook.title) }
         var author by rememberSaveable { mutableStateOf(state.value.editBook.author) }
@@ -3060,9 +3061,8 @@ fun EditReadBook(mainViewModel: MainViewModel, navController: NavHostController)
         )
         var selectedGenre by remember { mutableStateOf(genres[0]) }
 
-        val shelfList = listOf(
-            "Read", "To be Read", "Wishlist"
-        )
+        var daysText by remember { mutableStateOf(days?.toString() ?: "") }
+        var pagesText by remember { mutableStateOf(pages?.toString() ?: "") }
 
         val languages = listOf(
             "English",
@@ -3248,8 +3248,11 @@ fun EditReadBook(mainViewModel: MainViewModel, navController: NavHostController)
                                             .width(150.dp)
                                             .padding(top = 10.dp, start = 10.dp, end = 10.dp),
                                         shape = RoundedCornerShape(8.dp),
-                                        value = it.toString(),
-                                        onValueChange = { newText -> pages = newText.toIntOrNull() },
+                                        value = pagesText,
+                                        onValueChange = {
+                                            pagesText = it
+                                            pages = it.toIntOrNull() ?: 0
+                                        },
                                         colors = TextFieldDefaults.textFieldColors(
                                             textColor = Violet,
                                             backgroundColor = DarkBeige,
@@ -3277,8 +3280,11 @@ fun EditReadBook(mainViewModel: MainViewModel, navController: NavHostController)
                                             .width(150.dp)
                                             .padding(top = 10.dp, start = 10.dp, end = 10.dp),
                                         shape = RoundedCornerShape(8.dp),
-                                        value = it.toString(),
-                                        onValueChange = { newText -> days = newText.toIntOrNull() },
+                                        value = daysText,
+                                        onValueChange = {
+                                            daysText = it
+                                            days = it.toIntOrNull() ?: 0
+                                        },
                                         colors = TextFieldDefaults.textFieldColors(
                                             textColor = Violet,
                                             backgroundColor = DarkBeige,
@@ -3295,6 +3301,7 @@ fun EditReadBook(mainViewModel: MainViewModel, navController: NavHostController)
                                         )
                                     )
                                 }
+
                             }
                         }
 
@@ -3377,10 +3384,7 @@ fun EditReadBook(mainViewModel: MainViewModel, navController: NavHostController)
                                         state.value.editBook.id
                                     )
                                 )
-                                if (book != null) {
-                                    navController.navigate(Screen.BookDetails.route)
-                                    mainViewModel.setSelectedBook(book)
-                                }
+                                navController.navigate(Screen.Read.route)
                             }, modifier = Modifier
                                 .padding(top = 10.dp)
                                 .height(45.dp)
