@@ -686,7 +686,7 @@ fun GenreScroll(
                                     onGenreSelected(name)
                                 }
                             }
-                            .padding(12.dp),
+                            .padding(10.dp),
                         horizontalAlignment = CenterHorizontally
                     ) {
                         Icon(
