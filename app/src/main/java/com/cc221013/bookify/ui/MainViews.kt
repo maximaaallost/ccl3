@@ -337,12 +337,23 @@ fun TopDecoration(navController: NavHostController, titlePage: String, subHeadin
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                if(titlePage === "Stats" || titlePage === "Challenge"){
+                    Icon(
+                        painter = painterResource(id = R.drawable.goback),
+                        contentDescription = "Back",
+                        tint = Violet,
+                        modifier = Modifier
+                            .padding(20.dp)
+                            .clickable { navController.navigate(Screen.Read.route) }
+                            .size(40.dp)
+                    )
+                }
                 Column {
                     Text(
                         text = titlePage,
                         style = TextStyle(
                             fontFamily = Calistoga,
-                            fontSize = 36.sp,
+                            fontSize = 34.sp,
                             color = Violet
                         )
                     )
@@ -387,6 +398,7 @@ fun TopDecoration(navController: NavHostController, titlePage: String, subHeadin
 
 
 
+
             }
         }
 
@@ -401,9 +413,9 @@ fun ReadingChallengeScreen(mainViewModel: MainViewModel, navController: NavHostC
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ){
-        TopDecoration(navController = navController, titlePage = "Reading Challenge", subHeading = "Set your own reading challenges" )
+        TopDecoration(navController = navController, titlePage = "Challenge", subHeading = "Set a reading challenge" )
 
-        Spacer(modifier = Modifier.height(30.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         Image(
             painter = painterResource(id = R.drawable.challenge),
