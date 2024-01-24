@@ -3690,6 +3690,7 @@ fun EditReadBook(
                                                 pagesText = it
                                                 pages = it.toIntOrNull() ?: 0
                                             },
+                                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                             colors = TextFieldDefaults.textFieldColors(
                                                 textColor = Violet,
                                                 backgroundColor = DarkBeige,
@@ -3727,6 +3728,7 @@ fun EditReadBook(
                                                 daysText = it
                                                 days = it.toIntOrNull() ?: 0
                                             },
+                                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                             colors = TextFieldDefaults.textFieldColors(
                                                 textColor = Violet,
                                                 backgroundColor = DarkBeige,
