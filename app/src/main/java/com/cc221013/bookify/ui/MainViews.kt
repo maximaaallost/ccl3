@@ -344,9 +344,8 @@ fun TopDecoration(navController: NavHostController, titlePage: String, subHeadin
         ) {
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(15.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 if (titlePage === "Stats" || titlePage === "Challenge") {
@@ -387,7 +386,7 @@ fun TopDecoration(navController: NavHostController, titlePage: String, subHeadin
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
                             .background(Yellow)
-                            .padding(start = 12.dp, end = 12.dp),
+                            .padding(start = 18.dp, end = 18.dp),
                         colors = androidx.compose.material3.ButtonDefaults.buttonColors(
                             Color.Transparent
                         ),
@@ -413,11 +412,11 @@ fun TopDecoration(navController: NavHostController, titlePage: String, subHeadin
                     Spacer(modifier = Modifier.width(10.dp))
                     if (titlePage == "Read Books") { //only show this button in the Read Shelf
                         Button(
-                            onClick = { navController.navigate(Screen.Stats.route) },
+                            onClick = { navController.navigate(Screen.ChallengeScreen.route) },
                             modifier = Modifier
                                 .clip(RoundedCornerShape(8.dp))
                                 .background(Yellow)
-                                .padding(start = 12.dp, end = 12.dp),
+                                .padding(start = 18.dp, end = 18.dp),
                             colors = androidx.compose.material3.ButtonDefaults.buttonColors(
                                 Color.Transparent
                             ),
@@ -443,7 +442,7 @@ fun TopDecoration(navController: NavHostController, titlePage: String, subHeadin
                     }
                 }
             }
-                   else if (titlePage != "Stats") { //do not show on the stats page
+                   else if (titlePage  == "TBR" || titlePage == "Wishlist" ) { //do not show on the stats page
                            Spacer (modifier = Modifier.height(10.dp))
                             Button(
                                 onClick = { navController.navigate(Screen.AddBook.route) },
@@ -463,6 +462,15 @@ fun TopDecoration(navController: NavHostController, titlePage: String, subHeadin
                                     tint = Violet,
                                     modifier = Modifier.size(20.dp)
                                 )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "add book",
+                                    style = TextStyle(
+                                        fontSize = 14.sp,
+                                        color = Violet,
+                                        fontFamily = Poppins,
+                                        fontWeight = FontWeight.Medium)
+                                )
 
                     }
                 }
@@ -471,24 +479,10 @@ fun TopDecoration(navController: NavHostController, titlePage: String, subHeadin
             }
         }
                                 Spacer(modifier = Modifier.width(8.dp))
-
-                                Text(
-                                    text = "add book",
-                                    style = TextStyle(
-                                        fontSize = 14.sp,
-                                        color = Violet,
-                                        fontFamily = Poppins,
-                                        fontWeight = FontWeight.Medium
-                                    ),
-                                    )
                             }
                         }
                     }
-                }
-    }
 
-    }
-}
 
 @Composable
 fun ReadingChallengeScreen(mainViewModel: MainViewModel, navController: NavHostController) {
@@ -1477,7 +1471,7 @@ fun TBRScreen(mainViewModel: MainViewModel, navController: NavHostController) {
         }
     }
     Column {
-        EditBook(mainViewModel, readingChallenges = state.value.challenges)
+        EditBook(mainViewModel, readingChallenges = state.value.challenges, navController)
     }
 }
 
