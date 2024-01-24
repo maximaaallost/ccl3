@@ -3,6 +3,7 @@ package com.cc221013.bookify.ui
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -187,6 +188,8 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.withStyle
+import java.io.File
+import java.io.FileOutputStream
 import kotlin.collections.isNotEmpty
 import kotlin.math.min
 import kotlin.random.Random
@@ -2247,9 +2250,28 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
             TextFieldValue("")
         )
     }
+    //for photopicker
+    val context = LocalContext.current as ComponentActivity
 
     val photoPicker = setupPhotoPicker { uri ->
         cover = TextFieldValue(uri.toString())
+
+        val directory = File(context.filesDir, "images")
+        if (!directory.exists()) {
+            directory.mkdirs()
+        }
+
+        val file = File(context.filesDir, "images/${System.currentTimeMillis()}.jpg")
+
+        context.contentResolver.openInputStream(uri)?.use { input ->
+            FileOutputStream(file).use { output ->
+                input.copyTo(output)
+            }
+        }
+
+        cover = TextFieldValue("file://" + file.absolutePath);
+
+        Log.e("Photopicker", cover.text)
     }
 
     val genres = listOf(
@@ -2917,8 +2939,8 @@ private fun setupPhotoPicker(onImagePicked: (Uri) -> Unit): ManagedActivityResul
     return rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri != null) {
             onImagePicked(uri)
-            val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
-            context.contentResolver.takePersistableUriPermission(uri, flag)
+//            val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
+//            context.contentResolver.takePersistableUriPermission(uri, flag)
         } else {
             Log.e("PhotoPicker", "No image was picked")
         }
@@ -4039,7 +4061,7 @@ fun EditReadBook(mainViewModel: MainViewModel, navController: NavHostController,
                             }, modifier = Modifier
                                 .padding(top = 10.dp)
                                 .height(45.dp)
-                                .border(2.dp, NonWhite, shape = RoundedCornerShape(20.dp)),
+                                .border(2.dp, Grey, shape = RoundedCornerShape(20.dp)),
                             shape = CircleShape,
                             colors = ButtonDefaults.buttonColors(
                                 backgroundColor = Violet
@@ -4049,9 +4071,9 @@ fun EditReadBook(mainViewModel: MainViewModel, navController: NavHostController,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Icon(
-                                    painter = painterResource(id = R.drawable.confirm),
-                                    tint = NonWhite,
-                                    contentDescription = "Confirm Icon",
+                                    painter = painterResource(id = R.drawable.close),
+                                    tint = Grey,
+                                    contentDescription = "Cancel Icon",
                                     modifier = Modifier.size(15.dp)
                                 )
                                 Spacer(modifier = Modifier.width(10.dp))
@@ -4060,7 +4082,7 @@ fun EditReadBook(mainViewModel: MainViewModel, navController: NavHostController,
                                     fontSize = 16.sp,
                                     fontFamily = Poppins,
                                     fontWeight = FontWeight.SemiBold,
-                                    color = NonWhite
+                                    color = Grey
                                 )
                             }
 
