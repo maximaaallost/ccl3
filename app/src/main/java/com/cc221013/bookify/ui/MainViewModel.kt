@@ -67,7 +67,6 @@ class MainViewModel(private val db: DatabaseHandler, private val dbChallenge: Re
     }
 
 
-
     fun getChallenges() {
         _mainViewState.update { it.copy(challenges = dbChallenge.getChallenges()) }
     }
