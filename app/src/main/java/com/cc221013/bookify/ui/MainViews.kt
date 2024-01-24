@@ -267,10 +267,10 @@ fun NavigationBarItem(
                 shape = RoundedCornerShape(50.dp)
             )
             .size(55.dp),
-        contentAlignment = Alignment.Center
+        contentAlignment = Center
     ) {
         androidx.compose.material3.Icon(
-            painter = icon, // Use the painter property
+            painter = icon,
             contentDescription = contentDescription,
             tint = NonWhite,
             modifier = Modifier.size(32.dp)
@@ -329,7 +329,6 @@ fun TopDecoration(navController: NavHostController, titlePage: String, subHeadin
                 .fillMaxWidth()
                 .padding(15.dp),
         ) {
-
                     Text(
                         text = titlePage,
                         style = TextStyle(
@@ -369,22 +368,18 @@ fun TopDecoration(navController: NavHostController, titlePage: String, subHeadin
                             tint = Violet,
                             modifier = Modifier.size(20.dp)
                         )
-
                         Spacer(modifier = Modifier.width(8.dp))
-
                         Text(
                             text = "add book",
                             style = TextStyle(
                                 fontSize = 14.sp,
                                 color = Violet,
                                 fontFamily = Poppins,
-                                fontWeight = FontWeight.Medium
-                            ),
-
-                            )
+                                fontWeight = FontWeight.Medium)
+                        )
                     }
                     Spacer(modifier = Modifier.width(10.dp))
-                    if (titlePage == "Read Books") {
+                    if (titlePage == "Read Books") { //only show this button in the Read Shelf
                         Button(
                             onClick = { navController.navigate(Screen.Stats.route) },
                             modifier = Modifier
@@ -403,24 +398,20 @@ fun TopDecoration(navController: NavHostController, titlePage: String, subHeadin
                                 tint = Violet,
                                 modifier = Modifier.size(30.dp)
                             )
-
                             Spacer(modifier = Modifier.width(8.dp))
-
                             Text(
                                 text = "reading challenge",
                                 style = TextStyle(
                                     fontSize = 14.sp,
                                     color = Violet,
                                     fontFamily = Poppins,
-                                    fontWeight = FontWeight.Medium
-                                ),
-
+                                    fontWeight = FontWeight.Medium)
                                 )
                         }
                     }
                 }
             }
-                   else if (titlePage != "Stats") {
+                   else if (titlePage != "Stats") { //do not show on the stats page
                            Spacer (modifier = Modifier.height(10.dp))
                             Button(
                                 onClick = { navController.navigate(Screen.AddBook.route) },
