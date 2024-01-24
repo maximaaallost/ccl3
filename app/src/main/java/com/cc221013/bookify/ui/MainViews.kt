@@ -748,7 +748,9 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
                                             color = Violet,
                                             textAlign = TextAlign.Center
                                         ),
-                                        modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp)
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(start = 10.dp, end = 10.dp)
                                     )
 
 
@@ -791,7 +793,8 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
                                         .background(color = Violet, RoundedCornerShape(8.dp))
                                 ) {
                                     Row(
-                                        modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+                                        modifier = Modifier
+                                            .padding(start = 10.dp, end = 10.dp)
                                             .wrapContentWidth(),
                                         horizontalArrangement = Arrangement.Center,
                                         verticalAlignment = Alignment.CenterVertically
@@ -2462,6 +2465,12 @@ fun AddBookScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.warning),
+                    tint = DarkRed,
+                    contentDescription = "Warning Symbol",
+                    modifier = Modifier.size(40.dp)
+                )
                 if (title.text.isEmpty() && author.text.isEmpty() && cover.text.isEmpty()) {
                     SmallText(text = "Please fill out the book title", color = DarkRed)
                     SmallText(text = "Please fill out the author", color = DarkRed)
