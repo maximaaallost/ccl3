@@ -38,10 +38,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.AlertDialog
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Divider
@@ -540,11 +538,11 @@ fun SmallText(text: String?, color: Color) {
 
 //Styled Text
 @Composable
-fun BigText(text: Int?, color: Color) {
+fun BigText(text: Int, color: Color) {
     Text(
         text = text?.toString() ?: "",
         style = TextStyle(
-            fontSize = 24.sp,
+            fontSize = 20.sp,
             color = color,
             fontFamily = Poppins,
             fontWeight = FontWeight.Bold,
@@ -593,7 +591,7 @@ fun ReadStats(mainViewModel: MainViewModel, navController: NavHostController) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Text(text = booksRead.toString(), color = NonWhite)
+                    BigText(text = booksRead, color = NonWhite)
                     SmallText("books", NonWhite)
                 }
                 Spacer(modifier = Modifier.width(10.dp))
@@ -610,7 +608,7 @@ fun ReadStats(mainViewModel: MainViewModel, navController: NavHostController) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Text(text = pagesRead.toString(), color = NonWhite)
+                    BigText(text = pagesRead, color = NonWhite)
                     SmallText("pages", NonWhite)
                 }
                 Spacer(modifier = Modifier.width(10.dp))
@@ -950,13 +948,13 @@ fun BookDetails(mainViewModel: MainViewModel, navController: NavHostController) 
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        BigText(text = book.pages, color = NonWhite)
+                        book.pages?.let { BigText(text = it, color = NonWhite) }
                         SmallText(text = "pages", color = NonWhite)
                     }
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        BigText(text = book.days, color = NonWhite)
+                        book.days?.let { BigText(text = it, color = NonWhite) }
                         SmallText(text = "days", color = NonWhite)
                     }
                     Column(
