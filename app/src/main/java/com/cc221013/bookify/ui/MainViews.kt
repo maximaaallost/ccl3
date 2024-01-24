@@ -193,6 +193,7 @@ sealed class Screen(val route: String) {
     object AddBook : Screen("fourth")
     object BookDetails : Screen("fifth")
     object Stats : Screen("sixth")
+    object ChallengeScreen : Screen("seventh")
 }
 
 
@@ -241,6 +242,10 @@ fun MainView(mainViewModel: MainViewModel) {
             composable(Screen.Stats.route) {
                 mainViewModel.selectScreen(Screen.Stats)
                 StatsScreen(mainViewModel, navController)
+            }
+            composable(Screen.ChallengeScreen.route) {
+                mainViewModel.selectScreen(Screen.ChallengeScreen)
+                ReadingChallengeScreen(mainViewModel, navController)
             }
         }
     }
@@ -320,7 +325,6 @@ fun TopDecoration(navController: NavHostController, titlePage: String, subHeadin
             painter = painterResource(id = R.drawable.topswirl),
             contentDescription = "Beige Swirl in the Background of the Text"
         )
-
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -365,7 +369,7 @@ fun TopDecoration(navController: NavHostController, titlePage: String, subHeadin
                             tint = Violet,
                             modifier = Modifier
                                 .size(54.dp)
-                                .clickable { navController.navigate(Screen.Stats.route) }
+                                .clickable { navController.navigate(Screen.ChallengeScreen.route) }
                         )
                         Spacer(modifier = Modifier.width(15.dp))
 
@@ -388,6 +392,41 @@ fun TopDecoration(navController: NavHostController, titlePage: String, subHeadin
 
     }
 }
+
+@Composable
+fun ReadingChallengeScreen(mainViewModel: MainViewModel, navController: NavHostController){
+    val readingChallenges = mainViewModel.getChallenges()
+    val state = mainViewModel.mainViewState.collectAsState()
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ){
+        TopDecoration(navController = navController, titlePage = "Reading Challenge", subHeading = "Set your own reading challenges" )
+
+        Spacer(modifier = Modifier.height(30.dp))
+
+        Image(
+            painter = painterResource(id = R.drawable.challenge),
+            contentDescription = "Shelf full of books"
+        )
+
+        // Check if there are reading challenges
+        if (state.value.challenges.isNotEmpty()) {
+            // Display reading challenge entries
+            ReadingChallengeEntries(readingChallenges = state.value.challenges, mainViewModel = mainViewModel)
+
+        } else {
+            // Display add reading challenge button
+            AddReadingChallengeButton(mainViewModel)
+        }
+        Spacer(modifier = Modifier.width(10.dp))
+        addReadingChallengeAlert(mainViewModel)
+    }
+
+
+
+    }
+
 
 
 @Composable
@@ -1364,9 +1403,8 @@ fun WishlistScreen(mainViewModel: MainViewModel, navController: NavHostControlle
 
 @Composable
 fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController) {
-    val readingChallenges = mainViewModel.getChallenges()
+//    val readingChallenges = mainViewModel.getChallenges()
     val books = mainViewModel.mainViewState.collectAsState().value.books
-    val state = mainViewModel.mainViewState.collectAsState()
 
     val booksRead = books.filter { it.shelf == "Read" }.size
     val pagesRead = books.filter { it.shelf == "Read" }.sumOf { it.pages?.toInt() ?: 0 }
@@ -1567,25 +1605,10 @@ fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController) 
 
 
 
-                Spacer(modifier = Modifier.height(20.dp))
-                // Check if there are reading challenges
-                if (state.value.challenges.isNotEmpty()) {
-                    // Display reading challenge entries
-                    ReadingChallengeEntries(readingChallenges = state.value.challenges, mainViewModel = mainViewModel)
-
-                } else {
-                    // Display add reading challenge button
-                    AddReadingChallengeButton(mainViewModel)
-                }
-                Spacer(modifier = Modifier.width(10.dp))
-            }
-
-            addReadingChallengeAlert(mainViewModel)
-
         }
 
     }
-}
+}}
 
 
 // Add the following function to calculate the total percentage for genres:
