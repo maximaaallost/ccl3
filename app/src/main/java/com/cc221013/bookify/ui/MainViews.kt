@@ -204,7 +204,7 @@ fun MainView(mainViewModel: MainViewModel) {
     val navController = rememberNavController()
 
     val bottomBar: (@Composable () -> Unit) =
-        if (state.value.selectedScreen != Screen.AddBook && state.value.selectedScreen != Screen.BookDetails) {
+        if (state.value.selectedScreen != Screen.AddBook && state.value.selectedScreen != Screen.BookDetails && state.value.selectedScreen != Screen.Stats && state.value.selectedScreen != Screen.ChallengeScreen) {
             { BottomNavigationBar(navController, state.value.selectedScreen) }
         } else {
             { }
