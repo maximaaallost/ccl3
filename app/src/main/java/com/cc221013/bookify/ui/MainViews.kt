@@ -565,13 +565,13 @@ fun ReadStats(mainViewModel: MainViewModel, navController: NavHostController) {
                     verticalArrangement = Arrangement.Center
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.stats),
+                        painter = painterResource(id = R.drawable.barchart),
                         contentDescription = "Plus",
                         modifier = Modifier.size(20.dp),
                         tint = Yellow
                     )
                     Spacer(modifier = Modifier.height(5.dp))
-                    SmallText(text = "see more", color = Yellow)
+                    SmallText(text = "see stats", color = Yellow)
                 }
             }
         }
@@ -1318,7 +1318,7 @@ fun TBRScreen(mainViewModel: MainViewModel, navController: NavHostController) {
         }
     }
     Column {
-        EditBook(mainViewModel, readingChallenges = state.value.challenges)
+        EditBook(mainViewModel, readingChallenges = state.value.challenges, navController)
     }
 }
 
@@ -1417,7 +1417,7 @@ fun WishlistScreen(mainViewModel: MainViewModel, navController: NavHostControlle
                 }
             }
             Column {
-                EditBook(mainViewModel, readingChallenges = state.value.challenges)
+                EditBook(mainViewModel, readingChallenges = state.value.challenges, navController)
             }
 
         }
@@ -1494,35 +1494,6 @@ fun StatsScreen(mainViewModel: MainViewModel, navController: NavHostController) 
                 horizontalAlignment = CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Text (
-                    text = "Reading Challenge",
-                    style = TextStyle(
-                        fontSize = 18.sp,
-                        color = Violet,
-                        fontFamily = Calistoga,
-                        fontWeight = FontWeight.Bold,
-                    ),
-                    modifier = Modifier.padding(10.dp)
-                )
-                // Check if there are reading challenges
-                if (state.value.challenges.isNotEmpty()) {
-                    // Display reading challenge entries
-                    ReadingChallengeEntries(readingChallenges = state.value.challenges, mainViewModel = mainViewModel)
-                } else {
-                    // Display add reading challenge button
-                    AddReadingChallengeButton(mainViewModel)
-                }
-                Spacer(modifier = Modifier.height(20.dp))
-                Text (
-                    text = "Your Statistics",
-                    style = TextStyle(
-                        fontSize = 18.sp,
-                        color = Violet,
-                        fontFamily = Calistoga,
-                        fontWeight = FontWeight.Bold,
-                    ),
-                    modifier = Modifier.padding(10.dp)
-                )
                 //amount of books and pages
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -2486,8 +2457,17 @@ fun AddBookScreen(mainViewModel: MainViewModel, navController: NavHostController
                                     selectedMediaType
                                 ), readingChallenges
                             )
+                            if (selectedShelf == "Read") {
+                                navController.navigate(Screen.Read.route)
+                            }
+                            else if (selectedShelf == "To be Read") {
+                                navController.navigate(Screen.TBR.route)
+                            }
+                            else if (selectedShelf == "Wishlist") {
+                                navController.navigate(Screen.Wishlist.route)
+                            }
 
-                            navController.navigate(Screen.Read.route)
+
                         }
                         .size(40.dp)
                 )
@@ -3212,7 +3192,7 @@ fun addReadingChallengeAlert(mainViewModel: MainViewModel) {
 }
 
 @Composable
-fun EditBook(mainViewModel: MainViewModel, readingChallenges: List<ReadingChallenge>) {
+fun EditBook(mainViewModel: MainViewModel, readingChallenges: List<ReadingChallenge>, navController: NavHostController) {
     val state = mainViewModel.mainViewState.collectAsState()
     val genres = listOf(
         "Biography", "Erotica", "Fantasy", "History", "Horror", "Manga", "New Adult",
@@ -3498,7 +3478,20 @@ fun EditBook(mainViewModel: MainViewModel, readingChallenges: List<ReadingChalle
                                     state.value.editBook.id
                                 ), readingChallenges
                             )
-                        }, modifier = Modifier
+                            if (shelfChanged) {
+                                if (selectedShelf == "Read") {
+                                    navController.navigate(Screen.Read.route)
+                                }
+                                else if (selectedShelf == "To be Read") {
+                                    navController.navigate(Screen.TBR.route)
+                                }
+                                else if (selectedShelf == "Wishlist") {
+                                    navController.navigate(Screen.Wishlist.route)
+                                }
+                            }
+
+
+                                  }, modifier = Modifier
                             .padding(top = 10.dp)
                             .height(45.dp)
                             .border(2.dp, NonWhite, shape = RoundedCornerShape(20.dp)),

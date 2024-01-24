@@ -30,6 +30,7 @@ class MainViewModel(private val db: DatabaseHandler, private val dbChallenge: Re
     }
     fun save(book: Book, readingChallenges: List<ReadingChallenge>){
         db.insertBook(book)
+        getBooks()
         var newBookCount  = 0;
         readingChallenges.forEach { challenge ->
             Log.i ("challenge", challenge.title)
@@ -98,7 +99,6 @@ class MainViewModel(private val db: DatabaseHandler, private val dbChallenge: Re
     fun saveBook(book: Book, readingChallenges: List<ReadingChallenge>){
         _mainViewState.update { it.copy(openDialogEditBook = false) }
         _mainViewState.update { it.copy(openDialogEditReadBook = false) }
-
         db.updateBook(book)
         getBooks()
         var newBookCount  = 0;
