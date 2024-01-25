@@ -36,6 +36,7 @@ class MainActivity : ComponentActivity() {
     private val mainViewModel = MainViewModel(db, dbChallenge)
     private val requestFilePermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()){ mainViewModel.setFilePermission(it) }
 
+    //permission to access the files
     private fun requestFilePermission(){
         ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE).let{ result ->
             if(result != PackageManager.PERMISSION_GRANTED){
@@ -47,21 +48,18 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        requestFilePermission()
+        requestFilePermission() //request permission to access the files
         setContent {
             BookifyTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
                         MainView(mainViewModel)
                     }
-
                     }
                 }
             }
