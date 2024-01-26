@@ -3385,6 +3385,8 @@ fun EditBook(mainViewModel: MainViewModel, readingChallenges: List<ReadingChalle
         "Non-Fiction", "Novel", "Romance", "Sci-Fi", "Thriller"
     )
     var selectedGenre by remember { mutableStateOf(genres[0]) }
+    var genreChanged by remember { mutableStateOf(false) }
+    var genre by rememberSaveable { mutableStateOf(state.value.editBook.genre) }
 
     if (state.value.openDialogEditBook) {
         var title by rememberSaveable { mutableStateOf(state.value.editBook.title) }
@@ -3511,10 +3513,10 @@ fun EditBook(mainViewModel: MainViewModel, readingChallenges: List<ReadingChalle
 
                         StyledTextFieldWithDropdown(
                             items = genres,
-                            selectedValue = genre,
+                            selectedValue = if (genreChanged) selectedGenre else genre,
                             onValueChange = { newGenre ->
                                 // Hier wird das ausgewählte Regal aktualisiert
-                                genre = newGenre
+                                genreChanged = true
                                 selectedGenre = newGenre
                             }
                         )
