@@ -121,6 +121,13 @@ class MainViewModel(private val db: DatabaseHandler, private val dbChallenge: Re
         }
     }
 
+    fun updateReadBook(book: Book){
+        _mainViewState.update { it.copy(openDialogEditBook = false) }
+        _mainViewState.update { it.copy(openDialogEditReadBook = false) }
+        db.updateBook(book)
+        getBooks()
+    }
+
     fun dialogEditBook(book: Book) {
         _mainViewState.update { it.copy(openDialogEditBook = true, editBook = book) }
     }

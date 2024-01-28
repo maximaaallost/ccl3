@@ -2410,7 +2410,7 @@ fun EditReadBook(mainViewModel: MainViewModel, navController: NavHostController,
                         //Confirm Button
                             androidx.compose.material.Button(
                                 onClick = {
-                                    mainViewModel.saveBook(
+                                    mainViewModel.updateReadBook(
                                         Book(
                                             title,
                                             author,
@@ -2426,7 +2426,7 @@ fun EditReadBook(mainViewModel: MainViewModel, navController: NavHostController,
                                             days,
                                             if (mediaChanged) selectedMediaType else mediaType,
                                             state.value.editBook.id
-                                        ), readingChallenges
+                                        )
                                     )
                                     navController.navigate(Screen.Read.route)
                                 }, modifier = Modifier
