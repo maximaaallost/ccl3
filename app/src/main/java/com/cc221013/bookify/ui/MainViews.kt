@@ -1641,12 +1641,11 @@ fun EditBook(mainViewModel: MainViewModel, readingChallenges: List<ReadingChalle
         "Biography", "Erotica", "Fantasy", "History", "Horror", "Manga", "New Adult",
         "Non-Fiction", "Novel", "Romance", "Sci-Fi", "Thriller"
     )
-    var selectedGenre by remember { mutableStateOf(genres[0]) }
+
 
     if (state.value.openDialogEditBook) {
         var title by rememberSaveable { mutableStateOf(state.value.editBook.title) }
         var author by rememberSaveable { mutableStateOf(state.value.editBook.author) }
-        var genre by rememberSaveable { mutableStateOf(state.value.editBook.genre) }
         var color by rememberSaveable { mutableStateOf(state.value.editBook.color) }
         var cover by rememberSaveable { mutableStateOf(state.value.editBook.cover) }
         var rating by rememberSaveable { mutableStateOf(state.value.editBook.rating) }
@@ -1674,7 +1673,9 @@ fun EditBook(mainViewModel: MainViewModel, readingChallenges: List<ReadingChalle
         val mediaTypeList = listOf(
             "Paperback", "Ebook", "Audiobook"
         )
-
+        var genreChanged by remember { mutableStateOf(false) }
+        var genre by rememberSaveable { mutableStateOf(state.value.editBook.genre) }
+        var selectedGenre by remember { mutableStateOf(shelfList[0]) }
 
         var shelfChanged by remember { mutableStateOf(false) }
         var shelf by rememberSaveable { mutableStateOf(state.value.editBook.shelf) }
@@ -1778,9 +1779,9 @@ fun EditBook(mainViewModel: MainViewModel, readingChallenges: List<ReadingChalle
                             )
                             StyledTextFieldWithDropdown(
                                 items = genres,
-                                selectedValue = genre,
+                                selectedValue = if (genreChanged) selectedGenre else genre,
                                 onValueChange = { newGenre ->
-                                    genre = newGenre
+                                    genreChanged = true
                                     selectedGenre = newGenre
                                 }
                             )
@@ -1924,7 +1925,7 @@ fun EditBook(mainViewModel: MainViewModel, readingChallenges: List<ReadingChalle
                                         Book(
                                             title,
                                             author,
-                                            selectedGenre,
+                                            if (genreChanged) selectedGenre else genre,
                                             color,
                                             cover,
                                             if (shelfChanged) selectedShelf else shelf,
@@ -1997,10 +1998,9 @@ fun EditReadBook(mainViewModel: MainViewModel, navController: NavHostController,
     if (state.value.openDialogEditReadBook) {
         var title by rememberSaveable { mutableStateOf(state.value.editBook.title) }
         var author by rememberSaveable { mutableStateOf(state.value.editBook.author) }
-        var genre by rememberSaveable { mutableStateOf(state.value.editBook.genre) }
-        var shelf by rememberSaveable { mutableStateOf(state.value.editBook.shelf) }
         var color by rememberSaveable { mutableStateOf(state.value.editBook.color) }
         var cover by rememberSaveable { mutableStateOf(state.value.editBook.cover) }
+        var shelf by rememberSaveable { mutableStateOf(state.value.editBook.shelf) }
         var rating by rememberSaveable { mutableStateOf(state.value.editBook.rating) }
         var review by rememberSaveable { mutableStateOf(state.value.editBook.review) }
         var quote by rememberSaveable { mutableStateOf(state.value.editBook.quote) }
@@ -2012,7 +2012,6 @@ fun EditReadBook(mainViewModel: MainViewModel, navController: NavHostController,
             "Biography", "Erotica", "Fantasy", "History", "Horror", "Manga", "New Adult",
             "Non-Fiction", "Novel", "Romance", "Sci-Fi", "Thriller"
         )
-        var selectedGenre by remember { mutableStateOf(genres[0]) }
 
         var daysText by remember { mutableStateOf(days?.toString() ?: "") }
         var pagesText by remember { mutableStateOf(pages?.toString() ?: "") }
@@ -2029,6 +2028,10 @@ fun EditReadBook(mainViewModel: MainViewModel, navController: NavHostController,
             "Russian",
             "Spanish"
         )
+
+        val shelfList = listOf(
+            "Read", "To be Read", "Wishlist"
+        )
         var languageChanged by remember { mutableStateOf(false) }
         var selectedLanguage by remember { mutableStateOf(languages[0]) }
 
@@ -2044,6 +2047,9 @@ fun EditReadBook(mainViewModel: MainViewModel, navController: NavHostController,
         var ratingChanged by remember { mutableStateOf(false) }
         var selectedRating by remember { mutableStateOf(starRatings[0]) }
 
+        var genreChanged by remember { mutableStateOf(false) }
+        var genre by rememberSaveable { mutableStateOf(state.value.editBook.genre) }
+        var selectedGenre by remember { mutableStateOf(shelfList[0]) }
 
         Dialog(
             onDismissRequest = { mainViewModel.dismissDialog() }
@@ -2138,9 +2144,9 @@ fun EditReadBook(mainViewModel: MainViewModel, navController: NavHostController,
 
                             StyledTextFieldWithDropdown(
                                 items = genres,
-                                selectedValue = genre,
+                                selectedValue = if (genreChanged) selectedGenre else genre,
                                 onValueChange = { newGenre ->
-                                    genre = newGenre
+                                    genreChanged = true
                                     selectedGenre = newGenre
                                 }
                             )
@@ -2414,7 +2420,7 @@ fun EditReadBook(mainViewModel: MainViewModel, navController: NavHostController,
                                         Book(
                                             title,
                                             author,
-                                            selectedGenre,
+                                            if (genreChanged) selectedGenre else genre,
                                             color,
                                             cover,
                                             shelf,
