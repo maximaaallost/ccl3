@@ -62,13 +62,14 @@ class MainViewModel(private val db: DatabaseHandler, private val dbChallenge: Re
         getBooks()
         var newBookCount  = 0;
         readingChallenges.forEach { challenge ->
-            Log.i ("challenge", challenge.title)
-            newBookCount = (challenge.userBookCount + 1)
-            updateChallenge(
-                challenge.copy(
-                    userBookCount = newBookCount,
+            if (book.shelf == "Read") {
+                newBookCount = (challenge.userBookCount + 1)
+                updateChallenge(
+                    challenge.copy(
+                        userBookCount = newBookCount,
+                    )
                 )
-            )
+            }
         }
     }
 
@@ -111,13 +112,14 @@ class MainViewModel(private val db: DatabaseHandler, private val dbChallenge: Re
         getBooks()
         var newBookCount  = 0;
         readingChallenges.forEach { challenge ->
-            Log.i ("challenge", challenge.title)
-            newBookCount = (challenge.userBookCount + 1)
-            updateChallenge(
-                challenge.copy(
-                     userBookCount = newBookCount,
+            if (book.shelf == "Read") {
+                newBookCount = (challenge.userBookCount + 1)
+                updateChallenge(
+                    challenge.copy(
+                        userBookCount = newBookCount,
+                    )
                 )
-            )
+            }
         }
     }
 
